@@ -70,7 +70,7 @@
         #results-content { 
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            transition: opacity 0.15s ease; /* Snappier Transition */
+            transition: opacity 0.15s ease;
             opacity: 1; 
         }
 
@@ -103,37 +103,23 @@
         .tab.active { color: #000000; }
         .tab-slider { position: absolute; top: 4px; bottom: 4px; left: 0; background: #ffffff; border-radius: 100px; z-index: 1; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
 
-        /* --- Cards & Fixed Perfect Pills --- */
+        /* --- Cards & New Color Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card-header { margin-bottom: 14px; }
         
+        /* Die saubere Pillen-Klasse (ohne Blur-Image) */
         .color-pill {
-            position: relative; 
-            border-radius: 9999px; /* Echte Rundung */
             display: inline-flex; align-items: center; justify-content: center;
-            background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08);
-            
-            /* iOS Safari Bugfix für abgerundete Ecken mit Filter-Kindern */
-            overflow: hidden; 
-            transform: translateZ(0);
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
-        }
-        .color-pill img {
-            position: absolute; top: -100%; left: -100%; width: 300%; height: 300%;
-            object-fit: cover; 
-            filter: blur(24px) saturate(300%) brightness(0.6); 
-            z-index: 0; pointer-events: none;
-        }
-        .color-pill::after {
-            content: ''; position: absolute; inset: 0;
-            background: rgba(0,0,0,0.35); /* Stellt sicher, dass weißer Text immer lesbar ist */
-            z-index: 1; border-radius: 9999px;
+            padding: 6px 14px; border-radius: 9999px;
+            /* Fallback Grau, falls das Favicon blockiert wird */
+            background: #2c2c2e; 
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #ffffff; 
+            transition: background 0.4s ease, color 0.4s ease, border 0.4s ease;
         }
         .color-pill span {
-            position: relative; z-index: 2;
-            padding: 6px 14px;
             font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
-            color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+            color: inherit; /* Nimmt die Farbe vom Parent an */
         }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
@@ -215,18 +201,82 @@
         let currentQuery = '';
         let isLoading = false;
 
+        // Cache für die Canvas-Farben (beschleunigt das Scrollen extrem)
+        const colorCache = new Map();
+
+        // Extrahiert die Farbe asynchron und generiert den Apple-Style-Kontrast
+        async function getDominantColor(imageUrl) {
+            if (colorCache.has(imageUrl)) {
+                return colorCache.get(imageUrl);
+            }
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous'; // Wichtig für Canvas
+                
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth || 64;
+                    canvas.height = img.naturalHeight || 64;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    try {
+                        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                        let r = 0, g = 0, b = 0, count = 0;
+                        
+                        for (let i = 0; i < data.length; i += 4) {
+                            const alpha = data[i + 3];
+                            // Transparente Pixel überspringen
+                            if (alpha < 128) continue;
+                            
+                            // Fast-weisse und fast-schwarze Pixel ignorieren (Hintergründe)
+                            const brightness = (data[i] + data[i+1] + data[i+2]) / 3;
+                            if (brightness > 230 || brightness < 20) continue;
+                            
+                            r += data[i];
+                            g += data[i + 1];
+                            b += data[i + 2];
+                            count++;
+                        }
+                        
+                        if (count === 0) { resolve(null); return; }
+                        
+                        // Durchschnittsfarbe berechnen
+                        r = Math.round(r/count);
+                        g = Math.round(g/count);
+                        b = Math.round(b/count);
+
+                        // APPLE STYLE GENERATOR
+                        // Background = Stark ausgebleicht (nur 20% Deckkraft)
+                        // Text = Aufgehellt, um auf Darkmode gut lesbar zu sein (+50 auf jeden Kanal)
+                        const result = {
+                            bg: `rgba(${r}, ${g}, ${b}, 0.2)`,
+                            text: `rgb(${Math.min(r + 50, 255)}, ${Math.min(g + 50, 255)}, ${Math.min(b + 50, 255)})`
+                        };
+                        
+                        colorCache.set(imageUrl, result);
+                        resolve(result);
+                    } catch {
+                        resolve(null); // Fallback bei Error (z.B. CORS trotz anonymous)
+                    }
+                };
+                img.onerror = () => resolve(null);
+                img.src = imageUrl;
+            });
+        }
+
+
         function updateTabSlider(activeEl) {
             if(!activeEl) return;
             tabSlider.style.width = activeEl.offsetWidth + 'px';
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
         
-        // --- ARC Browser / URL Parameter Support ---
         window.addEventListener('load', () => { 
             checkApiKey(); 
             setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 50); 
 
-            // Automatischer Start bei "?q=..."
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
             if (queryParam) {
@@ -244,7 +294,7 @@
             
             if (currentQuery) {
                 currentPage = 1; 
-                resultsContent.style.opacity = '0.4'; // Schnelles Abdunkeln statt komplettes Schwarz
+                resultsContent.style.opacity = '0.4';
                 clearResults(); 
                 performSearch();
             }
@@ -253,14 +303,14 @@
         // --- Suche Auslösen ---
         homeSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && homeSearchInput.value.trim() !== '') {
-                homeSearchInput.blur(); // Versteckt die Tastatur auf iOS
+                homeSearchInput.blur(); 
                 startSearchFrom(homeSearchInput.value.trim());
             }
         });
 
         overlaySearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && overlaySearchInput.value.trim() !== '') {
-                overlaySearchInput.blur(); // Versteckt die Tastatur auf iOS
+                overlaySearchInput.blur(); 
                 closeSearch();
                 startSearchFrom(overlaySearchInput.value.trim());
             }
@@ -274,7 +324,7 @@
             currentQuery = query;
             currentPage = 1;
             
-            resultsContent.style.opacity = '0.4'; // Weiches Laden
+            resultsContent.style.opacity = '0.4';
             setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 10);
             
             clearResults();
@@ -295,7 +345,7 @@
             resultsContent.appendChild(loadMoreTrigger);
         }
 
-        // --- Fetch & Render (Mit Ruckelfrei-Fix) ---
+        // --- Fetch & Render ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
@@ -347,12 +397,13 @@
                 if (currentType === 'search') {
                     const domain = getHostname(item.link);
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                    
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card'; el.target = '_blank';
+                    
                     el.innerHTML = `
                         <div class="card-header">
                             <div class="color-pill">
-                                <img src="${faviconUrl}" onerror="this.style.display='none'">
                                 <span>${domain}</span>
                             </div>
                         </div>
@@ -360,6 +411,19 @@
                         <div class="card-snippet">${item.snippet || ''}</div>
                     `;
                     fragment.appendChild(el);
+
+                    // Async Farbe laden und direkt anwenden
+                    getDominantColor(faviconUrl).then(color => {
+                        if (color) {
+                            const pill = el.querySelector('.color-pill');
+                            if (pill) {
+                                pill.style.background = color.bg;
+                                pill.style.color = color.text;
+                                pill.style.border = 'none'; // Entfernt den Fallback-Rahmen
+                            }
+                        }
+                    });
+
                 } 
                 else if (currentType === 'images') {
                     const el = document.createElement('a');
@@ -386,22 +450,18 @@
 
             if (isLoadMore) {
                 loadMoreTrigger.after(fragment);
-                
-                // Erzwingt ein synchrones Browser-Update vor dem Scrollen.
-                // Verhindert das "Zucken", das oft in iOS Safari auftritt.
                 void document.documentElement.offsetHeight;
                 
                 const newScrollHeight = document.documentElement.scrollHeight;
                 window.scrollTo({
                     top: oldScrollTop + (newScrollHeight - oldScrollHeight),
-                    behavior: 'instant' /* Instant verhindert das stotternde Soft-Scrollen des Browsers */
+                    behavior: 'instant' 
                 });
             } else {
                 resultsContent.className = currentType === 'search' ? 'layout-list' : 'layout-grid';
                 resultsContent.appendChild(fragment);
                 resultsContent.style.opacity = '1'; 
                 
-                // Springe ganz nach unten (Zum besten Ergebnis im Chat-Layout)
                 setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 10);
             }
         }
