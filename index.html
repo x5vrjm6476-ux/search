@@ -70,8 +70,7 @@
         #results-content { 
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            transition: opacity 0.15s ease;
-            opacity: 1; 
+            transition: opacity 0.15s ease; opacity: 1; 
         }
 
         #results-content.layout-list { display: flex; flex-direction: column; }
@@ -110,19 +109,16 @@
         .color-pill {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 6px 14px; border-radius: 9999px;
-            /* Transition sorgt für fließenden Wechsel von Hash-Farbe zu Proxy-Farbe */
-            transition: background 0.4s ease, color 0.4s ease;
+            background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08);
+            color: #ffffff; transition: background 0.4s ease, color 0.4s ease; text-decoration: none;
         }
-        .color-pill span {
-            font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
-            color: inherit; 
-        }
+        .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         /* Grids */
-        .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; }
+        .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
         .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
@@ -130,6 +126,32 @@
         .shopping-info { padding: 16px; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 600; color: white; font-size: 16px; }
+
+        /* --- Image Lightbox (Vollbild Swipe) --- */
+        #image-viewer {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #image-viewer.active { opacity: 1; pointer-events: all; }
+        .viewer-header {
+            position: absolute; top: var(--safe-top); left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; z-index: 2010;
+        }
+        .viewer-close {
+            background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
+            border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .viewer-track {
+            display: flex; height: 100%; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            will-change: transform;
+        }
+        .viewer-slide {
+            flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0;
+        }
+        .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; } /* Rand zu Rand */
 
         /* Setup Modal */
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--agile); }
@@ -160,6 +182,16 @@
             <input type="text" id="overlaySearchInput" class="overlay-input" placeholder="Suchen..." autocomplete="off" spellcheck="false">
             <button class="cancel-btn" onclick="closeSearch()">Abbrechen</button>
         </div>
+    </div>
+
+    <div id="image-viewer">
+        <div class="viewer-header">
+            <div id="viewer-pill-container"></div>
+            <button class="viewer-close" onclick="closeImageViewer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="viewer-track" id="viewer-track"></div>
     </div>
 
     <div id="results-wrapper">
@@ -196,15 +228,19 @@
         let currentPage = 1;
         let currentQuery = '';
         let isLoading = false;
+        
+        // --- Image Viewer State ---
+        let globalImages = [];
+        let viewerIndex = 0;
+        let startX = 0;
+        const track = document.getElementById('viewer-track');
 
-        // --- Robuste Farb-Extraktion mit Multi-Strategie Fallback ---
+        // --- Robuste Farb-Extraktion ---
         const colorCache = new Map();
 
         async function getDominantColor(domain) {
             if (colorCache.has(domain)) return colorCache.get(domain);
 
-            // Strategie 1: Direkt (klappt auf Desktop-Chrome meist)
-            // Strategie 2: Via corsproxy.io (klappt auf Safari/WebKit)
             const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(faviconUrl)}`;
 
@@ -216,7 +252,6 @@
                 }
             }
 
-            // Strategie 3: Hash-Fallback (immer eindeutig, nie grau)
             const result = hashColor(domain);
             colorCache.set(domain, result);
             return result;
@@ -228,7 +263,7 @@
                 img.crossOrigin = 'anonymous';
 
                 img.onload = () => {
-                    const size = 16; // Klein halten = schnell
+                    const size = 16;
                     const canvas = document.createElement('canvas');
                     canvas.width = size; canvas.height = size;
                     const ctx = canvas.getContext('2d');
@@ -245,7 +280,7 @@
                             r += data[i]; g += data[i+1]; b += data[i+2]; count++;
                         }
 
-                        if (count < 10) { resolve(null); return; } // Zu wenig brauchbare Pixel
+                        if (count < 10) { resolve(null); return; }
 
                         r = Math.round(r/count);
                         g = Math.round(g/count);
@@ -255,28 +290,19 @@
                             bg:   `rgba(${r}, ${g}, ${b}, 0.22)`,
                             text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`
                         });
-                    } catch {
-                        resolve(null); // getImageData blockiert → nächste Strategie
-                    }
+                    } catch { resolve(null); }
                 };
                 img.onerror = () => resolve(null);
                 img.src = url;
             });
         }
 
-        // Deterministisches Hashing – NIEMALS grau, immer eine echte Farbe
         function hashColor(domain) {
             let hash = 0;
-            for (let i = 0; i < domain.length; i++) {
-                hash = domain.charCodeAt(i) + ((hash << 5) - hash) | 0;
-            }
+            for (let i = 0; i < domain.length; i++) hash = domain.charCodeAt(i) + ((hash << 5) - hash) | 0;
             const hue = Math.abs(hash) % 360;
-            return {
-                bg:   `hsla(${hue}, 55%, 50%, 0.22)`,
-                text: `hsl(${hue}, 80%, 78%)`
-            };
+            return { bg: `hsla(${hue}, 55%, 50%, 0.22)`, text: `hsl(${hue}, 80%, 78%)` };
         }
-
 
         function updateTabSlider(activeEl) {
             if(!activeEl) return;
@@ -284,15 +310,31 @@
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
         
+        // --- Nativer ARC Start Fix ---
         window.addEventListener('load', () => { 
-            checkApiKey(); 
-            setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 50); 
-
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
+            
+            // Wenn Query Parameter gesetzt ist: Unsichtbar den Start-Screen killen
             if (queryParam) {
-                startSearchFrom(queryParam);
+                homeView.style.transition = 'none'; // Keine Startanimation
+                homeView.classList.add('hidden');
+                resultsWrapper.classList.add('active');
+                
+                homeSearchInput.value = queryParam;
+                overlaySearchInput.value = queryParam;
+                currentQuery = queryParam;
+                currentPage = 1;
+                
+                if (getCookie('serper_api_key')) performSearch();
             }
+
+            checkApiKey(); 
+
+            setTimeout(() => {
+                homeView.style.transition = ''; // Transition zurückgeben
+                updateTabSlider(document.querySelector('.tab.active'));
+            }, 50); 
         });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -311,7 +353,17 @@
             }
         }
 
-        // --- Suche Auslösen ---
+        // --- Native iOS Keyboard Trigger ---
+        function openSearch() {
+            searchOverlay.classList.add('active');
+            overlaySearchInput.focus(); // Synchroner Trigger! Zwingt iOS die Tastatur zu zeigen.
+        }
+        
+        function closeSearch() {
+            searchOverlay.classList.remove('active');
+            overlaySearchInput.blur();
+        }
+
         homeSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && homeSearchInput.value.trim() !== '') {
                 homeSearchInput.blur(); 
@@ -340,15 +392,6 @@
             
             clearResults();
             performSearch();
-        }
-
-        function openSearch() {
-            searchOverlay.classList.add('active');
-            setTimeout(() => overlaySearchInput.focus(), 100);
-        }
-        function closeSearch() {
-            searchOverlay.classList.remove('active');
-            overlaySearchInput.blur();
         }
 
         function clearResults() {
@@ -403,16 +446,16 @@
 
             let items = rawItems.reverse();
             const fragment = document.createDocumentFragment();
+            
+            if (!isLoadMore && currentType === 'images') globalImages = [];
 
             items.forEach((item, index) => {
                 if (currentType === 'search') {
                     const domain = getHostname(item.link);
-                    const pillId = `pill-${Date.now()}-${index}`; // Eindeutige ID für die Pille
-                    
+                    const pillId = `pill-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card'; el.target = '_blank';
                     
-                    // Setze sofort die Hash-Farbe synchron um Flackern zu verhindern
                     const immediateColor = hashColor(domain);
 
                     el.innerHTML = `
@@ -426,7 +469,6 @@
                     `;
                     fragment.appendChild(el);
 
-                    // Lade echte Favicon-Farbe asynchron nach (falls möglich)
                     getDominantColor(domain).then(color => {
                         const pill = el.querySelector(`#${pillId}`);
                         if (color && pill && pill.isConnected) {
@@ -437,9 +479,19 @@
 
                 } 
                 else if (currentType === 'images') {
+                    // Bilder in den Global Array pushen für den Swipe-Viewer
+                    const myIndex = globalImages.length;
+                    globalImages.push(item);
+                    
                     const el = document.createElement('a');
-                    el.href = item.link; el.className = 'image-card'; el.target = '_blank';
+                    el.href = item.link; el.className = 'image-card';
                     el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
+                    
+                    // Verhindert Link-Öffnung und öffnet stattdessen den Viewer
+                    el.onclick = (e) => {
+                        e.preventDefault();
+                        openImageViewer(myIndex);
+                    };
                     fragment.appendChild(el);
                 }
                 else if (currentType === 'shopping') {
@@ -462,25 +514,93 @@
             if (isLoadMore) {
                 loadMoreTrigger.after(fragment);
                 void document.documentElement.offsetHeight;
-                
                 const newScrollHeight = document.documentElement.scrollHeight;
-                window.scrollTo({
-                    top: oldScrollTop + (newScrollHeight - oldScrollHeight),
-                    behavior: 'instant' 
-                });
+                window.scrollTo({ top: oldScrollTop + (newScrollHeight - oldScrollHeight), behavior: 'instant' });
             } else {
                 resultsContent.className = currentType === 'search' ? 'layout-list' : 'layout-grid';
                 resultsContent.appendChild(fragment);
                 resultsContent.style.opacity = '1'; 
-                
                 setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 10);
             }
         }
 
+        // --- Image Viewer (Lightbox Swipe Logic) ---
+        function openImageViewer(index) {
+            viewerIndex = index;
+            renderViewerSlides();
+            updateViewerPosition();
+            document.getElementById('image-viewer').classList.add('active');
+        }
+
+        function closeImageViewer() {
+            document.getElementById('image-viewer').classList.remove('active');
+            track.innerHTML = ''; // Memory aufräumen
+        }
+
+        function renderViewerSlides() {
+            track.innerHTML = globalImages.map(img => `
+                <div class="viewer-slide"><img src="${img.imageUrl}"></div>
+            `).join('');
+            updateViewerPill();
+        }
+
+        function updateViewerPill() {
+            const item = globalImages[viewerIndex];
+            const domain = getHostname(item.link);
+            const pillContainer = document.getElementById('viewer-pill-container');
+            const immediateColor = hashColor(domain);
+            const pillId = `viewer-pill-${Date.now()}`;
+
+            pillContainer.innerHTML = `
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="background: ${immediateColor.bg}; color: ${immediateColor.text}; text-decoration: none;">
+                    <span>${domain} ↗</span>
+                </a>
+            `;
+
+            getDominantColor(domain).then(color => {
+                const pill = document.getElementById(pillId);
+                if (color && pill) {
+                    pill.style.background = color.bg;
+                    pill.style.color = color.text;
+                }
+            });
+        }
+
+        function updateViewerPosition() {
+            track.style.transform = `translateX(-${viewerIndex * 100}vw)`;
+        }
+
+        // Nativer Touch-Swipe (Links/Rechts)
+        track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            track.style.transition = 'none'; // Direkt an den Finger binden
+        }, {passive: true});
+
+        track.addEventListener('touchmove', (e) => {
+            const diff = e.touches[0].clientX - startX;
+            track.style.transform = `translateX(calc(-${viewerIndex * 100}vw + ${diff}px))`;
+        }, {passive: true});
+
+        track.addEventListener('touchend', (e) => {
+            const diff = e.changedTouches[0].clientX - startX;
+            track.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1)'; // Snap back
+
+            if (diff < -50 && viewerIndex < globalImages.length - 1) viewerIndex++;
+            else if (diff > 50 && viewerIndex > 0) viewerIndex--;
+
+            updateViewerPosition();
+            updateViewerPill();
+        });
+
+        // --- Auth & Setup ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
-            if (key) { document.cookie = `serper_api_key=${key}; max-age=31536000; path=/`; setupModal.classList.remove('active'); }
+            if (key) { 
+                document.cookie = `serper_api_key=${key}; max-age=31536000; path=/`; 
+                setupModal.classList.remove('active'); 
+                if (currentQuery) performSearch(); // Startet Search, falls wir über URL kamen und der Key fehlte
+            }
         }
     </script>
 </body>
