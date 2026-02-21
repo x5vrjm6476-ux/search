@@ -5,229 +5,234 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suchen</title>
     <style>
-        /* --- 1. Design Variablen & Themes (Apple 2026 Look) --- */
+        /* --- 1. Design Variablen & Themes (Apple High-End Look) --- */
         :root {
-            /* Light Mode defaults */
-            --bg-color: #fbfbfd;
-            --text-color-primary: #1d1d1f;
-            --text-color-secondary: #86868b;
-            --search-input-bg: rgba(255, 255, 255, 0.8);
-            --search-border: #d2d2d7;
-            --focus-ring: rgba(0, 122, 255, 0.2); /* Apple Blue focus */
-            --accent-color: #007aff;
-            --result-link-color: #1a0dab;
-            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.05);
+            /* Light Mode */
+            --app-bg: #F5F5F7; /* Helles Apple Grau */
+            --card-bg: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --accent: #007AFF; /* Apple Blue */
+            --border-light: rgba(0,0,0,0.1);
+            /* Subtiler, hochwertiger Schatten für Cards */
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+            --input-bg: rgba(255,255,255,0.8);
+            --focus-ring: rgba(0, 122, 255, 0.3);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                /* Dark Mode updates - NICHT komplett schwarz, sondern dunkles Grau */
-                --bg-color: #1c1c1e; /* Apple Dark Mode Background Gray */
-                --text-color-primary: #f5f5f7;
-                --text-color-secondary: #a1a1a6;
-                --search-input-bg: rgba(44, 44, 46, 0.8); /* Dunkleres Grau für Input */
-                --search-border: #3a3a3c;
-                --focus-ring: rgba(10, 132, 255, 0.3);
-                --accent-color: #0a84ff; /* Helleres Apple Blue für Dark Mode */
-                --result-link-color: #66b5ff;
-                --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.2);
+                /* Dark Mode (iOS Style Tiefenstaffelung) */
+                --app-bg: #000000;
+                --card-bg: #1C1C1E; /* Heller als Hintergrund für "Pop"-Effekt */
+                --text-primary: #F5F5F7;
+                --text-secondary: #98989D;
+                --accent: #0A84FF; /* Helleres Blau für Dark Mode */
+                --border-light: rgba(255,255,255,0.1);
+                --card-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                --input-bg: rgba(28, 28, 30, 0.8);
             }
         }
 
-        /* --- 2. Basis Layout --- */
+        /* --- 2. Basis Layout & Typografie --- */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color-primary);
-            /* Natives Apple Font Rendering */
+            background-color: var(--app-bg);
+            color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             -webkit-font-smoothing: antialiased;
-            overflow-y: scroll; /* Immer Scrollbar anzeigen um Springen zu verhindern */
+            overflow-x: hidden;
         }
 
-        /* Der Bereich, der das Suchfeld und die Überschrift enthält */
-        .hero-search-section {
-            width: 100%;
-            max-width: 680px;
-            padding: 120px 20px 40px 20px; /* Viel Platz oben */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Sanfte Animation beim Laden */
-            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 80px 24px;
         }
 
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: 700;
+        h1.app-title {
+            font-size: 44px;
+            font-weight: 800;
+            text-align: center;
             letter-spacing: -0.02em;
-            margin-bottom: 32px;
-            color: var(--text-color-primary);
+            margin-bottom: 40px;
+            /* Gradient Text Effekt (optional, sehr modern) */
+            background: linear-gradient(135deg, var(--text-primary) 50%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* --- 3. Google CSE Input Styling (Aggressive Overrides) --- */
-        /* Container für das Suchfeld */
-        .search-box-container {
-            width: 100%;
+        /* --- 3. Google CSE Core Overrides (Das Fundament) --- */
+        /* Alles zurücksetzen */
+        .gsc-control-cse { padding: 0 !important; border: none !important; background: transparent !important; font-family: inherit !important; }
+        .gsc-search-box { margin-bottom: 30px !important; }
+        /* Overlay verhindern */
+        .gsc-results-wrapper-overlay, .gsc-results-wrapper-visible {
+            position: static !important; box-shadow: none !important; border: none !important; background: transparent !important;
+            padding: 0 !important; width: auto !important; height: auto !important; max-width: none !important; z-index: auto !important;
         }
+        .gsc-modal-background-image, .gsc-results-close-btn { display: none !important; }
 
-        /* Reset von Google Stilen */
-        .gsc-control-cse { padding: 0 !important; border: none !important; background: transparent !important; }
-        .gsc-search-box { margin: 0 !important; }
+        /* --- 4. Das Suchfeld (Spotlight Style) --- */
         td.gsc-input { padding-right: 0 !important; }
-        
+        td.gsc-search-button { display: none !important; /* Wir verstecken den Standard Button */ }
+
+        /* Input Container stylen */
+        .gsc-input-box {
+            border: none !important;
+            background: transparent !important;
+        }
+
         /* Das eigentliche Input Feld */
         input.gsc-input {
-            background-color: var(--search-input-bg) !important;
-            border: 1px solid var(--search-border) !important;
-            backdrop-filter: blur(20px) !important; /* Apple Frost Effekt */
-            -webkit-backdrop-filter: blur(20px) !important;
-            border-radius: 20px !important; /* Sehr rund */
-            padding: 16px 24px !important;
-            font-size: 19px !important;
-            font-family: inherit !important;
-            color: var(--text-color-primary) !important;
-            box-shadow: var(--shadow-soft) !important;
-            transition: all 0.2s ease-in-out !important;
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--border-light) !important;
+            backdrop-filter: blur(25px) saturate(180%) !important; /* Starker Milchglas-Effekt */
+            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+            border-radius: 22px !important;
+            padding: 18px 24px !important;
+            font-size: 20px !important;
+            color: var(--text-primary) !important;
+            box-shadow: var(--card-shadow) !important;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
             outline: none !important;
-            /* Platzhalter Text Farbe anpassen (trick) */
-        }
-        /* Input Focus State - Der blaue Ring */
-        input.gsc-input:focus {
-            border-color: var(--accent-color) !important;
-            box-shadow: 0 0 0 4px var(--focus-ring) !important;
-        }
-
-        /* Der Such-Button (Lupe) */
-        button.gsc-search-button {
-            background-color: var(--accent-color) !important;
-            border: none !important;
-            border-radius: 50% !important; /* Runder Knopf */
-            margin-left: 12px !important;
-            width: 44px !important;
-            height: 44px !important;
-            padding: 10px !important;
-            cursor: pointer !important;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2) !important;
-            transition: transform 0.2s !important;
-        }
-        button.gsc-search-button:hover { transform: scale(1.05) !important; }
-        button.gsc-search-button svg { fill: white !important; }
-
-
-        /* --- 4. Google CSE Ergebnisse Styling (Eingebettet, kein Popup!) --- */
-        
-        /* Container für die Ergebnisse */
-        .results-container {
-            width: 100%;
-            max-width: 680px;
-            padding: 0 20px 60px 20px;
-        }
-
-        /* WICHTIG: Zwingt Google, das Overlay nicht zu nutzen */
-        .gsc-results-wrapper-overlay, .gsc-results-wrapper-visible {
-            position: static !important;
-            box-shadow: none !important;
-            border: none !important;
-            background: transparent !important;
-            padding: 20px 0 !important;
             width: 100% !important;
-            max-width: 100% !important;
-            height: auto !important;
-            top: auto !important; left: auto !important;
-            z-index: 1 !important;
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/circle%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: 16px center !important;
+            text-indent: 36px !important; /* Platz für das Icon schaffen */
         }
-        /* Modal Hintergrund entfernen */
-        .gsc-modal-background-image { display: none !important; }
-        /* Schließen Button entfernen */
-        .gsc-results-close-btn { display: none !important; }
 
-        /* Einzelne Ergebnisse stylen */
-        .gsc-webResult.gsc-result {
-            padding: 24px 0 !important;
-            border-bottom: 1px solid var(--search-border) !important;
+        input.gsc-input:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 4px var(--focus-ring), var(--card-shadow) !important;
+        }
+
+        /* --- 5. Tabs (Web / Bilder) Modernisieren --- */
+        .gsc-tabsArea {
+            border: none !important;
+            margin-bottom: 24px !important;
+            display: flex !important;
+            gap: 12px !important;
+        }
+        .gsc-tabHeader {
             background: transparent !important;
+            border: none !important;
+            padding: 8px 16px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            color: var(--text-secondary) !important;
+            border-radius: 20px !important;
+            transition: all 0.2s ease !important;
         }
-        .gs-webResult:last-child { border-bottom: none !important; }
+        /* Aktiver Tab */
+        .gsc-tabHeader.gsc-tabhActive {
+            background-color: var(--card-bg) !important;
+            color: var(--accent) !important;
+            box-shadow: var(--card-shadow) !important;
+        }
 
-        /* Titel des Suchergebnisses (Link) */
+
+        /* --- 6. Suchergebnisse als CARDS (Das Herzstück) --- */
+        .gsc-webResult.gsc-result {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-light) !important;
+            border-radius: 24px !important; /* Sehr runde Ecken */
+            padding: 28px !important;
+            margin-bottom: 24px !important;
+            box-shadow: var(--card-shadow) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        }
+
+        /* Hover Effekt für Cards */
+        .gsc-webResult.gsc-result:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.04) !important;
+        }
+
+        /* Der Titel-Link */
         .gs-title {
-            height: auto !important;
-            text-decoration: none !important;
+            height: auto !important; line-height: 1.3 !important;
         }
         .gs-title a {
-            font-size: 20px !important;
-            font-weight: 600 !important;
-            color: var(--result-link-color) !important;
+            font-size: 22px !important;
+            font-weight: 700 !important;
+            color: var(--accent) !important;
             text-decoration: none !important;
             letter-spacing: -0.01em !important;
         }
-        .gs-title a:hover { text-decoration: underline !important; }
-        /* "b" tags in Titeln sind die fett markierten Suchbegriffe */
-        .gs-title b { color: inherit !important; font-weight: 600 !important;}
+        .gs-title b { color: inherit !important; font-weight: 700 !important; }
 
-        /* Die URL unter dem Titel */
+        /* Die URL Zeile */
         .gs-visibleUrl {
-            color: var(--text-color-secondary) !important;
+            color: var(--text-secondary) !important;
             font-size: 14px !important;
-            margin-bottom: 4px !important;
-        }
-
-        /* Der Beschreibungstext (Snippet) */
-        .gs-snippet {
-            font-size: 16px !important;
-            line-height: 1.5 !important;
-            color: var(--text-color-primary) !important;
+            font-weight: 500 !important;
             margin-top: 8px !important;
+            margin-bottom: 12px !important;
+            display: block !important;
         }
-        .gs-snippet b { color: var(--text-color-primary) !important; font-weight: 600 !important;}
 
-        /* Unnötige Google Elemente ausblenden für Clean Look */
-        .gcsc-branding, .gsc-cursor-box, .gsc-above-wrapper-area-container, .gsc-tabsArea {
-            display: none !important;
+        /* Der Beschreibungstext */
+        .gs-snippet {
+            font-size: 17px !important;
+            line-height: 1.6 !important;
+            color: var(--text-primary) !important;
+            opacity: 0.9 !important;
         }
-        /* Pagination (Seitenzahlen unten) modernisieren */
+        /* Fettgedruckte Suchbegriffe im Text */
+        .gs-snippet b { color: var(--text-primary) !important; font-weight: 600 !important; }
+
+        /* --- 7. Aufräumen & Pagination --- */
+        /* Google Branding entfernen */
+        .gcsc-branding, .gsc-above-wrapper-area-container { display: none !important; }
+
+        /* Pagination modernisieren */
+        .gsc-cursor-box {
+            margin-top: 40px !important;
+            text-align: center !important;
+        }
         .gsc-cursor-page {
-            color: var(--accent-color) !important;
+            display: inline-block !important;
+            padding: 10px 16px !important;
+            margin: 0 4px !important;
+            border-radius: 12px !important;
             font-size: 16px !important;
-            margin-right: 12px !important;
-            padding: 4px 8px !important;
-            border-radius: 8px !important;
+            font-weight: 600 !important;
+            color: var(--accent) !important;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-light) !important;
+            text-decoration: none !important;
+            box-shadow: var(--card-shadow) !important;
         }
         .gsc-cursor-current-page {
-            color: var(--text-color-primary) !important;
-            font-weight: bold !important;
-            background: var(--search-border) !important;
+            background-color: var(--accent) !important;
+            color: #FFFFFF !important;
+            border-color: transparent !important;
         }
+
+        /* Animation beim Laden */
+        .container {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0; transform: translateY(30px);
+        }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
     </style>
 </head>
 <body>
 
-    <script async src="https://cse.google.com/cse.js?cx=20a2dddf993d94da0"></script>
-
-    <div class="hero-search-section">
-        <h1>Suchen.</h1>
-        <div class="search-box-container">
-            <div class="gcse-searchbox"
-                 data-resultsUrl=""
-                 data-newWindow="false"
-                 data-queryParameterName="q">
-            </div>
+    <div class="container">
+        <h1 class="app-title">Suchen.</h1>
+        
+        <script async src="https://cse.google.com/cse.js?cx=20a2dddf993d94da0"></script>
+        <div class="gcse-search" 
+             data-imageSearch="true" 
+             data-webSearch="true"
+             data-linkTarget="_blank">
         </div>
-    </div>
-
-    <div class="results-container">
-        <div class="gcse-searchresults"></div>
     </div>
 
 </body>
