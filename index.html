@@ -24,37 +24,34 @@
             --spring-smooth: all 0.4s cubic-bezier(0.25, 1, 0.3, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; }
+        /* --- Global Reset & Safari UI Lock --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; overflow-anchor: none; }
         *::-webkit-scrollbar { display: none; }
         
-        html, body { 
-            background-color: var(--bg-color); color: var(--text-main); 
-            height: 100%; width: 100%; overflow: hidden; 
-            -ms-overflow-style: none;
-        }
-        body.no-scroll { overflow: hidden; }
+        /* Sperrt den Body, damit Safari die UI-Leiste unten nicht ständig ein/ausklappt */
+        html, body { background-color: var(--bg-color); color: var(--text-main); height: 100%; width: 100%; overflow: hidden; }
+        body.no-scroll { pointer-events: none; } /* Stoppt Scrollen hinter dem Lightbox-Overlay */
 
-        /* --- Isolierter Viewport für Safari UI Verankerung --- */
-        #scroll-viewport {
+        /* --- Isolierte Viewports für Tab-Caching --- */
+        #results-wrapper { position: relative; width: 100%; height: 100%; display: none; }
+        #results-wrapper.active { display: block; }
+
+        .scroll-viewport {
             position: absolute; inset: 0;
             overflow-y: auto; -webkit-overflow-scrolling: touch;
-            overflow-anchor: auto;
-            display: flex; flex-direction: column;
+            display: none; flex-direction: column;
+            overflow-anchor: auto; /* Erlaubt dem Browser natives Scroll-Fixing */
+            pointer-events: auto;
         }
+        .scroll-viewport.active { display: flex; }
 
-        /* --- Tab Panes mit Caching-Struktur --- */
-        .tab-pane {
-            display: none; flex-direction: column-reverse; /* Bottom-Up Magic */
-            max-width: 760px; margin: 0 auto; width: 100%;
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            transition: opacity 0.2s ease; opacity: 1; 
-        }
-        .tab-pane.active { display: flex; }
+        .results-content { max-width: 760px; margin: 0 auto; width: 100%; padding: calc(var(--safe-top) + 20px) 20px 0; display: flex; flex-direction: column; }
+        
+        /* Abstand unten, etwas kleiner gemacht */
+        .bottom-spacer { height: calc(var(--safe-bottom) + 90px); flex-shrink: 0; width: 100%; }
 
-        .load-more-trigger { width: 100%; height: 1px; flex-shrink: 0; opacity: 0; pointer-events: none; margin-bottom: 10px;}
-
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
-        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
+        /* Trigger zum unsichtbaren Nachladen */
+        .load-more-trigger { width: 100%; height: 1px; flex-shrink: 0; opacity: 0; pointer-events: none; }
 
         /* --- 1. Initial Home Screen --- */
         #home-view {
@@ -93,18 +90,22 @@
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: opacity 0.2s; }
 
         /* --- Skeletons & Animations --- */
-        .animate-in { animation: slideIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+        .page-block { display: flex; flex-direction: column; width: 100%; margin-bottom: 20px; }
+        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
+        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
+
+        .animate-in { animation: slideIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
         @keyframes slideIn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
 
         .skeleton { animation: pulse 1.2s infinite ease-in-out; background: rgba(255,255,255,0.06); }
-        .skeleton-card { border-radius: var(--border-radius); padding: 28px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); width: 100%; }
+        .skeleton-card { border-radius: var(--border-radius); padding: 28px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); }
         .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
         .s-title { height: 24px; width: 75%; border-radius: 8px; }
         .s-text { height: 16px; width: 100%; border-radius: 6px; }
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* --- Floating Bottom Bar (Liquid Glass) --- */
+        /* --- Floating Bottom Bar --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.45); 
@@ -131,7 +132,7 @@
         }
 
         /* --- Cards & Pills --- */
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); transition: transform 0.15s; width: 100%;}
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); transition: transform 0.15s; }
         .card:active { transform: scale(0.98); background-color: var(--card-hover); }
         .card-header { margin-bottom: 14px; }
         
@@ -158,34 +159,37 @@
 
         /* --- Native iOS Image Lightbox --- */
         #image-viewer {
-            position: fixed; inset: 0; z-index: 2147483647; /* Absoluter Top-Layer */
+            position: fixed; inset: 0; z-index: 999999; /* Absoluter Vordergrund */
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; 
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; 
         }
         #image-viewer.active { opacity: 1; pointer-events: all; }
         
         .viewer-header {
             position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0;
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; z-index: 2147483647;
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; z-index: 9999999;
         }
         .viewer-close {
             background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
             border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); transition: transform 0.2s; pointer-events: all;
         }
+        .viewer-close:active { transform: scale(0.9); }
         .viewer-track {
             display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x;
+            z-index: 100;
         }
         .viewer-slide { flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; }
         .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
 
         /* Setup Modal */
-        #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
+        #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 999999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
         .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; }
+        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
+        .modal-content button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -211,17 +215,36 @@
         </form>
     </div>
 
+    <div id="image-viewer">
+        <div class="viewer-header" id="viewer-header">
+            <div id="viewer-pill-container"></div>
+            <button class="viewer-close" onclick="closeImageViewer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="viewer-track" id="viewer-track"></div>
+    </div>
+
     <div id="results-wrapper">
-        <div id="scroll-viewport">
-            <div id="pane-search" class="tab-pane active">
+        <div id="view-search" data-type="search" class="scroll-viewport active">
+            <div class="results-content">
                 <div class="load-more-trigger"></div>
             </div>
-            <div id="pane-images" class="tab-pane">
+            <div class="bottom-spacer"></div>
+        </div>
+        
+        <div id="view-images" data-type="images" class="scroll-viewport">
+            <div class="results-content">
                 <div class="load-more-trigger"></div>
             </div>
-            <div id="pane-shopping" class="tab-pane">
+            <div class="bottom-spacer"></div>
+        </div>
+        
+        <div id="view-shopping" data-type="shopping" class="scroll-viewport">
+            <div class="results-content">
                 <div class="load-more-trigger"></div>
             </div>
+            <div class="bottom-spacer"></div>
         </div>
 
         <div id="bottom-bar">
@@ -237,20 +260,9 @@
         </div>
     </div>
 
-    <div id="image-viewer">
-        <div class="viewer-header" id="viewer-header">
-            <div id="viewer-pill-container"></div>
-            <button class="viewer-close" onclick="closeImageViewer()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-            </button>
-        </div>
-        <div class="viewer-track" id="viewer-track"></div>
-    </div>
-
     <script>
         const homeView = document.getElementById('home-view');
         const resultsWrapper = document.getElementById('results-wrapper');
-        const scrollViewport = document.getElementById('scroll-viewport');
         const searchOverlay = document.getElementById('search-overlay');
         const homeSearchInput = document.getElementById('homeSearchInput');
         const overlaySearchInput = document.getElementById('overlaySearchInput');
@@ -258,38 +270,42 @@
         const tabSlider = document.getElementById('tabSlider');
         const tabs = document.querySelectorAll('.tab');
         
+        // --- State Management für Tab-Caching ---
         let currentType = 'search';
         let currentQuery = '';
         let isLoading = false;
-        
-        // Cache State pro Tab
-        const tabState = {
-            search: { page: 1, scroll: 0 },
-            images: { page: 1, scroll: 0, items: [] },
-            shopping: { page: 1, scroll: 0 }
+        const state = {
+            search: { page: 1, loaded: false },
+            images: { page: 1, loaded: false },
+            shopping: { page: 1, loaded: false }
         };
         
+        // --- Image Viewer State ---
+        let globalImages = [];
+        let viewerIndex = 0;
         const track = document.getElementById('viewer-track');
         const viewerHeader = document.getElementById('viewer-header');
         const imageViewer = document.getElementById('image-viewer');
-        let viewerIndex = 0;
 
-        // --- Fast Farb-Extraktion ---
+        // --- Robuste Farb-Extraktion (Preload-Fähig) ---
         const colorCache = new Map();
 
-        async function getDominantColor(domain) {
-            if (colorCache.has(domain)) return colorCache.get(domain);
-            const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(faviconUrl)}`;
+        function getDominantColor(domain) {
+            return new Promise(async (resolve) => {
+                if (colorCache.has(domain)) return resolve(colorCache.get(domain));
 
-            for (const url of [faviconUrl, proxyUrl]) {
-                const result = await tryExtractColor(url);
-                if (result) {
-                    colorCache.set(domain, result);
-                    return result;
+                const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(faviconUrl)}`;
+
+                for (const url of [faviconUrl, proxyUrl]) {
+                    const result = await tryExtractColor(url);
+                    if (result) {
+                        colorCache.set(domain, result);
+                        return resolve(result);
+                    }
                 }
-            }
-            return null; 
+                resolve(null); 
+            });
         }
 
         function tryExtractColor(url) {
@@ -341,11 +357,10 @@
                 resultsWrapper.classList.add('active');
                 homeSearchInput.value = queryParam;
                 overlaySearchInput.value = queryParam;
+                currentQuery = queryParam;
                 
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-                if (getCookie('serper_api_key')) {
-                    startSearchFrom(queryParam, true);
-                }
+                if (getCookie('serper_api_key')) triggerNewSearch();
             } else {
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
@@ -354,34 +369,27 @@
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
 
+        // --- Caching Tab Switcher ---
         function switchTab(element, type) {
             if (currentType === type) return;
             
-            // Speichere Scroll-Position des alten Tabs
-            tabState[currentType].scroll = scrollViewport.scrollTop;
-            
-            currentType = type;
+            // UI Toggle
             tabs.forEach(t => t.classList.remove('active')); element.classList.add('active');
             updateTabSlider(element);
             
-            // UI Umschalten
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-            const newPane = document.getElementById(`pane-${currentType}`);
-            newPane.classList.add('active');
+            // Viewport Toggle
+            document.querySelectorAll('.scroll-viewport').forEach(vp => vp.classList.remove('active'));
+            document.getElementById(`view-${type}`).classList.add('active');
+            currentType = type;
             
-            if (currentQuery) {
-                // Wenn Tab noch leer ist (wegen Cache Reset oder Erstaufruf)
-                if(tabState[currentType].page === 1 && newPane.children.length <= 1) {
-                    renderSkeletons(newPane);
-                    performSearch(false);
-                } else {
-                    // Restore Scroll
-                    scrollViewport.scrollTop = tabState[currentType].scroll;
-                }
+            // Falls Tab noch nicht geladen wurde -> Laden!
+            if (currentQuery && !state[currentType].loaded) {
+                renderSkeletons(currentType); 
+                performSearch(currentType, false, true);
             }
         }
 
-        // --- Keyboard (Native) ---
+        // --- Keyboard ---
         function handleHomeSubmit(e) {
             e.preventDefault();
             const q = homeSearchInput.value.trim();
@@ -396,34 +404,28 @@
             if(q) startSearchFrom(q);
         }
 
-        overlaySearchInput.addEventListener('blur', () => {
-            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 100);
-        });
-
-        function startSearchFrom(query, isInitialLoad = false) {
-            if(!isInitialLoad) {
-                homeView.classList.add('hidden');
-                resultsWrapper.classList.add('active');
-            }
-            
+        function startSearchFrom(query) {
+            homeView.classList.add('hidden');
+            resultsWrapper.classList.add('active');
             homeSearchInput.value = query;
             overlaySearchInput.value = query;
-            
-            // Reset ALL Caches on new Search
-            if(query !== currentQuery) {
-                currentQuery = query;
-                Object.keys(tabState).forEach(key => {
-                    tabState[key].page = 1;
-                    tabState[key].scroll = 0;
-                    if(key === 'images') tabState[key].items = [];
-                    document.getElementById(`pane-${key}`).innerHTML = '<div class="load-more-trigger"></div>';
-                });
-            }
+            currentQuery = query;
+            triggerNewSearch();
+        }
+
+        function triggerNewSearch() {
+            // Setzt alle Caches zurück
+            Object.keys(state).forEach(k => {
+                state[k].page = 1;
+                state[k].loaded = false;
+                const vp = document.getElementById(`view-${k}`);
+                const content = vp.querySelector('.results-content');
+                content.innerHTML = '<div class="load-more-trigger"></div>'; // Nur Trigger bleibt
+            });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-            const activePane = document.getElementById(`pane-${currentType}`);
-            renderSkeletons(activePane);
-            performSearch(false);
+            renderSkeletons(currentType);
+            performSearch(currentType, false, true);
         }
 
         function openSearch() {
@@ -436,50 +438,48 @@
         }
 
         // --- Skeletons ---
-        function renderSkeletons(pane) {
-            pane.innerHTML = '<div class="load-more-trigger"></div>'; // Trigger GANZ OBEN
+        function renderSkeletons(type) {
+            const content = document.querySelector(`#view-${type} .results-content`);
             const frag = document.createDocumentFragment();
+            const pageBlock = document.createElement('div');
+            pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
             
-            if (currentType === 'search') {
-                for(let i=0; i<6; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'skeleton-card skeleton animate-in';
-                    el.style.animationDelay = `${i * 0.015}s`;
-                    el.innerHTML = `<div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div>`;
-                    frag.appendChild(el);
+            const count = type === 'search' ? 6 : (type === 'images' ? 12 : 8);
+            for(let i=0; i<count; i++) {
+                const delay = `${i * 0.015}s`;
+                if(type === 'search') {
+                    pageBlock.innerHTML += `<div class="skeleton-card skeleton animate-in" style="animation-delay:${delay}"><div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div></div>`;
+                } else if(type === 'images') {
+                    pageBlock.innerHTML += `<div class="image-card skeleton animate-in" style="animation-delay:${delay}"></div>`;
+                } else {
+                    pageBlock.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px; animation-delay:${delay}"></div>`;
                 }
-            } else {
-                const grid = document.createElement('div');
-                grid.className = 'grid-page';
-                const count = currentType === 'images' ? 12 : 8;
-                for(let i=0; i<count; i++) {
-                    const delay = `${i * 0.015}s`;
-                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton animate-in" style="animation-delay:${delay}"></div>`;
-                    else grid.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px; animation-delay:${delay}"></div>`;
-                }
-                frag.appendChild(grid);
             }
-            pane.appendChild(frag);
-            requestAnimationFrame(() => scrollViewport.scrollTop = scrollViewport.scrollHeight);
+            frag.appendChild(pageBlock);
+            content.appendChild(frag);
+            
+            const vp = document.getElementById(`view-${type}`);
+            requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
-        // --- Fetch & Render (Unendliche Illusion mit 1500px Load-Margin) ---
+        // --- Fetch & Render (Unendliche Illusion pro Viewport) ---
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !isLoading && currentQuery) {
-                    // Check if the triggered element is inside the active pane
-                    if(entry.target.parentElement.id === `pane-${currentType}`) {
-                        tabState[currentType].page++;
-                        performSearch(true);
+                    const vp = entry.target.closest('.scroll-viewport');
+                    const type = vp.dataset.type;
+                    if (state[type].loaded) { // Nur nachladen, wenn Erstladen fertig
+                        state[type].page++;
+                        performSearch(type, true);
                     }
                 }
             });
-        }, { rootMargin: '1500px', root: scrollViewport });
+        }, { root: null, rootMargin: '2500px' }); // Lädt gigantisch früh vor!
 
-        // Observe initial triggers
-        document.querySelectorAll('.load-more-trigger').forEach(el => observer.observe(el));
+        // Alle Trigger initialisieren
+        document.querySelectorAll('.load-more-trigger').forEach(trigger => observer.observe(trigger));
 
-        async function performSearch(isLoadMore = false) {
+        async function performSearch(type, isLoadMore = false, isInitial = false) {
             if (isLoading) return;
             isLoading = true;
 
@@ -487,17 +487,17 @@
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
 
             try {
-                let endpoint = currentType === 'search' ? 'search' : currentType;
-                // NUM 100! Fetch as much as possible for infinite feel
+                const endpoint = type === 'search' ? 'search' : type;
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
-                    body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 100, page: tabState[currentType].page }) 
+                    body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 40, page: state[type].page }) // 40 Items
                 });
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
-                renderResults(data, isLoadMore);
+                renderResults(type, data, isLoadMore, isInitial);
+                state[type].loaded = true;
 
             } catch (error) {
                 console.error("Fetch error");
@@ -508,80 +508,62 @@
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
-        function renderResults(data, isLoadMore) {
-            const pane = document.getElementById(`pane-${currentType}`);
-            let rawItems = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
+        function renderResults(type, data, isLoadMore, isInitial) {
+            const vp = document.getElementById(`view-${type}`);
+            const content = vp.querySelector('.results-content');
+            const trigger = content.querySelector('.load-more-trigger');
+
+            let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
             
-            if (!isLoadMore) {
-                pane.innerHTML = '<div class="load-more-trigger"></div>'; 
-                observer.observe(pane.querySelector('.load-more-trigger'));
+            if (isInitial) {
+                // Löscht alles AUSSER den Trigger
+                Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             }
-            
             if (rawItems.length === 0) return;
 
-            // Array umdrehen für das Bottom-Up Erlebnis
             let items = rawItems.reverse();
-            
             const pageBlock = document.createElement('div');
-            pageBlock.className = currentType === 'search' ? 'page-block' : 'grid-page';
-            
+            pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
+
             items.forEach((item, index) => {
-                const delay = !isLoadMore ? `${index * 0.01s}` : '0s'; 
+                const delay = isInitial ? `${index * 0.015}s` : '0s'; 
+                const domain = getHostname(item.link);
                 
-                if (currentType === 'search') {
-                    const domain = getHostname(item.link);
-                    const pillId = `pill-${Date.now()}-${index}`; 
+                // --- Background Preload für schnelle Lightbox ---
+                getDominantColor(domain);
+
+                if (type === 'search') {
+                    const pillId = `pill-${type}-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
-                    el.href = item.link; el.className = `card ${!isLoadMore ? 'animate-in' : ''}`; el.target = '_blank';
+                    el.href = item.link; el.className = `card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
                     el.style.animationDelay = delay;
 
                     el.innerHTML = `
-                        <div class="card-header">
-                            <div class="color-pill" id="${pillId}">
-                                <span>${domain}</span>
-                            </div>
-                        </div>
+                        <div class="card-header"><div class="color-pill" id="${pillId}"><span>${domain}</span></div></div>
                         <div class="card-title">${item.title}</div>
                         <div class="card-snippet">${item.snippet || ''}</div>
                     `;
                     pageBlock.appendChild(el);
 
-                    // Color Load
-                    if(colorCache.has(domain)) {
-                        const color = colorCache.get(domain);
+                    getDominantColor(domain).then(color => {
                         if (color) {
-                            requestAnimationFrame(()=>{
-                                const p = document.getElementById(pillId);
-                                if(p) { p.style.background = color.bg; p.style.color = color.text; p.style.border = color.border; }
-                            });
+                            const pill = document.getElementById(pillId);
+                            if (pill) { pill.style.background = color.bg; pill.style.color = color.text; pill.style.border = color.border; }
                         }
-                    } else {
-                        getDominantColor(domain).then(color => {
-                            if (color) {
-                                const pill = document.getElementById(pillId);
-                                if (pill) { pill.style.background = color.bg; pill.style.color = color.text; pill.style.border = color.border; }
-                            }
-                        });
-                    }
+                    });
                 } 
-                else if (currentType === 'images') {
-                    const myIndex = tabState['images'].items.length;
-                    tabState['images'].items.push(item);
-                    
-                    // Preload Image Color
-                    getDominantColor(getHostname(item.link)); 
-
+                else if (type === 'images') {
                     const el = document.createElement('a');
-                    el.href = item.link; el.className = `image-card ${!isLoadMore ? 'animate-in' : ''}`;
+                    el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
                     el.style.animationDelay = delay;
-                    // Native Error Protection: Kill image element seamlessly if broken
                     el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
-                    el.onclick = (e) => { e.preventDefault(); openImageViewer(myIndex); };
+                    // Dynamisches Zuweisen für Lightbox anhand DOM
+                    el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                     pageBlock.appendChild(el);
                 } 
-                else if (currentType === 'shopping') {
+                else if (type === 'shopping') {
                     const el = document.createElement('a');
-                    el.href = item.link; el.className = `shopping-card ${!isLoadMore ? 'animate-in' : ''}`; el.target = '_blank';
+                    el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
                     el.style.animationDelay = delay;
                     el.innerHTML = `
                         <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
@@ -594,26 +576,41 @@
                 }
             });
 
-            // Einfügen hinter den Trigger (optisch ganz oben im Pane)
-            const trigger = pane.querySelector('.load-more-trigger');
-            
-            if (!isLoadMore) {
-                trigger.after(pageBlock);
-                requestAnimationFrame(() => scrollViewport.scrollTop = scrollViewport.scrollHeight);
+            const oldScrollHeight = vp.scrollHeight;
+            const oldScrollTop = vp.scrollTop;
+
+            // Block NACH dem unsichtbaren Trigger einfügen (Prepend!)
+            trigger.after(pageBlock);
+
+            if (isLoadMore) {
+                // Ruckelfreies Scroll-Korrektur-System
+                requestAnimationFrame(() => {
+                    const newScrollHeight = vp.scrollHeight;
+                    vp.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
+                });
             } else {
-                // Bei unendlichem Scroll verankert iOS Safari (overflow-anchor) perfekt!
-                trigger.after(pageBlock);
+                requestAnimationFrame(() => {
+                    vp.scrollTop = vp.scrollHeight;
+                });
             }
         }
 
-        // --- Native Image Viewer (Swipe Dismiss Fixed) ---
+        // --- Native Image Viewer (Swipe Dismiss X & Y Fix) ---
         let startX = 0, startY = 0;
         let isSwipingY = false, isSwipingX = false;
 
-        function openImageViewer(index) {
-            viewerIndex = index;
-            track.innerHTML = tabState['images'].items.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}"></div>`).join('');
+        function openImageViewer(clickedCard) {
+            // Baut die Liste live aus dem DOM (Robustes Caching)
+            const allCards = Array.from(document.querySelectorAll('#view-images .image-card'));
+            globalImages = allCards.map(card => ({
+                link: card.href,
+                imageUrl: card.querySelector('img').src
+            }));
+            viewerIndex = allCards.indexOf(clickedCard);
+            
+            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.display='none'"></div>`).join('');
             imageViewer.classList.add('active');
+            document.body.classList.add('no-scroll'); 
             
             requestAnimationFrame(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
@@ -623,12 +620,13 @@
 
         function closeImageViewer() {
             imageViewer.style.opacity = '0';
+            document.body.classList.remove('no-scroll'); 
             setTimeout(() => { 
                 imageViewer.classList.remove('active');
                 imageViewer.style.cssText = ''; 
                 track.innerHTML = ''; 
                 track.style.transform = '';
-            }, 200); 
+            }, 250); 
         }
 
         track.addEventListener('scroll', () => {
@@ -655,7 +653,7 @@
                 if (diffX > diffY && diffX > 5) isSwipingX = true;
             }
             if (isSwipingY) {
-                e.preventDefault(); 
+                e.preventDefault(); // Stoppt den Hintergrund-Bounce
                 const diffY = e.touches[0].clientY - startY;
                 if (diffY > 0) {
                     const scale = Math.max(0.75, 1 - (diffY / 800));
@@ -682,8 +680,8 @@
         });
 
         function updateViewerPill() {
-            const item = tabState['images'].items[viewerIndex];
-            if(!item) return;
+            if(!globalImages[viewerIndex]) return;
+            const item = globalImages[viewerIndex];
             const domain = getHostname(item.link);
             const pillContainer = document.getElementById('viewer-pill-container');
             const pillId = `viewer-pill-${Date.now()}`;
@@ -711,7 +709,7 @@
             if (key) { 
                 document.cookie = `serper_api_key=${key}; max-age=31536000; path=/`; 
                 setupModal.classList.remove('active'); 
-                if (currentQuery) performSearch(false); 
+                if (currentQuery) triggerNewSearch(); 
             }
         }
     </script>
