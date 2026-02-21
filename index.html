@@ -20,7 +20,7 @@
             --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --agile: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --agile: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -70,13 +70,16 @@
         #results-content { 
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            transition: opacity 0.15s ease; /* Schneller Tab-Wechsel Fade */
-            display: flex; flex-direction: column-reverse; /* iOS Chat Style Scroll */
+            transition: opacity 0.15s ease; /* Snappier Transition */
+            opacity: 1; 
         }
 
-        /* Loader */
+        #results-content.layout-list { display: flex; flex-direction: column; }
+        #results-content.layout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (min-width: 600px) { #results-content.layout-grid { grid-template-columns: repeat(3, 1fr); } }
+
         #load-more-trigger { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
-        .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-main); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         #load-more-trigger.loading .loading-spinner { display: block; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -96,48 +99,47 @@
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
         .tabs-container { position: relative; display: flex; padding: 4px; }
-        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; z-index: 2; transition: color 0.15s ease; text-align: center; }
+        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; z-index: 2; transition: color 0.25s ease; text-align: center; }
         .tab.active { color: #000000; }
-        .tab-slider { position: absolute; top: 4px; bottom: 4px; left: 0; background: #ffffff; border-radius: 100px; z-index: 1; transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.25s cubic-bezier(0.2, 0.9, 0.3, 1); }
+        .tab-slider { position: absolute; top: 4px; bottom: 4px; left: 0; background: #ffffff; border-radius: 100px; z-index: 1; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
 
-        /* --- Cards & Perfect Ambient Pills --- */
+        /* --- Cards & Fixed Perfect Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card-header { margin-bottom: 14px; }
         
-        /* Absolut perfektionierte Ambient-Pille für iOS */
         .color-pill {
-            position: relative; overflow: hidden;
-            border-radius: 9999px; /* Forciert immer perfekt runde Ecken */
+            position: relative; 
+            border-radius: 9999px; /* Echte Rundung */
             display: inline-flex; align-items: center; justify-content: center;
             background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08);
-            transform: translateZ(0); /* Hardware Beschleunigung, zwingt iOS die Maske zu beachten */
-            -webkit-mask-image: -webkit-radial-gradient(white, black); /* Bugfix für Safari */
+            
+            /* iOS Safari Bugfix für abgerundete Ecken mit Filter-Kindern */
+            overflow: hidden; 
+            transform: translateZ(0);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
         .color-pill img {
             position: absolute; top: -100%; left: -100%; width: 300%; height: 300%;
             object-fit: cover; 
-            filter: blur(24px) saturate(300%) brightness(0.6); /* Extrem aggressiver Blur */
+            filter: blur(24px) saturate(300%) brightness(0.6); 
             z-index: 0; pointer-events: none;
         }
         .color-pill::after {
             content: ''; position: absolute; inset: 0;
-            background: rgba(0,0,0,0.35); /* Dunkler Filter für perfekte Lesbarkeit */
+            background: rgba(0,0,0,0.35); /* Stellt sicher, dass weißer Text immer lesbar ist */
             z-index: 1; border-radius: 9999px;
         }
         .color-pill span {
             position: relative; z-index: 2;
             padding: 6px 14px;
             font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
-            color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); /* Schatten für Lesbarkeit */
+            color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9);
         }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Grids (24 Elemente garantieren lückenlose Zeilen) */
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
-        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
-        
+        /* Grids */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
@@ -213,27 +215,24 @@
         let currentQuery = '';
         let isLoading = false;
 
-        // --- Init & ARC Support ---
-        window.addEventListener('load', () => { 
-            checkApiKey(); 
-            setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 50); 
-            
-            // Fängt Suchen via ARC Browser / URL Parameter direkt ab
-            const urlParams = new URLSearchParams(window.location.search);
-            const queryParam = urlParams.get('q');
-            if (queryParam) {
-                homeSearchInput.value = queryParam;
-                overlaySearchInput.value = queryParam;
-                startSearchFrom(queryParam);
-            }
-        });
-
-        // --- Tab Logik ---
         function updateTabSlider(activeEl) {
             if(!activeEl) return;
             tabSlider.style.width = activeEl.offsetWidth + 'px';
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
+        
+        // --- ARC Browser / URL Parameter Support ---
+        window.addEventListener('load', () => { 
+            checkApiKey(); 
+            setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 50); 
+
+            // Automatischer Start bei "?q=..."
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryParam = urlParams.get('q');
+            if (queryParam) {
+                startSearchFrom(queryParam);
+            }
+        });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
 
@@ -245,7 +244,7 @@
             
             if (currentQuery) {
                 currentPage = 1; 
-                resultsContent.style.opacity = '0.5'; // Schneller Fade statt schwarz
+                resultsContent.style.opacity = '0.4'; // Schnelles Abdunkeln statt komplettes Schwarz
                 clearResults(); 
                 performSearch();
             }
@@ -254,14 +253,14 @@
         // --- Suche Auslösen ---
         homeSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && homeSearchInput.value.trim() !== '') {
-                homeSearchInput.blur(); // Tastatur einklappen auf iOS
+                homeSearchInput.blur(); // Versteckt die Tastatur auf iOS
                 startSearchFrom(homeSearchInput.value.trim());
             }
         });
 
         overlaySearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && overlaySearchInput.value.trim() !== '') {
-                overlaySearchInput.blur(); // Tastatur einklappen auf iOS
+                overlaySearchInput.blur(); // Versteckt die Tastatur auf iOS
                 closeSearch();
                 startSearchFrom(overlaySearchInput.value.trim());
             }
@@ -275,7 +274,7 @@
             currentQuery = query;
             currentPage = 1;
             
-            resultsContent.style.opacity = '1';
+            resultsContent.style.opacity = '0.4'; // Weiches Laden
             setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 10);
             
             clearResults();
@@ -293,10 +292,10 @@
 
         function clearResults() {
             resultsContent.innerHTML = '';
-            resultsContent.appendChild(loadMoreTrigger); 
+            resultsContent.appendChild(loadMoreTrigger);
         }
 
-        // --- Fetch & Render ---
+        // --- Fetch & Render (Mit Ruckelfrei-Fix) ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
@@ -317,8 +316,7 @@
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
-                    // 24 ist teilbar durch 2 UND 3. Das verhindert Löcher im Grid!
-                    body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 24, page: currentPage })
+                    body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 20, page: currentPage })
                 });
 
                 if (!response.ok) throw new Error();
@@ -329,7 +327,6 @@
                 console.error("Fetch error");
             } finally {
                 isLoading = false; loadMoreTrigger.classList.remove('loading');
-                resultsContent.style.opacity = '1'; // Fade wiederherstellen nach Tab-Wechsel
             }
         }
 
@@ -337,9 +334,13 @@
 
         function renderResults(data, isLoadMore) {
             let rawItems = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
-            if (rawItems.length === 0 && currentPage === 1) return;
+            
+            if (rawItems.length === 0 && currentPage === 1) {
+                resultsContent.style.opacity = '1';
+                return;
+            }
 
-            let items = rawItems.reverse(); // Chat Style Reihenfolge
+            let items = rawItems.reverse();
             const fragment = document.createDocumentFragment();
 
             items.forEach(item => {
@@ -380,35 +381,31 @@
                 }
             });
 
+            const oldScrollHeight = document.documentElement.scrollHeight;
+            const oldScrollTop = document.documentElement.scrollTop;
+
             if (isLoadMore) {
-                // Bei column-reverse wird am Lade-Spinner angefügt, Scroll position bleibt nativ absolut ruhig!
-                // Kein manuelles window.scrollTo mehr nötig, der Browser macht Scroll Anchoring.
-                if (currentType === 'search') {
-                    loadMoreTrigger.after(fragment);
-                } else {
-                    // Für Grids packen wir die neuen Items in eine neue Grid-Zeile
-                    const grid = document.createElement('div');
-                    grid.className = 'grid-page';
-                    grid.appendChild(fragment);
-                    loadMoreTrigger.after(grid);
-                }
-            } else {
-                // Neue Suche
-                if (currentType !== 'search') {
-                    const grid = document.createElement('div');
-                    grid.className = 'grid-page';
-                    grid.appendChild(fragment);
-                    resultsContent.appendChild(grid);
-                } else {
-                    resultsContent.appendChild(fragment);
-                }
+                loadMoreTrigger.after(fragment);
                 
-                resultsContent.appendChild(loadMoreTrigger);
-                setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' }), 10);
+                // Erzwingt ein synchrones Browser-Update vor dem Scrollen.
+                // Verhindert das "Zucken", das oft in iOS Safari auftritt.
+                void document.documentElement.offsetHeight;
+                
+                const newScrollHeight = document.documentElement.scrollHeight;
+                window.scrollTo({
+                    top: oldScrollTop + (newScrollHeight - oldScrollHeight),
+                    behavior: 'instant' /* Instant verhindert das stotternde Soft-Scrollen des Browsers */
+                });
+            } else {
+                resultsContent.className = currentType === 'search' ? 'layout-list' : 'layout-grid';
+                resultsContent.appendChild(fragment);
+                resultsContent.style.opacity = '1'; 
+                
+                // Springe ganz nach unten (Zum besten Ergebnis im Chat-Layout)
+                setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 10);
             }
         }
 
-        // --- Auth Setup ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
