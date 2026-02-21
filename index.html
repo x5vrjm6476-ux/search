@@ -134,7 +134,6 @@
         .color-pill {
             display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px;
             background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; 
-            /* Keine Animation mehr, die Farbe ist instant da */
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
@@ -146,9 +145,9 @@
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
         .shopping-card:active { transform: scale(0.98); transition: transform 0.15s; }
-        .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
+        .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .shopping-info { padding: 16px; }
+        .shopping-info { padding: 16px; flex: 1; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
 
@@ -326,6 +325,23 @@
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
         
+        const observers = {};
+
+        function setupObserver(type) {
+            if (observers[type]) observers[type].disconnect();
+            const vp = document.getElementById(`view-${type}`);
+            const trigger = vp.querySelector('.load-more-trigger');
+            if (!trigger) return;
+
+            observers[type] = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !isLoading && currentQuery && state[type].loaded) {
+                    state[type].page++;
+                    performSearch(type, true);
+                }
+            }, { root: vp, rootMargin: '1500px' });
+            observers[type].observe(trigger);
+        }
+
         window.addEventListener('load', () => { 
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
@@ -343,19 +359,7 @@
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
             checkApiKey(); 
-
-            // Intersection Observers pro Viewport
-            Object.keys(state).forEach(type => {
-                const vp = document.getElementById(`view-${type}`);
-                const trigger = vp.querySelector('.load-more-trigger');
-                const obs = new IntersectionObserver((entries) => {
-                    if (entries[0].isIntersecting && !isLoading && currentQuery && state[type].loaded) {
-                        state[type].page++;
-                        performSearch(type, true);
-                    }
-                }, { root: vp, rootMargin: '1500px' });
-                obs.observe(trigger);
-            });
+            Object.keys(state).forEach(k => setupObserver(k));
         });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -389,7 +393,6 @@
             if(q) startSearchFrom(q);
         }
 
-        // Schließt Overlay beim "Fertig/Done" Tippen
         overlaySearchInput.addEventListener('blur', () => {
             setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 50);
         });
@@ -409,6 +412,7 @@
                 state[k].loaded = false;
                 const content = document.querySelector(`#view-${k} .results-content`);
                 content.innerHTML = '<div class="load-more-trigger"></div>'; 
+                setupObserver(k);
             });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
@@ -438,9 +442,11 @@
             frag.appendChild(pageBlock);
             content.appendChild(frag);
             
-            // Sofort ans Ende des DOMs springen (was bei column-reverse der visuelle Boden ist)
+            const trigger = content.querySelector('.load-more-trigger');
+            if (trigger) content.appendChild(trigger);
+            
             const vp = document.getElementById(`view-${type}`);
-            vp.scrollTop = vp.scrollHeight;
+            requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
         async function performSearch(type, isLoadMore = false, isInitial = false) {
@@ -475,7 +481,7 @@
         function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
-            const trigger = content.querySelector('.load-more-trigger');
+            let trigger = content.querySelector('.load-more-trigger');
 
             let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
             
@@ -484,25 +490,19 @@
             }
             if (rawItems.length === 0) return;
 
-            // DOM Insertion: items un-reversed! Da column-reverse, wird das letzte Element im HTML ganz oben angezeigt.
-            // Wenn wir Bestes(1), Gut(2), Okay(3) haben:
-            // Wir iterieren 1, 2, 3 und append()en sie in den Block.
-            // Der Block hat column-direction (default). 
-            // In Column-Reverse wird der *gesamte* Block nach unten gedrückt.
-            
+            let items = rawItems.reverse();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
-            rawItems.forEach((item, index) => {
-                const delay = isInitial ? `${index * 0.015}s` : '0s'; 
-                const domain = getHostname(item.link);
-                getDominantColor(domain); // Headless Preload
+            items.forEach(item => getDominantColor(getHostname(item.link)));
 
+            items.forEach((item, index) => {
+                const domain = getHostname(item.link);
+                
                 if (type === 'search') {
                     const pillId = `pill-${type}-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                    el.style.animationDelay = delay;
 
                     el.innerHTML = `
                         <div class="card-header"><div class="color-pill" id="${pillId}"><span>${domain}</span></div></div>
@@ -523,7 +523,6 @@
                     globalImages.push(item);
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                    el.style.animationDelay = delay;
                     el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                     el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                     pageBlock.appendChild(el);
@@ -531,7 +530,6 @@
                 else if (type === 'shopping') {
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                    el.style.animationDelay = delay;
                     el.innerHTML = `
                         <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
                         <div class="shopping-info">
@@ -543,20 +541,22 @@
                 }
             });
 
-            // Der PageBlock wird immer AM ENDE des DOMs eingefügt (via appendChild).
-            // Dank column-reverse auf dem Parent wird das was zuletzt eingefügt wird, GANZ OBEN angezeigt.
-            // Der Trigger MUSS daher ans Ende verschoben werden, damit er ganz oben bleibt.
+            const oldScrollHeight = vp.scrollHeight;
+            const oldScrollTop = vp.scrollTop;
+
             content.appendChild(pageBlock);
-            content.appendChild(trigger); 
+            if (trigger) content.appendChild(trigger); 
 
             if (isInitial) {
-                // Bei Initial-Suche: Springe ans Ende (was visuell der Boden ist)
                 requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
+            } else if (isLoadMore) {
+                requestAnimationFrame(() => {
+                    const newScrollHeight = vp.scrollHeight;
+                    vp.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
+                });
             }
-            // Bei Load-More macht der Browser dank overflow-anchor den Rest perfekt unsichtbar!
         }
 
-        // --- Native Image Viewer (Swipe Dismiss X & Y) ---
         let startX = 0, startY = 0;
         let isSwipingY = false, isSwipingX = false;
 
@@ -589,13 +589,17 @@
         track.addEventListener('scroll', () => {
             if(isSwipingY) return; 
             const index = Math.round(track.scrollLeft / window.innerWidth);
-            if(index !== viewerIndex) { viewerIndex = index; updateViewerPill(); }
+            if(index !== viewerIndex) {
+                viewerIndex = index;
+                updateViewerPill();
+            }
         }, {passive: true});
 
         track.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
-            isSwipingY = false; isSwipingX = false;
+            isSwipingY = false;
+            isSwipingX = false;
         }, {passive: false});
 
         track.addEventListener('touchmove', (e) => {
@@ -655,7 +659,6 @@
             });
         }
 
-        // --- Auth Setup ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
