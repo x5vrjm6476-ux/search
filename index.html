@@ -17,36 +17,36 @@
             --card-hover: #1c1c1e;
             --text-main: #ffffff;
             --text-muted: #8e8e93;
-            --border-radius: 24px;
+            --border-radius: 28px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
             
-            /* Premium iOS Spring Animationen */
-            --spring-fast: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-            --spring-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Native iOS Spring Curves */
+            --agile: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --spring: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
         }
 
-        /* Verhindert natives Scroll-Ankern, das beim Nachladen für Sprünge sorgt */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
-        html, body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        html, body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
 
         /* --- 1. Initial Home Screen --- */
         #home-view {
             position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.4s ease, transform 0.4s ease;
+            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.4s ease;
         }
-        #home-view.hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
+        #home-view.hidden { opacity: 0; pointer-events: none; }
         
         .home-search-wrapper { width: 100%; max-width: 600px; position: relative; }
         .home-search-input {
-            width: 100%; padding: 20px 24px 20px 56px; font-size: 20px; font-weight: 500; 
+            width: 100%; padding: 22px 24px 22px 56px; font-size: 20px; font-weight: 500; 
             background-color: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 28px; color: var(--text-main); outline: none;
+            border-radius: 32px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 20px center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: var(--spring-fast);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: var(--agile);
+            -webkit-appearance: none;
         }
-        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
+        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.15); transform: scale(1.02); }
         .home-search-input::placeholder { color: var(--text-muted); }
 
         /* --- 2. Solid Black Search Overlay --- */
@@ -63,36 +63,46 @@
             flex: 1; padding: 16px 20px 16px 50px; font-size: 18px; font-weight: 500; 
             background-color: var(--card-bg); border: none; border-radius: 20px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: 16px center; min-width: 0; 
-            -webkit-appearance: none;
+            background-repeat: no-repeat; background-position: 16px center; min-width: 0; -webkit-appearance: none;
         }
-        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; transition: opacity 0.2s; }
-        .cancel-btn:active { opacity: 0.6; }
+        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: opacity 0.2s; }
+        .cancel-btn:active { opacity: 0.5; }
 
-        /* --- 3. Results View & Layouts --- */
-        #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
-        #results-wrapper.active { display: flex; }
+        /* --- 3. Robust Native Reverse Scroll Layout --- */
+        #results-wrapper {
+            display: none; position: fixed; inset: 0; z-index: 10;
+            overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+            background: var(--bg-color);
+        }
+        #results-wrapper.active { display: block; }
 
+        /* Die Magie: Container ist per scaleY(-1) gespiegelt! */
         #results-content { 
-            display: flex; flex-direction: column-reverse; /* Das Herzstück für Bottom-Up */
-            max-width: 760px; margin: 0 auto; width: 100%;
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            transition: opacity 0.2s ease; opacity: 1; 
+            display: flex; flex-direction: column; max-width: 760px; margin: 0 auto; width: 100%;
+            /* Padding invertiert: Unten ist jetzt Visuell Oben! */
+            padding: calc(var(--safe-bottom) + 120px) 20px calc(var(--safe-top) + 60px); 
+            transform: scaleY(-1); transition: opacity 0.3s ease; opacity: 1; 
         }
 
+        /* Jedes Element wird wieder zurückgespiegelt */
+        .card, .image-card, .shopping-card, .skeleton-card, #load-more-trigger {
+            transform: scaleY(-1);
+        }
+        
         .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         #load-more-trigger { width: 100%; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
         .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         #load-more-trigger.loading .loading-spinner { display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin { to { transform: scaleY(-1) rotate(360deg); } } /* Wegen Vererbung zurückdrehen */
 
         /* --- Staggered iOS Animations --- */
-        .animate-in { animation: slideInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-        @keyframes slideInUp {
-            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+        .animate-in { animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        @keyframes slideIn {
+            /* Transform in Kombination mit der Spiegelung berechnet */
+            0% { opacity: 0; transform: scaleY(-1) translateY(40px) scale(0.92); }
+            100% { opacity: 1; transform: scaleY(-1) translateY(0) scale(1); }
         }
 
         /* --- Skeletons --- */
@@ -107,17 +117,21 @@
         /* --- Floating Bottom Bar (PERFEKTES iOS 26 Liquid Glass) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
-            background: rgba(38, 38, 40, 0.45); 
-            backdrop-filter: blur(50px) saturate(250%) brightness(1.1); 
-            -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.1);
+            background: rgba(35, 35, 38, 0.45); 
+            backdrop-filter: blur(50px) saturate(250%) contrast(1.1); 
+            -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(1.1);
             padding: 8px; border-radius: 100px; 
-            box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.6);
+            /* High-End 3D Glas-Kanten */
+            box-shadow: 
+                inset 0 1px 1.5px rgba(255, 255, 255, 0.25), 
+                inset 0 -1px 1.5px rgba(0, 0, 0, 0.4), 
+                0 16px 40px rgba(0, 0, 0, 0.7);
             display: flex; align-items: center; gap: 8px; z-index: 100;
         }
 
         .search-circle-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-bounce); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: var(--agile); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -128,20 +142,21 @@
         .tab-slider { 
             position: absolute; top: 4px; bottom: 4px; left: 0; 
             background: rgba(255, 255, 255, 0.18); border-radius: 100px; z-index: 1; 
-            border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        /* --- Cards & Pills --- */
+        /* --- Cards & Neutral First Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); transition: transform 0.2s; }
-        .card:active { transform: scale(0.98); background-color: var(--card-hover); }
+        .card:active { transform: scale(0.98) scaleY(-1); background-color: var(--card-hover); }
         .card-header { margin-bottom: 14px; }
         
         .color-pill {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 6px 14px; border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.05);
-            color: var(--text-muted); transition: all 0.5s ease;
+            /* Startet Neutral */
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-main); transition: all 0.6s ease;
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
@@ -150,43 +165,41 @@
 
         /* Grids */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; transition: transform 0.2s; }
-        .image-card:active { transform: scale(0.96); }
+        .image-card:active { transform: scale(0.96) scaleY(-1); }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: transform 0.2s; }
-        .shopping-card:active { transform: scale(0.98); }
+        .shopping-card:active { transform: scale(0.98) scaleY(-1); }
         .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .shopping-info { padding: 16px; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 600; color: white; font-size: 16px; }
 
-        /* --- Native iOS Image Lightbox --- */
+        /* --- Native iOS Image Lightbox (Scroll Snap & Swipe Dismiss) --- */
         #image-viewer {
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none; 
-            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-            transform: scale(1.05); /* Schöner Scale-in Effekt */
-            overscroll-behavior-y: none; /* Verhindert das iOS Webpage Bouncen */
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        #image-viewer.active { opacity: 1; pointer-events: all; transform: scale(1); }
+        #image-viewer.active { opacity: 1; pointer-events: all; }
         
         .viewer-header {
             position: absolute; top: var(--safe-top); left: 0; right: 0;
             display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; z-index: 2010;
-            transition: opacity 0.2s; /* Fade out when swiping down */
+            transition: opacity 0.2s;
         }
         .viewer-close {
             background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px;
             border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
         }
+        
         .viewer-track {
             display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-            transition: transform 0s; /* Wird von JS während des Swipens kontrolliert */
+            /* Kein Transition auf Transform, da JS es für Swipe steuert */
         }
         .viewer-track::-webkit-scrollbar { display: none; }
+        
         .viewer-slide {
             flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
         }
@@ -195,10 +208,9 @@
         /* Setup Modal */
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--agile); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-bounce);}
-        .modal-content button:active { transform: scale(0.95); }
+        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; }
     </style>
 </head>
 <body>
@@ -273,8 +285,8 @@
         let globalImages = [];
         let viewerIndex = 0;
         const track = document.getElementById('viewer-track');
-        const viewerHeader = document.getElementById('viewer-header');
         const imageViewer = document.getElementById('image-viewer');
+        const viewerHeader = document.getElementById('viewer-header');
 
         // --- Robuste Farb-Extraktion ---
         const colorCache = new Map();
@@ -292,7 +304,7 @@
                     return result;
                 }
             }
-            return null; 
+            return null; // Kein Fallback, bleibt neutral
         }
 
         function tryExtractColor(url) {
@@ -334,7 +346,7 @@
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
         
-        // --- Init ---
+        // --- Init (ARC / URL Start) ---
         window.addEventListener('load', () => { 
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
@@ -353,6 +365,7 @@
             }
 
             checkApiKey(); 
+            setTimeout(() => { homeView.style.transition = ''; }, 50); 
         });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -370,7 +383,7 @@
             }
         }
 
-        // --- Keyboard Handling (Native Forms) ---
+        // --- Keyboard Handling ---
         function handleHomeSubmit(e) {
             e.preventDefault();
             const q = homeSearchInput.value.trim();
@@ -412,11 +425,6 @@
         // --- Skeletons ---
         function renderSkeletons() {
             resultsContent.innerHTML = '';
-            
-            const loadMoreEl = document.createElement('div');
-            loadMoreEl.id = 'load-more-trigger';
-            resultsContent.appendChild(loadMoreEl);
-
             const frag = document.createDocumentFragment();
             
             if (currentType === 'search') {
@@ -439,10 +447,14 @@
                 frag.appendChild(grid);
             }
             
-            loadMoreEl.before(frag);
+            // Lade-Trigger ans Ende hängen (Visual Top!)
+            const loadMoreEl = document.createElement('div');
+            loadMoreEl.id = 'load-more-trigger';
+            resultsContent.appendChild(frag);
+            resultsContent.appendChild(loadMoreEl);
         }
 
-        // --- Fetch & Render (Mit Felsenfester Scroll-Korrektur) ---
+        // --- Fetch & Render (Mit Felsenfester CSS Architektur) ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
@@ -482,24 +494,24 @@
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
         function renderResults(data, isLoadMore) {
-            let rawItems = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
+            let items = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
             
             if (!isLoadMore) {
                 resultsContent.innerHTML = ''; 
                 if (currentType === 'images') globalImages = [];
             }
             
-            if (rawItems.length === 0 && currentPage === 1) return;
+            if (items.length === 0 && currentPage === 1) return;
 
             const fragment = document.createDocumentFragment();
             
             if (currentType === 'search') {
-                rawItems.forEach((item, index) => {
+                // Keine Umkehrung. Erstes Ergebnis ist ganz Oben im DOM = ganz Unten Visuell.
+                items.forEach((item, index) => {
                     const domain = getHostname(item.link);
                     const pillId = `pill-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card animate-in'; el.target = '_blank';
-                    // Staggered Animation Delay
                     el.style.animationDelay = `${index * 0.05}s`;
 
                     el.innerHTML = `
@@ -515,8 +527,8 @@
 
                     getDominantColor(domain).then(color => {
                         if (color) {
-                            const pill = el.querySelector(`#${pillId}`);
-                            if (pill && pill.isConnected) {
+                            const pill = document.getElementById(pillId);
+                            if (pill) {
                                 pill.style.background = color.bg;
                                 pill.style.color = color.text;
                                 pill.style.border = color.border;
@@ -528,9 +540,7 @@
                 const grid = document.createElement('div');
                 grid.className = 'grid-page';
                 
-                let reversedItems = [...rawItems].reverse(); // Reverse for grid layout inside block
-                
-                reversedItems.forEach((item, index) => {
+                items.forEach((item, index) => {
                     const delay = `${index * 0.03}s`;
                     if (currentType === 'images') {
                         const myIndex = globalImages.length;
@@ -568,25 +578,17 @@
                 observer.observe(loadMoreEl);
             }
 
-            const oldScrollHeight = document.documentElement.scrollHeight;
-            const oldScrollTop = document.documentElement.scrollTop;
-
+            // Die Magic: Wir fügen neue Items VOR dem Trigger ein.
+            // Weil das Parent-Element scaleY(-1) hat, übernimmt der Browser das Scrollen 100% nativ. Es gibt NULL Sprünge.
             loadMoreEl.before(fragment);
 
-            if (isLoadMore) {
-                // EXAKTE Scroll-Korrektur über RequestAnimationFrame für 100% Stabilität auf iOS Safari
-                requestAnimationFrame(() => {
-                    const newScrollHeight = document.documentElement.scrollHeight;
-                    window.scrollBy(0, newScrollHeight - oldScrollHeight);
-                });
-            } else {
-                requestAnimationFrame(() => {
-                    window.scrollTo(0, document.body.scrollHeight);
-                });
+            if (!isLoadMore) {
+                // Bei neuer Suche einfach an den Visuellen Start scrollen (welcher scrollTop = 0 ist!)
+                resultsWrapper.scrollTop = 0;
             }
         }
 
-        // --- Native Image Viewer (Swipe Dismiss & Snapping) ---
+        // --- Native Image Viewer (Swipe Dismiss Logic) ---
         let viewerStartY = 0;
         let isSwipingDown = false;
 
@@ -596,6 +598,9 @@
             
             imageViewer.classList.add('active');
             
+            // Blockiert den Hintergrund-Scroll der Suchergebnisse komplett
+            resultsWrapper.style.overflow = 'hidden';
+            
             setTimeout(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
                 updateViewerPill();
@@ -603,18 +608,20 @@
         }
 
         function closeImageViewer() {
+            // Restore Hintergrund-Scroll
+            resultsWrapper.style.overflow = 'auto';
+            
             imageViewer.style.opacity = '0';
-            imageViewer.style.transform = 'scale(0.95)';
             setTimeout(() => { 
                 imageViewer.classList.remove('active');
-                imageViewer.style.cssText = ''; // Zurücksetzen der Inline-Styles vom Swipe
+                imageViewer.style.cssText = ''; 
                 track.innerHTML = ''; 
                 track.style.transform = '';
             }, 300); 
         }
 
         track.addEventListener('scroll', () => {
-            if(isSwipingDown) return; // Nicht während vertikalem Swipe updaten
+            if(isSwipingDown) return; 
             const index = Math.round(track.scrollLeft / window.innerWidth);
             if(index !== viewerIndex) {
                 viewerIndex = index;
@@ -622,39 +629,38 @@
             }
         }, {passive: true});
 
-        // Swipe-to-Dismiss Logik (Nach unten Wischen zum Schließen)
+        // Swipe-to-Dismiss Gesten-Erkennung
         track.addEventListener('touchstart', (e) => {
             viewerStartY = e.touches[0].clientY;
             isSwipingDown = false;
+            track.style.transition = 'none';
         }, {passive: true});
 
         track.addEventListener('touchmove', (e) => {
-            const currentY = e.touches[0].clientY;
-            const diffY = currentY - viewerStartY;
+            const diffY = e.touches[0].clientY - viewerStartY;
 
-            // Wenn wir stark nach unten wischen, aktiviere den Dismiss-Modus
-            if (diffY > 10 && !isSwipingDown) {
+            // Wenn wir stark nach unten wischen, Dismiss-Modus aktivieren & Background Dragging abbrechen
+            if (diffY > 15 && !isSwipingDown) {
                 isSwipingDown = true;
-                track.style.transition = 'none';
             }
 
             if (isSwipingDown) {
-                // Bild nach unten ziehen und Overlay ausblenden
-                const scale = Math.max(0.8, 1 - (diffY / 1000));
+                e.preventDefault(); // Verhindert strikt, dass Safari den Hintergrund bewegt
+                const scale = Math.max(0.75, 1 - (diffY / 1000));
                 track.style.transform = `translateY(${diffY}px) scale(${scale})`;
                 imageViewer.style.background = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 500))})`;
                 viewerHeader.style.opacity = Math.max(0, 1 - (diffY / 150));
             }
-        }, {passive: true});
+        }, {passive: false}); // false erlaubt uns e.preventDefault() zu nutzen!
 
         track.addEventListener('touchend', (e) => {
             if (isSwipingDown) {
                 const diffY = e.changedTouches[0].clientY - viewerStartY;
-                if (diffY > 120) {
-                    closeImageViewer(); // Schließen wenn weit genug gezogen
+                if (diffY > 100) {
+                    closeImageViewer();
                 } else {
-                    // Zurückfedern (Spring Animation), wenn nicht weit genug gezogen
-                    track.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    // Feder-Animation (Bounce), wenn nicht weit genug nach unten gezogen
+                    track.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
                     track.style.transform = 'translateY(0) scale(1)';
                     imageViewer.style.background = '';
                     viewerHeader.style.opacity = '1';
@@ -670,9 +676,8 @@
             const pillContainer = document.getElementById('viewer-pill-container');
             const pillId = `viewer-pill-${Date.now()}`;
 
-            // Kein Emoji mehr (↗ entfernt)
             pillContainer.innerHTML = `
-                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.1); color: white;">
                     <span>${domain}</span>
                 </a>
             `;
