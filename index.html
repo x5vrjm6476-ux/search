@@ -21,23 +21,23 @@
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
             --agile: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
-            --spring: all 0.4s cubic-bezier(0.25, 1, 0.3, 1);
+            --spring: all 0.5s cubic-bezier(0.25, 1, 0.3, 1);
         }
 
-        /* --- Scrollbar global verstecken & Ankern blockieren --- */
+        /* --- Scrollbar global verstecken & Native Scroll Anchoring aktivieren --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; 
-            overflow-anchor: none; scrollbar-width: none; 
+            scrollbar-width: none; 
         }
         *::-webkit-scrollbar { display: none; }
         
         html, body { 
             background-color: var(--bg-color); color: var(--text-main); 
             min-height: 100vh; overflow-x: hidden; 
-            -ms-overflow-style: none; /* IE/Edge */
+            -ms-overflow-style: none;
         }
-        body.no-scroll { overflow: hidden; } /* Für Lightbox */
+        body.no-scroll { overflow: hidden; } /* Blockiert Scrollen während Vollbild */
 
         /* --- 1. Initial Home Screen --- */
         #home-view {
@@ -75,10 +75,10 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 16px center; min-width: 0; -webkit-appearance: none;
         }
-        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; transition: opacity 0.2s; }
+        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: opacity 0.2s; }
         .cancel-btn:active { opacity: 0.6; }
 
-        /* --- 3. Results View --- */
+        /* --- 3. Results View (Native Scroll Anchoring) --- */
         #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
         #results-wrapper.active { display: flex; }
 
@@ -86,13 +86,22 @@
             display: flex; flex-direction: column; 
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
+            /* Native iOS Scroll Ankering: Hält den Viewport stabil, wenn oben neue Dinge laden */
+            overflow-anchor: auto; 
         }
 
         .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
-        /* Unsichtbarer Trigger ganz oben */
-        #load-more-trigger { width: 100%; height: 1px; opacity: 0; pointer-events: none; }
+        /* Unsichtbarer Trigger für das unendliche Nachladen */
+        #load-more-trigger { width: 100%; height: 1px; opacity: 0; pointer-events: none; margin-bottom: 10px; }
+
+        /* --- Elegant Card Animations (iOS Premium Feel) --- */
+        .animate-in { animation: slideUpFade 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(24px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
         /* --- Skeletons --- */
         .skeleton { animation: pulse 1.5s infinite ease-in-out; background: rgba(255,255,255,0.06); }
@@ -103,14 +112,7 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* --- Staggered Fast Animations --- */
-        .animate-in { animation: slideIn 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
-        @keyframes slideIn {
-            0% { opacity: 0; transform: translateY(15px) scale(0.99); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* --- Floating Bottom Bar (Premium iOS 26) --- */
+        /* --- Floating Bottom Bar (Premium iOS 26 Liquid Glass) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.45); 
@@ -166,7 +168,7 @@
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
 
-        /* --- Native iOS Image Lightbox --- */
+        /* --- Native iOS Image Lightbox (Swipe Dismiss) --- */
         #image-viewer {
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -176,18 +178,21 @@
         #image-viewer.active { opacity: 1; pointer-events: all; }
         
         .viewer-header {
-            position: absolute; top: var(--safe-top); left: 0; right: 0;
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; z-index: 2010;
+            position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; 
+            z-index: 9999; /* Absolut im Vordergrund */
+            transition: opacity 0.2s;
         }
         .viewer-close {
-            background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px;
+            background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
             border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); transition: transform 0.2s;
         }
+        .viewer-close:active { transform: scale(0.9); }
         .viewer-track {
             display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-            transition: transform 0s; touch-action: pan-x; /* Blockiert vertikales natives Scrollen */
+            transition: transform 0s; touch-action: pan-x; /* Erlaubt wischen, blockiert vertikal nativ */
         }
         .viewer-slide {
             flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
@@ -346,7 +351,7 @@
                 currentPage = 1;
                 
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-                if (getCookie('serper_api_key')) performSearch(false, true); // initial true
+                if (getCookie('serper_api_key')) performSearch(false, true);
             } else {
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
@@ -378,10 +383,15 @@
         function handleOverlaySubmit(e) {
             e.preventDefault();
             const q = overlaySearchInput.value.trim();
-            overlaySearchInput.blur(); // Tastatur zu
-            closeSearch(); // Overlay zu
+            overlaySearchInput.blur(); // Tastatur schließt sich sofort
+            closeSearch(); // Overlay schließt sich sofort
             if(q) startSearchFrom(q);
         }
+
+        // Wenn Tastatur via "Fertig" (ohne Submit) geschlossen wird, Overlay aufräumen
+        overlaySearchInput.addEventListener('blur', () => {
+            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 100);
+        });
 
         function startSearchFrom(query) {
             homeView.classList.add('hidden');
@@ -407,14 +417,13 @@
 
         // --- Skeletons ---
         function renderSkeletons() {
-            resultsContent.innerHTML = '<div id="load-more-trigger"></div>';
+            resultsContent.innerHTML = '<div id="load-more-trigger"></div>'; // Trigger immer GANZ OBEN
             const frag = document.createDocumentFragment();
             
             if (currentType === 'search') {
                 for(let i=0; i<6; i++) {
                     const el = document.createElement('div');
                     el.className = 'skeleton-card skeleton animate-in';
-                    el.style.animationDelay = `${i * 0.02}s`;
                     el.innerHTML = `<div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div>`;
                     frag.appendChild(el);
                 }
@@ -423,9 +432,8 @@
                 grid.className = 'grid-page';
                 const count = currentType === 'images' ? 12 : 8;
                 for(let i=0; i<count; i++) {
-                    const delay = `${i * 0.02}s`;
-                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton animate-in" style="animation-delay: ${delay}"></div>`;
-                    else grid.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px; animation-delay: ${delay}"></div>`;
+                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton animate-in"></div>`;
+                    else grid.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px;"></div>`;
                 }
                 frag.appendChild(grid);
             }
@@ -433,9 +441,9 @@
             window.scrollTo(0, 0); 
         }
 
-        // --- Fetch & Render ---
+        // --- Fetch & Render (Endless Illusion) ---
         const observer = new IntersectionObserver((entries) => {
-            // Extrem frühes Vorladen (1500px Root Margin)
+            // Riesiger 1500px Margin: Lädt unbemerkt im Hintergrund, bevor User ankommt
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
             }
@@ -479,11 +487,12 @@
             
             if (rawItems.length === 0 && currentPage === 1) return;
 
+            // Arrays per Seite umdrehen für Bottom-Up UX
             let items = rawItems.reverse();
             const fragment = document.createDocumentFragment();
             
             items.forEach((item, index) => {
-                const delay = isInitial ? `${index * 0.02}s` : '0s'; // Nur beim initialen Laden Stagger
+                const delay = isInitial ? `${index * 0.02}s` : '0s'; // Animations-Staffelung
                 
                 if (currentType === 'search') {
                     const domain = getHostname(item.link);
@@ -503,14 +512,14 @@
                     `;
                     fragment.appendChild(el);
 
-                    // Schnelles Befüllen, wenn Farbe schon im Cache
+                    // Farben sofort oder Async setzen
                     if(colorCache.has(domain)) {
                         const color = colorCache.get(domain);
                         if (color) {
-                            setTimeout(()=>{
+                            requestAnimationFrame(()=>{
                                 const p = document.getElementById(pillId);
                                 if(p) { p.style.background = color.bg; p.style.color = color.text; p.style.border = color.border; }
-                            }, 0);
+                            });
                         }
                     } else {
                         getDominantColor(domain).then(color => {
@@ -538,15 +547,17 @@
                         const el = document.createElement('a');
                         el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
                         el.style.animationDelay = delay;
-                        el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
+                        // Fehlerhafte Bilder werden sofort gelöscht
+                        el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                         el.onclick = (e) => { e.preventDefault(); openImageViewer(myIndex); };
                         grid.appendChild(el);
                     } else if (currentType === 'shopping') {
                         const el = document.createElement('a');
                         el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
                         el.style.animationDelay = delay;
+                        // Fehlerhafte Bilder -> ganze Karte weg
                         el.innerHTML = `
-                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
+                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
                             <div class="shopping-info">
                                 <div class="shopping-title">${item.title}</div>
                                 <div class="shopping-price">${item.price || ''}</div>
@@ -558,6 +569,7 @@
                 fragment.appendChild(grid);
             }
 
+            // Sicherstellen, dass Trigger OBEN existiert
             let loadMoreEl = document.getElementById('load-more-trigger');
             if(!loadMoreEl) {
                 loadMoreEl = document.createElement('div');
@@ -566,33 +578,27 @@
                 observer.observe(loadMoreEl);
             }
 
-            const oldScrollHeight = document.documentElement.scrollHeight;
-            const oldScrollTop = document.documentElement.scrollTop;
-
-            // Prepend: Neue (schlechtere) Ergebnisse kommen OBEN dazu.
+            // Prepend: Neue Blöcke werden UNTERHALB des Triggers (also ganz oben) eingefügt
             loadMoreEl.after(fragment);
 
-            if (isLoadMore) {
+            if (isInitial) {
+                // Bei Neu-Suche: Springe direkt GANZ ans Ende
                 requestAnimationFrame(() => {
-                    const newScrollHeight = document.documentElement.scrollHeight;
-                    window.scrollTo({ top: oldScrollTop + (newScrollHeight - oldScrollHeight), behavior: 'instant' });
-                });
-            } else {
-                requestAnimationFrame(() => {
-                    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+                    window.scrollTo(0, document.body.scrollHeight);
                 });
             }
+            // Bei isLoadMore macht der native Browser-Anchor (overflow-anchor) den Rest! Null Ruckeln!
         }
 
-        // --- Native Image Viewer (Swipe Dismiss mit Bugfix) ---
+        // --- Native Image Viewer (Swipe Dismiss X & Y) ---
         let startX = 0, startY = 0;
         let isSwipingY = false, isSwipingX = false;
 
         function openImageViewer(index) {
             viewerIndex = index;
-            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}"></div>`).join('');
+            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.display='none'"></div>`).join('');
             imageViewer.classList.add('active');
-            document.body.classList.add('no-scroll'); // Hintergrund scrollen verhindern!
+            document.body.classList.add('no-scroll'); // Verhindert Buggy-Scroll im Hintergrund
             
             requestAnimationFrame(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
@@ -603,13 +609,13 @@
         function closeImageViewer() {
             imageViewer.style.opacity = '0';
             imageViewer.style.transform = 'scale(0.95)';
-            document.body.classList.remove('no-scroll'); // Hintergrund wieder scrollbar
+            document.body.classList.remove('no-scroll'); 
             setTimeout(() => { 
                 imageViewer.classList.remove('active');
                 imageViewer.style.cssText = ''; 
                 track.innerHTML = ''; 
                 track.style.transform = '';
-            }, 250); 
+            }, 300); 
         }
 
         track.addEventListener('scroll', () => {
@@ -621,7 +627,7 @@
             }
         }, {passive: true});
 
-        // WICHTIG: passive: false, damit wir preventDefault nutzen können
+        // WICHTIG: {passive: false} um Scrollen abzufangen
         track.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -638,9 +644,9 @@
             }
 
             if (isSwipingY) {
-                e.preventDefault(); // Verhindert strikt, dass iOS Safari scrollen will
+                e.preventDefault(); // Stoppt den Body-Bounce von iOS komplett
                 const diffY = e.touches[0].clientY - startY;
-                if (diffY > 0) {
+                if (diffY > 0) { // Nur Wischen nach unten schließt
                     const scale = Math.max(0.75, 1 - (diffY / 800));
                     track.style.transform = `translateY(${diffY}px) scale(${scale})`;
                     imageViewer.style.backgroundColor = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 400))})`;
@@ -655,11 +661,11 @@
                 if (diffY > 120) {
                     closeImageViewer();
                 } else {
-                    track.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    track.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                     track.style.transform = 'translateY(0) scale(1)';
                     imageViewer.style.backgroundColor = 'rgba(0,0,0,0.95)';
                     viewerHeader.style.opacity = '1';
-                    setTimeout(() => track.style.transition = 'none', 300);
+                    setTimeout(() => track.style.transition = 'none', 400);
                 }
             }
         });
@@ -671,6 +677,7 @@
             const pillContainer = document.getElementById('viewer-pill-container');
             const pillId = `viewer-pill-${Date.now()}`;
 
+            // EMOJI restlos entfernt!
             pillContainer.innerHTML = `
                 <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
                     <span>${domain}</span>
@@ -687,7 +694,7 @@
             });
         }
 
-        // --- Auth ---
+        // --- Auth Setup ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
