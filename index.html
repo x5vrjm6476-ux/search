@@ -8,7 +8,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -17,36 +17,32 @@
             --card-hover: #1c1c1e;
             --text-main: #ffffff;
             --text-muted: #8e8e93;
-            --border-radius: 28px;
+            --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            
-            /* Native iOS Spring Curves */
-            --agile: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
-            --spring: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            --spring: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-        html, body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
+        html, body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
 
         /* --- 1. Initial Home Screen --- */
         #home-view {
             position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.4s ease;
+            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        #home-view.hidden { opacity: 0; pointer-events: none; }
+        #home-view.hidden { opacity: 0; transform: scale(0.97); pointer-events: none; }
         
         .home-search-wrapper { width: 100%; max-width: 600px; position: relative; }
         .home-search-input {
-            width: 100%; padding: 22px 24px 22px 56px; font-size: 20px; font-weight: 500; 
+            width: 100%; padding: 20px 24px 20px 56px; font-size: 20px; font-weight: 500; 
             background-color: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 32px; color: var(--text-main); outline: none;
+            border-radius: 28px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 20px center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: var(--agile);
-            -webkit-appearance: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: var(--spring);
         }
-        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.15); transform: scale(1.02); }
+        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
         .home-search-input::placeholder { color: var(--text-muted); }
 
         /* --- 2. Solid Black Search Overlay --- */
@@ -54,7 +50,7 @@
             position: fixed; inset: 0; z-index: 1000; background: #000000; 
             display: flex; flex-direction: column; align-items: center; 
             padding: calc(var(--safe-top) + 20px) 16px 20px;
-            opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
         #search-overlay.active { opacity: 1; pointer-events: all; }
         
@@ -65,45 +61,25 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 16px center; min-width: 0; -webkit-appearance: none;
         }
-        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: opacity 0.2s; }
-        .cancel-btn:active { opacity: 0.5; }
+        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; transition: opacity 0.2s; }
+        .cancel-btn:active { opacity: 0.6; }
 
-        /* --- 3. Robust Native Reverse Scroll Layout --- */
-        #results-wrapper {
-            display: none; position: fixed; inset: 0; z-index: 10;
-            overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
-            background: var(--bg-color);
-        }
-        #results-wrapper.active { display: block; }
+        /* --- 3. Results View --- */
+        #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
+        #results-wrapper.active { display: flex; }
 
-        /* Die Magie: Container ist per scaleY(-1) gespiegelt! */
+        /* Normales Layout - Der JS-Code regelt die umgekehrte Reihenfolge! */
         #results-content { 
-            display: flex; flex-direction: column; max-width: 760px; margin: 0 auto; width: 100%;
-            /* Padding invertiert: Unten ist jetzt Visuell Oben! */
-            padding: calc(var(--safe-bottom) + 120px) 20px calc(var(--safe-top) + 60px); 
-            transform: scaleY(-1); transition: opacity 0.3s ease; opacity: 1; 
+            display: flex; flex-direction: column; 
+            max-width: 760px; margin: 0 auto; width: 100%;
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
         }
 
-        /* Jedes Element wird wieder zurückgespiegelt */
-        .card, .image-card, .shopping-card, .skeleton-card, #load-more-trigger {
-            transform: scaleY(-1);
-        }
-        
         .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
-        #load-more-trigger { width: 100%; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
-        .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-        #load-more-trigger.loading .loading-spinner { display: block; }
-        @keyframes spin { to { transform: scaleY(-1) rotate(360deg); } } /* Wegen Vererbung zurückdrehen */
-
-        /* --- Staggered iOS Animations --- */
-        .animate-in { animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-        @keyframes slideIn {
-            /* Transform in Kombination mit der Spiegelung berechnet */
-            0% { opacity: 0; transform: scaleY(-1) translateY(40px) scale(0.92); }
-            100% { opacity: 1; transform: scaleY(-1) translateY(0) scale(1); }
-        }
+        /* Unsichtbarer Trigger ganz oben (Ladeanimation entfernt für ultimativen Speed) */
+        #load-more-trigger { width: 100%; height: 1px; opacity: 0; pointer-events: none; }
 
         /* --- Skeletons --- */
         .skeleton { animation: pulse 1.5s infinite ease-in-out; background: rgba(255,255,255,0.06); }
@@ -114,49 +90,51 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 0.2; } 100% { opacity: 0.5; } }
 
-        /* --- Floating Bottom Bar (PERFEKTES iOS 26 Liquid Glass) --- */
+        /* --- Staggered iOS Animations --- */
+        .animate-in { animation: slideIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- Floating Bottom Bar (Premium iOS 26 Liquid Glass) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
-            background: rgba(35, 35, 38, 0.45); 
-            backdrop-filter: blur(50px) saturate(250%) contrast(1.1); 
-            -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(1.1);
+            background: rgba(30, 30, 32, 0.45); 
+            backdrop-filter: blur(50px) saturate(250%) brightness(1.15); 
+            -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.15);
             padding: 8px; border-radius: 100px; 
-            /* High-End 3D Glas-Kanten */
-            box-shadow: 
-                inset 0 1px 1.5px rgba(255, 255, 255, 0.25), 
-                inset 0 -1px 1.5px rgba(0, 0, 0, 0.4), 
-                0 16px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.6);
             display: flex; align-items: center; gap: 8px; z-index: 100;
         }
 
         .search-circle-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--agile); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: var(--spring); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
         .tabs-container { position: relative; display: flex; padding: 4px; }
-        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.6); cursor: pointer; position: relative; z-index: 2; transition: color 0.3s ease; text-align: center; }
+        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.65); cursor: pointer; position: relative; z-index: 2; transition: color 0.3s ease; text-align: center; }
         .tab.active { color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
         .tab-slider { 
             position: absolute; top: 4px; bottom: 4px; left: 0; 
-            background: rgba(255, 255, 255, 0.18); border-radius: 100px; z-index: 1; 
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.2); border-radius: 100px; z-index: 1; 
+            border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        /* --- Cards & Neutral First Pills --- */
+        /* --- Cards & Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); transition: transform 0.2s; }
-        .card:active { transform: scale(0.98) scaleY(-1); background-color: var(--card-hover); }
+        .card:active { transform: scale(0.98); background-color: var(--card-hover); }
         .card-header { margin-bottom: 14px; }
         
         .color-pill {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 6px 14px; border-radius: 9999px;
-            /* Startet Neutral */
             background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05);
-            color: var(--text-main); transition: all 0.6s ease;
+            color: #ffffff; transition: all 0.4s ease;
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
@@ -165,41 +143,40 @@
 
         /* Grids */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; transition: transform 0.2s; }
-        .image-card:active { transform: scale(0.96) scaleY(-1); }
+        .image-card:active { transform: scale(0.96); }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: transform 0.2s; }
-        .shopping-card:active { transform: scale(0.98) scaleY(-1); }
+        .shopping-card:active { transform: scale(0.98); }
         .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .shopping-info { padding: 16px; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .shopping-price { font-weight: 600; color: white; font-size: 16px; }
+        .shopping-price { font-weight: 700; color: white; font-size: 16px; }
 
-        /* --- Native iOS Image Lightbox (Scroll Snap & Swipe Dismiss) --- */
+        /* --- Native iOS Image Lightbox (Swipe Dismiss) --- */
         #image-viewer {
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s ease; overscroll-behavior-y: none;
         }
         #image-viewer.active { opacity: 1; pointer-events: all; }
         
         .viewer-header {
             position: absolute; top: var(--safe-top); left: 0; right: 0;
             display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; z-index: 2010;
-            transition: opacity 0.2s;
         }
         .viewer-close {
             background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px;
             border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
         }
-        
         .viewer-track {
             display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-            /* Kein Transition auf Transform, da JS es für Swipe steuert */
+            transition: transform 0s;
         }
         .viewer-track::-webkit-scrollbar { display: none; }
-        
         .viewer-slide {
             flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
         }
@@ -208,9 +185,10 @@
         /* Setup Modal */
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--agile); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; }
+        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring);}
+        .modal-content button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -248,8 +226,7 @@
 
     <div id="results-wrapper">
         <main id="results-content">
-            <div id="load-more-trigger"><div class="loading-spinner"></div></div>
-        </main>
+            </main>
 
         <div id="bottom-bar">
             <button class="search-circle-btn" onclick="openSearch()">
@@ -271,7 +248,6 @@
         const searchOverlay = document.getElementById('search-overlay');
         const homeSearchInput = document.getElementById('homeSearchInput');
         const overlaySearchInput = document.getElementById('overlaySearchInput');
-        const loadMoreTrigger = document.getElementById('load-more-trigger');
         const setupModal = document.getElementById('setup-modal');
         const tabSlider = document.getElementById('tabSlider');
         const tabs = document.querySelectorAll('.tab');
@@ -281,19 +257,17 @@
         let currentQuery = '';
         let isLoading = false;
         
-        // --- Image Viewer State ---
         let globalImages = [];
         let viewerIndex = 0;
         const track = document.getElementById('viewer-track');
-        const imageViewer = document.getElementById('image-viewer');
         const viewerHeader = document.getElementById('viewer-header');
+        const imageViewer = document.getElementById('image-viewer');
 
-        // --- Robuste Farb-Extraktion ---
+        // --- Farb-Extraktion ---
         const colorCache = new Map();
 
         async function getDominantColor(domain) {
             if (colorCache.has(domain)) return colorCache.get(domain);
-
             const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(faviconUrl)}`;
 
@@ -304,7 +278,7 @@
                     return result;
                 }
             }
-            return null; // Kein Fallback, bleibt neutral
+            return null; 
         }
 
         function tryExtractColor(url) {
@@ -346,26 +320,28 @@
             tabSlider.style.transform = `translateX(${activeEl.offsetLeft}px)`;
         }
         
-        // --- Init (ARC / URL Start) ---
+        // --- Init ---
         window.addEventListener('load', () => { 
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
             
             if (queryParam) {
-                homeView.style.transition = 'none';
-                homeView.classList.add('hidden');
+                homeView.style.display = 'none'; // Instant ausblenden
                 resultsWrapper.classList.add('active');
                 homeSearchInput.value = queryParam;
                 overlaySearchInput.value = queryParam;
                 currentQuery = queryParam;
                 currentPage = 1;
                 
-                setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 100);
-                if (getCookie('serper_api_key')) performSearch();
+                requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
+                if (getCookie('serper_api_key')) {
+                    renderSkeletons();
+                    performSearch();
+                }
+            } else {
+                requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
-
             checkApiKey(); 
-            setTimeout(() => { homeView.style.transition = ''; }, 50); 
         });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -383,7 +359,7 @@
             }
         }
 
-        // --- Keyboard Handling ---
+        // --- Keyboard ---
         function handleHomeSubmit(e) {
             e.preventDefault();
             const q = homeSearchInput.value.trim();
@@ -396,10 +372,6 @@
             if(q) { overlaySearchInput.blur(); closeSearch(); startSearchFrom(q); }
         }
 
-        overlaySearchInput.addEventListener('blur', () => {
-            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 100);
-        });
-
         function startSearchFrom(query) {
             homeView.classList.add('hidden');
             resultsWrapper.classList.add('active');
@@ -408,7 +380,7 @@
             currentQuery = query;
             currentPage = 1;
             
-            setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 10);
+            requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             renderSkeletons();
             performSearch();
         }
@@ -422,16 +394,22 @@
             overlaySearchInput.blur();
         }
 
-        // --- Skeletons ---
+        // --- Skeleton & Logic ---
         function renderSkeletons() {
             resultsContent.innerHTML = '';
+            
+            // Trigger GANZ OBEN (Da wir nach OBEN scrollen um alte zu laden)
+            const loadMoreEl = document.createElement('div');
+            loadMoreEl.id = 'load-more-trigger';
+            resultsContent.appendChild(loadMoreEl);
+
             const frag = document.createDocumentFragment();
             
+            // Skeletons dranhängen (Wir füllen den Screen von oben nach unten)
             if (currentType === 'search') {
                 for(let i=0; i<6; i++) {
                     const el = document.createElement('div');
-                    el.className = 'skeleton-card skeleton animate-in';
-                    el.style.animationDelay = `${i * 0.05}s`;
+                    el.className = 'skeleton-card skeleton';
                     el.innerHTML = `<div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div>`;
                     frag.appendChild(el);
                 }
@@ -440,21 +418,16 @@
                 grid.className = 'grid-page';
                 const count = currentType === 'images' ? 12 : 8;
                 for(let i=0; i<count; i++) {
-                    const delay = `${i * 0.05}s`;
-                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton animate-in" style="animation-delay: ${delay}"></div>`;
-                    else grid.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px; animation-delay: ${delay}"></div>`;
+                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton"></div>`;
+                    else grid.innerHTML += `<div class="shopping-card skeleton" style="height:240px;"></div>`;
                 }
                 frag.appendChild(grid);
             }
             
-            // Lade-Trigger ans Ende hängen (Visual Top!)
-            const loadMoreEl = document.createElement('div');
-            loadMoreEl.id = 'load-more-trigger';
             resultsContent.appendChild(frag);
-            resultsContent.appendChild(loadMoreEl);
+            window.scrollTo(0, 0); // Skeletons sind oben, wir starten oben
         }
 
-        // --- Fetch & Render (Mit Felsenfester CSS Architektur) ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
@@ -464,9 +437,6 @@
         async function performSearch(isLoadMore = false) {
             if (isLoading) return;
             isLoading = true;
-            
-            let loadMoreEl = document.getElementById('load-more-trigger');
-            if(loadMoreEl) loadMoreEl.classList.add('loading');
 
             const apiKey = getCookie('serper_api_key');
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
@@ -487,7 +457,6 @@
                 console.error("Fetch error");
             } finally {
                 isLoading = false; 
-                if(loadMoreEl) loadMoreEl.classList.remove('loading');
             }
         }
 
@@ -503,16 +472,20 @@
             
             if (items.length === 0 && currentPage === 1) return;
 
+            // WICHTIG: Keine CSS Tricks mehr!
+            // Wir drehen die neuen Items um: [Schlechtestes ... Bestes]
+            items = items.reverse();
             const fragment = document.createDocumentFragment();
             
-            if (currentType === 'search') {
-                // Keine Umkehrung. Erstes Ergebnis ist ganz Oben im DOM = ganz Unten Visuell.
-                items.forEach((item, index) => {
+            items.forEach((item, index) => {
+                const delay = `${index * 0.03}s`; // Staggered Animation
+                
+                if (currentType === 'search') {
                     const domain = getHostname(item.link);
                     const pillId = `pill-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card animate-in'; el.target = '_blank';
-                    el.style.animationDelay = `${index * 0.05}s`;
+                    el.style.animationDelay = delay;
 
                     el.innerHTML = `
                         <div class="card-header">
@@ -527,16 +500,19 @@
 
                     getDominantColor(domain).then(color => {
                         if (color) {
-                            const pill = document.getElementById(pillId);
-                            if (pill) {
+                            const pill = el.querySelector(`#${pillId}`);
+                            if (pill && pill.isConnected) {
                                 pill.style.background = color.bg;
                                 pill.style.color = color.text;
                                 pill.style.border = color.border;
                             }
                         }
                     });
-                });
-            } else {
+                } 
+            });
+
+            // Grid Layouts
+            if (currentType !== 'search') {
                 const grid = document.createElement('div');
                 grid.className = 'grid-page';
                 
@@ -569,49 +545,54 @@
                 fragment.appendChild(grid);
             }
 
+            // Sicherstellen, dass Trigger existiert
             let loadMoreEl = document.getElementById('load-more-trigger');
             if(!loadMoreEl) {
                 loadMoreEl = document.createElement('div');
                 loadMoreEl.id = 'load-more-trigger';
-                loadMoreEl.innerHTML = '<div class="loading-spinner"></div>';
                 resultsContent.appendChild(loadMoreEl);
                 observer.observe(loadMoreEl);
             }
 
-            // Die Magic: Wir fügen neue Items VOR dem Trigger ein.
-            // Weil das Parent-Element scaleY(-1) hat, übernimmt der Browser das Scrollen 100% nativ. Es gibt NULL Sprünge.
-            loadMoreEl.before(fragment);
+            // --- Scroll Logik (Absolut robust) ---
+            const oldScrollHeight = document.documentElement.scrollHeight;
+            const oldScrollTop = document.documentElement.scrollTop;
 
-            if (!isLoadMore) {
-                // Bei neuer Suche einfach an den Visuellen Start scrollen (welcher scrollTop = 0 ist!)
-                resultsWrapper.scrollTop = 0;
+            // Wir fügen NACH dem Trigger ein (also optisch OBEN, da Trigger ganz oben ist!)
+            loadMoreEl.after(fragment);
+
+            if (isLoadMore) {
+                // Bei "Load More" korrigieren wir den Scroll, damit das Bild nicht hüpft
+                requestAnimationFrame(() => {
+                    const newScrollHeight = document.documentElement.scrollHeight;
+                    window.scrollTo({ top: oldScrollTop + (newScrollHeight - oldScrollHeight), behavior: 'instant' });
+                });
+            } else {
+                // Bei neuer Suche springen wir SOFORT GANZ NACH UNTEN zum besten Ergebnis
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+                });
             }
         }
 
-        // --- Native Image Viewer (Swipe Dismiss Logic) ---
-        let viewerStartY = 0;
-        let isSwipingDown = false;
+        // --- Native Image Viewer (Swipe Dismiss X & Y) ---
+        let startX = 0, startY = 0;
+        let isSwipingY = false, isSwipingX = false;
 
         function openImageViewer(index) {
             viewerIndex = index;
             track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}"></div>`).join('');
-            
             imageViewer.classList.add('active');
             
-            // Blockiert den Hintergrund-Scroll der Suchergebnisse komplett
-            resultsWrapper.style.overflow = 'hidden';
-            
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
                 updateViewerPill();
-            }, 10);
+            });
         }
 
         function closeImageViewer() {
-            // Restore Hintergrund-Scroll
-            resultsWrapper.style.overflow = 'auto';
-            
             imageViewer.style.opacity = '0';
+            imageViewer.style.transform = 'scale(0.95)';
             setTimeout(() => { 
                 imageViewer.classList.remove('active');
                 imageViewer.style.cssText = ''; 
@@ -621,7 +602,7 @@
         }
 
         track.addEventListener('scroll', () => {
-            if(isSwipingDown) return; 
+            if(isSwipingY) return; 
             const index = Math.round(track.scrollLeft / window.innerWidth);
             if(index !== viewerIndex) {
                 viewerIndex = index;
@@ -629,43 +610,46 @@
             }
         }, {passive: true});
 
-        // Swipe-to-Dismiss Gesten-Erkennung
+        // Geniale Gestenerkennung (Apple-Style)
         track.addEventListener('touchstart', (e) => {
-            viewerStartY = e.touches[0].clientY;
-            isSwipingDown = false;
-            track.style.transition = 'none';
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isSwipingY = false;
+            isSwipingX = false;
         }, {passive: true});
 
         track.addEventListener('touchmove', (e) => {
-            const diffY = e.touches[0].clientY - viewerStartY;
-
-            // Wenn wir stark nach unten wischen, Dismiss-Modus aktivieren & Background Dragging abbrechen
-            if (diffY > 15 && !isSwipingDown) {
-                isSwipingDown = true;
+            if (!isSwipingX && !isSwipingY) {
+                const diffX = Math.abs(e.touches[0].clientX - startX);
+                const diffY = Math.abs(e.touches[0].clientY - startY);
+                if (diffY > diffX && diffY > 5) isSwipingY = true;
+                if (diffX > diffY && diffX > 5) isSwipingX = true;
             }
 
-            if (isSwipingDown) {
-                e.preventDefault(); // Verhindert strikt, dass Safari den Hintergrund bewegt
-                const scale = Math.max(0.75, 1 - (diffY / 1000));
-                track.style.transform = `translateY(${diffY}px) scale(${scale})`;
-                imageViewer.style.background = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 500))})`;
-                viewerHeader.style.opacity = Math.max(0, 1 - (diffY / 150));
+            if (isSwipingY) {
+                const diffY = e.touches[0].clientY - startY;
+                if (diffY > 0) { // Nur nach unten wischen schließt das Bild
+                    const scale = Math.max(0.75, 1 - (diffY / 800));
+                    track.style.transform = `translateY(${diffY}px) scale(${scale})`;
+                    imageViewer.style.backgroundColor = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 400))})`;
+                    viewerHeader.style.opacity = Math.max(0, 1 - (diffY / 200));
+                }
             }
-        }, {passive: false}); // false erlaubt uns e.preventDefault() zu nutzen!
+        }, {passive: true});
 
         track.addEventListener('touchend', (e) => {
-            if (isSwipingDown) {
-                const diffY = e.changedTouches[0].clientY - viewerStartY;
-                if (diffY > 100) {
+            if (isSwipingY) {
+                const diffY = e.changedTouches[0].clientY - startY;
+                if (diffY > 120) {
                     closeImageViewer();
                 } else {
-                    // Feder-Animation (Bounce), wenn nicht weit genug nach unten gezogen
-                    track.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    // Feder-Zurücksetzen
+                    track.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                     track.style.transform = 'translateY(0) scale(1)';
-                    imageViewer.style.background = '';
+                    imageViewer.style.backgroundColor = 'rgba(0,0,0,0.95)';
                     viewerHeader.style.opacity = '1';
+                    setTimeout(() => track.style.transition = 'none', 400);
                 }
-                isSwipingDown = false;
             }
         });
 
@@ -677,7 +661,7 @@
             const pillId = `viewer-pill-${Date.now()}`;
 
             pillContainer.innerHTML = `
-                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
                     <span>${domain}</span>
                 </a>
             `;
@@ -692,7 +676,7 @@
             });
         }
 
-        // --- Auth Setup ---
+        // --- Auth ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
