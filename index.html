@@ -20,18 +20,22 @@
             --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --agile: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            
+            /* Premium iOS Spring Animationen */
+            --spring-fast: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --spring-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        /* Verhindert natives Scroll-Ankern, das beim Nachladen für Sprünge sorgt */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
         html, body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
 
         /* --- 1. Initial Home Screen --- */
         #home-view {
             position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.3s ease;
+            background: var(--bg-color); z-index: 50; padding: 24px; transition: opacity 0.4s ease, transform 0.4s ease;
         }
-        #home-view.hidden { opacity: 0; pointer-events: none; }
+        #home-view.hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
         
         .home-search-wrapper { width: 100%; max-width: 600px; position: relative; }
         .home-search-input {
@@ -40,9 +44,9 @@
             border-radius: 28px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 20px center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: var(--spring-fast);
         }
-        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); }
+        .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
         .home-search-input::placeholder { color: var(--text-muted); }
 
         /* --- 2. Solid Black Search Overlay --- */
@@ -50,7 +54,7 @@
             position: fixed; inset: 0; z-index: 1000; background: #000000; 
             display: flex; flex-direction: column; align-items: center; 
             padding: calc(var(--safe-top) + 20px) 16px 20px;
-            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
         }
         #search-overlay.active { opacity: 1; pointer-events: all; }
         
@@ -62,24 +66,21 @@
             background-repeat: no-repeat; background-position: 16px center; min-width: 0; 
             -webkit-appearance: none;
         }
-        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; }
+        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; transition: opacity 0.2s; }
+        .cancel-btn:active { opacity: 0.6; }
 
-        /* --- 3. Results View (Immer Column-Reverse) --- */
+        /* --- 3. Results View & Layouts --- */
         #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
         #results-wrapper.active { display: flex; }
 
         #results-content { 
-            display: flex; flex-direction: column-reverse; /* Das Herzstück für Bottom-Up Scrolling */
+            display: flex; flex-direction: column-reverse; /* Das Herzstück für Bottom-Up */
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
             transition: opacity 0.2s ease; opacity: 1; 
         }
 
-        /* Das Grid für Bilder und Shopping als sauberer Block */
-        .grid-page { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; 
-            width: 100%; margin-bottom: 20px; 
-        }
+        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         #load-more-trigger { width: 100%; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
@@ -87,7 +88,14 @@
         #load-more-trigger.loading .loading-spinner { display: block; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- Skeletons (Lazy Load) --- */
+        /* --- Staggered iOS Animations --- */
+        .animate-in { animation: slideInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- Skeletons --- */
         .skeleton { animation: pulse 1.5s infinite ease-in-out; background: rgba(255,255,255,0.06); }
         .skeleton-card { border-radius: var(--border-radius); padding: 28px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); }
         .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
@@ -99,22 +107,19 @@
         /* --- Floating Bottom Bar (PERFEKTES iOS 26 Liquid Glass) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
-            background: rgba(45, 45, 48, 0.4); /* Refraktives, leicht helleres Grau für den Glass-Effekt */
+            background: rgba(38, 38, 40, 0.45); 
             backdrop-filter: blur(50px) saturate(250%) brightness(1.1); 
             -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.1);
             padding: 8px; border-radius: 100px; 
-            box-shadow: 
-                inset 0 1px 1px rgba(255, 255, 255, 0.25), /* Heller Lichtkante oben */
-                inset 0 -1px 1px rgba(0, 0, 0, 0.3),       /* Dunkle Kante unten */
-                0 16px 40px rgba(0, 0, 0, 0.7);            /* Weicher Drop-Shadow */
+            box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.25), inset 0 -1px 1px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.6);
             display: flex; align-items: center; gap: 8px; z-index: 100;
         }
 
         .search-circle-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--agile); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: var(--spring-bounce); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
         }
-        .search-circle-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
+        .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
         .tabs-container { position: relative; display: flex; padding: 4px; }
@@ -122,13 +127,14 @@
         .tab.active { color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
         .tab-slider { 
             position: absolute; top: 4px; bottom: 4px; left: 0; 
-            background: rgba(255, 255, 255, 0.15); border-radius: 100px; z-index: 1; 
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.18); border-radius: 100px; z-index: 1; 
+            border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
         /* --- Cards & Pills --- */
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); transition: transform 0.2s; }
+        .card:active { transform: scale(0.98); background-color: var(--card-hover); }
         .card-header { margin-bottom: 14px; }
         
         .color-pill {
@@ -143,46 +149,56 @@
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         /* Grids */
-        .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
+        .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; transition: transform 0.2s; }
+        .image-card:active { transform: scale(0.96); }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+        .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: transform 0.2s; }
+        .shopping-card:active { transform: scale(0.98); }
         .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .shopping-info { padding: 16px; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 600; color: white; font-size: 16px; }
 
-        /* --- Native iOS Image Lightbox (Scroll Snap) --- */
+        /* --- Native iOS Image Lightbox --- */
         #image-viewer {
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; 
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            transform: scale(1.05); /* Schöner Scale-in Effekt */
+            overscroll-behavior-y: none; /* Verhindert das iOS Webpage Bouncen */
         }
-        #image-viewer.active { opacity: 1; pointer-events: all; }
+        #image-viewer.active { opacity: 1; pointer-events: all; transform: scale(1); }
+        
         .viewer-header {
             position: absolute; top: var(--safe-top); left: 0; right: 0;
             display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; z-index: 2010;
+            transition: opacity 0.2s; /* Fade out when swiping down */
         }
         .viewer-close {
             background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px;
             border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
         }
         .viewer-track {
             display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            transition: transform 0s; /* Wird von JS während des Swipens kontrolliert */
         }
         .viewer-track::-webkit-scrollbar { display: none; }
         .viewer-slide {
             flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
         }
-        .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; }
+        .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
 
         /* Setup Modal */
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--agile); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: #1c1c1e; padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; }
+        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; }
+        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-bounce);}
+        .modal-content button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -209,7 +225,7 @@
     </div>
 
     <div id="image-viewer">
-        <div class="viewer-header">
+        <div class="viewer-header" id="viewer-header">
             <div id="viewer-pill-container"></div>
             <button class="viewer-close" onclick="closeImageViewer()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
@@ -220,7 +236,8 @@
 
     <div id="results-wrapper">
         <main id="results-content">
-            </main>
+            <div id="load-more-trigger"><div class="loading-spinner"></div></div>
+        </main>
 
         <div id="bottom-bar">
             <button class="search-circle-btn" onclick="openSearch()">
@@ -242,6 +259,7 @@
         const searchOverlay = document.getElementById('search-overlay');
         const homeSearchInput = document.getElementById('homeSearchInput');
         const overlaySearchInput = document.getElementById('overlaySearchInput');
+        const loadMoreTrigger = document.getElementById('load-more-trigger');
         const setupModal = document.getElementById('setup-modal');
         const tabSlider = document.getElementById('tabSlider');
         const tabs = document.querySelectorAll('.tab');
@@ -255,6 +273,8 @@
         let globalImages = [];
         let viewerIndex = 0;
         const track = document.getElementById('viewer-track');
+        const viewerHeader = document.getElementById('viewer-header');
+        const imageViewer = document.getElementById('image-viewer');
 
         // --- Robuste Farb-Extraktion ---
         const colorCache = new Map();
@@ -272,24 +292,21 @@
                     return result;
                 }
             }
-            return null; // Kein Grauer/Random Fallback! Bleibt im edlen Glas-Design.
+            return null; 
         }
 
         function tryExtractColor(url) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-
                 img.onload = () => {
                     const size = 16;
                     const canvas = document.createElement('canvas');
                     canvas.width = size; canvas.height = size;
                     const ctx = canvas.getContext('2d');
-
                     try {
                         ctx.drawImage(img, 0, 0, size, size);
                         const data = ctx.getImageData(0, 0, size, size).data;
-
                         let r = 0, g = 0, b = 0, count = 0;
                         for (let i = 0; i < data.length; i += 4) {
                             if (data[i+3] < 128) continue;
@@ -297,13 +314,10 @@
                             if (brightness > 230 || brightness < 20) continue;
                             r += data[i]; g += data[i+1]; b += data[i+2]; count++;
                         }
-
                         if (count < 10) { resolve(null); return; }
-
                         r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count);
-
                         resolve({
-                            bg:   `rgba(${r}, ${g}, ${b}, 0.22)`,
+                            bg: `rgba(${r}, ${g}, ${b}, 0.22)`,
                             text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`,
                             border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`
                         });
@@ -334,9 +348,7 @@
                 currentQuery = queryParam;
                 currentPage = 1;
                 
-                // Slider sicher platzieren, nachdem das Layout geladen ist
                 setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 100);
-
                 if (getCookie('serper_api_key')) performSearch();
             }
 
@@ -353,7 +365,7 @@
             
             if (currentQuery) {
                 currentPage = 1; 
-                renderSkeletons(); // Skeleton Loader (Lazy Load)
+                renderSkeletons(); 
                 performSearch();
             }
         }
@@ -362,23 +374,15 @@
         function handleHomeSubmit(e) {
             e.preventDefault();
             const q = homeSearchInput.value.trim();
-            if(q) {
-                homeSearchInput.blur();
-                startSearchFrom(q);
-            }
+            if(q) { homeSearchInput.blur(); startSearchFrom(q); }
         }
 
         function handleOverlaySubmit(e) {
             e.preventDefault();
             const q = overlaySearchInput.value.trim();
-            if(q) {
-                overlaySearchInput.blur();
-                closeSearch();
-                startSearchFrom(q);
-            }
+            if(q) { overlaySearchInput.blur(); closeSearch(); startSearchFrom(q); }
         }
 
-        // Wenn Tastatur via "Fertig" geschlossen wird
         overlaySearchInput.addEventListener('blur', () => {
             setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 100);
         });
@@ -409,7 +413,6 @@
         function renderSkeletons() {
             resultsContent.innerHTML = '';
             
-            // Lade-Trigger sicher wieder in den DOM legen (am "visuellen" Top)
             const loadMoreEl = document.createElement('div');
             loadMoreEl.id = 'load-more-trigger';
             resultsContent.appendChild(loadMoreEl);
@@ -419,7 +422,8 @@
             if (currentType === 'search') {
                 for(let i=0; i<6; i++) {
                     const el = document.createElement('div');
-                    el.className = 'skeleton-card skeleton';
+                    el.className = 'skeleton-card skeleton animate-in';
+                    el.style.animationDelay = `${i * 0.05}s`;
                     el.innerHTML = `<div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div>`;
                     frag.appendChild(el);
                 }
@@ -428,17 +432,17 @@
                 grid.className = 'grid-page';
                 const count = currentType === 'images' ? 12 : 8;
                 for(let i=0; i<count; i++) {
-                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton"></div>`;
-                    else grid.innerHTML += `<div class="shopping-card skeleton" style="height:240px;"></div>`;
+                    const delay = `${i * 0.05}s`;
+                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton animate-in" style="animation-delay: ${delay}"></div>`;
+                    else grid.innerHTML += `<div class="shopping-card skeleton animate-in" style="height:240px; animation-delay: ${delay}"></div>`;
                 }
                 frag.appendChild(grid);
             }
             
-            // Vor dem Lade-Trigger einfügen
             loadMoreEl.before(frag);
         }
 
-        // --- Fetch & Render ---
+        // --- Fetch & Render (Mit Felsenfester Scroll-Korrektur) ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
@@ -490,12 +494,13 @@
             const fragment = document.createDocumentFragment();
             
             if (currentType === 'search') {
-                // Keine Umkehrung bei Search, damit Bestes Ergebnis unten ist! (wegen column-reverse)
                 rawItems.forEach((item, index) => {
                     const domain = getHostname(item.link);
                     const pillId = `pill-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
-                    el.href = item.link; el.className = 'card'; el.target = '_blank';
+                    el.href = item.link; el.className = 'card animate-in'; el.target = '_blank';
+                    // Staggered Animation Delay
+                    el.style.animationDelay = `${index * 0.05}s`;
 
                     el.innerHTML = `
                         <div class="card-header">
@@ -520,26 +525,27 @@
                     });
                 });
             } else {
-                // Für Grids fassen wir die Seite in einem Raster zusammen und kehren die Items um, 
-                // damit das beste Element unten rechts ist.
                 const grid = document.createElement('div');
                 grid.className = 'grid-page';
                 
-                let reversedItems = [...rawItems].reverse();
+                let reversedItems = [...rawItems].reverse(); // Reverse for grid layout inside block
                 
-                reversedItems.forEach((item) => {
+                reversedItems.forEach((item, index) => {
+                    const delay = `${index * 0.03}s`;
                     if (currentType === 'images') {
                         const myIndex = globalImages.length;
                         globalImages.push(item);
                         
                         const el = document.createElement('a');
-                        el.href = item.link; el.className = 'image-card';
+                        el.href = item.link; el.className = 'image-card animate-in';
+                        el.style.animationDelay = delay;
                         el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
                         el.onclick = (e) => { e.preventDefault(); openImageViewer(myIndex); };
                         grid.appendChild(el);
                     } else if (currentType === 'shopping') {
                         const el = document.createElement('a');
-                        el.href = item.link; el.className = 'shopping-card'; el.target = '_blank';
+                        el.href = item.link; el.className = 'shopping-card animate-in'; el.target = '_blank';
+                        el.style.animationDelay = delay;
                         el.innerHTML = `
                             <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
                             <div class="shopping-info">
@@ -553,7 +559,6 @@
                 fragment.appendChild(grid);
             }
 
-            // Sicherstellen, dass der Load-Trigger existiert
             let loadMoreEl = document.getElementById('load-more-trigger');
             if(!loadMoreEl) {
                 loadMoreEl = document.createElement('div');
@@ -566,26 +571,31 @@
             const oldScrollHeight = document.documentElement.scrollHeight;
             const oldScrollTop = document.documentElement.scrollTop;
 
-            // Neue Ergebnisse VOR dem Loader einfügen (was optisch über die alten Karten wandert)
             loadMoreEl.before(fragment);
 
             if (isLoadMore) {
-                void document.documentElement.offsetHeight;
-                const newScrollHeight = document.documentElement.scrollHeight;
-                window.scrollTo({ top: oldScrollTop + (newScrollHeight - oldScrollHeight), behavior: 'instant' });
+                // EXAKTE Scroll-Korrektur über RequestAnimationFrame für 100% Stabilität auf iOS Safari
+                requestAnimationFrame(() => {
+                    const newScrollHeight = document.documentElement.scrollHeight;
+                    window.scrollBy(0, newScrollHeight - oldScrollHeight);
+                });
             } else {
-                setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 10);
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
             }
         }
 
-        // --- Native Image Viewer (Scroll Snap) ---
+        // --- Native Image Viewer (Swipe Dismiss & Snapping) ---
+        let viewerStartY = 0;
+        let isSwipingDown = false;
+
         function openImageViewer(index) {
             viewerIndex = index;
-            // Native DOM Swipe Slide
             track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}"></div>`).join('');
-            document.getElementById('image-viewer').classList.add('active');
             
-            // Springt synchron zum ausgewählten Bild
+            imageViewer.classList.add('active');
+            
             setTimeout(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
                 updateViewerPill();
@@ -593,17 +603,65 @@
         }
 
         function closeImageViewer() {
-            document.getElementById('image-viewer').classList.remove('active');
-            setTimeout(() => { track.innerHTML = ''; }, 300); 
+            imageViewer.style.opacity = '0';
+            imageViewer.style.transform = 'scale(0.95)';
+            setTimeout(() => { 
+                imageViewer.classList.remove('active');
+                imageViewer.style.cssText = ''; // Zurücksetzen der Inline-Styles vom Swipe
+                track.innerHTML = ''; 
+                track.style.transform = '';
+            }, 300); 
         }
 
         track.addEventListener('scroll', () => {
+            if(isSwipingDown) return; // Nicht während vertikalem Swipe updaten
             const index = Math.round(track.scrollLeft / window.innerWidth);
             if(index !== viewerIndex) {
                 viewerIndex = index;
                 updateViewerPill();
             }
         }, {passive: true});
+
+        // Swipe-to-Dismiss Logik (Nach unten Wischen zum Schließen)
+        track.addEventListener('touchstart', (e) => {
+            viewerStartY = e.touches[0].clientY;
+            isSwipingDown = false;
+        }, {passive: true});
+
+        track.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].clientY;
+            const diffY = currentY - viewerStartY;
+
+            // Wenn wir stark nach unten wischen, aktiviere den Dismiss-Modus
+            if (diffY > 10 && !isSwipingDown) {
+                isSwipingDown = true;
+                track.style.transition = 'none';
+            }
+
+            if (isSwipingDown) {
+                // Bild nach unten ziehen und Overlay ausblenden
+                const scale = Math.max(0.8, 1 - (diffY / 1000));
+                track.style.transform = `translateY(${diffY}px) scale(${scale})`;
+                imageViewer.style.background = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 500))})`;
+                viewerHeader.style.opacity = Math.max(0, 1 - (diffY / 150));
+            }
+        }, {passive: true});
+
+        track.addEventListener('touchend', (e) => {
+            if (isSwipingDown) {
+                const diffY = e.changedTouches[0].clientY - viewerStartY;
+                if (diffY > 120) {
+                    closeImageViewer(); // Schließen wenn weit genug gezogen
+                } else {
+                    // Zurückfedern (Spring Animation), wenn nicht weit genug gezogen
+                    track.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    track.style.transform = 'translateY(0) scale(1)';
+                    imageViewer.style.background = '';
+                    viewerHeader.style.opacity = '1';
+                }
+                isSwipingDown = false;
+            }
+        });
 
         function updateViewerPill() {
             if(!globalImages[viewerIndex]) return;
@@ -612,9 +670,10 @@
             const pillContainer = document.getElementById('viewer-pill-container');
             const pillId = `viewer-pill-${Date.now()}`;
 
+            // Kein Emoji mehr (↗ entfernt)
             pillContainer.innerHTML = `
-                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none;">
-                    <span>${domain} ↗</span>
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
+                    <span>${domain}</span>
                 </a>
             `;
 
