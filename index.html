@@ -47,118 +47,105 @@
 
         /* --- 2. Solid Black Search Overlay --- */
         #search-overlay {
-            position: fixed; inset: 0; z-index: 1000;
-            background: #000000; 
+            position: fixed; inset: 0; z-index: 1000; background: #000000; 
             display: flex; flex-direction: column; align-items: center; 
             padding: calc(var(--safe-top) + 20px) 16px 20px;
             opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
         #search-overlay.active { opacity: 1; pointer-events: all; }
         
-        .overlay-bar-container { 
-            display: flex; width: 100%; max-width: 600px; gap: 12px; align-items: center; 
-        }
+        .overlay-bar-container { display: flex; width: 100%; max-width: 600px; gap: 12px; align-items: center; }
         .overlay-input {
             flex: 1; padding: 16px 20px 16px 50px; font-size: 18px; font-weight: 500; 
             background-color: var(--card-bg); border: none; border-radius: 20px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: 16px center;
-            min-width: 0; /* Verhindert, dass Input sich über den Rand drückt */
+            background-repeat: no-repeat; background-position: 16px center; min-width: 0; 
         }
-        .cancel-btn { 
-            background: none; border: none; color: var(--text-main); font-size: 16px; 
-            font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; 
-        }
+        .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; }
 
-        /* --- 3. Results View --- */
+        /* --- 3. Results View & Layouts --- */
         #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
         #results-wrapper.active { display: flex; }
 
-        /* NATIVE COLUMN REVERSE */
         #results-content { 
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
-            display: flex; flex-direction: column-reverse; 
+            transition: opacity 0.3s ease; /* Lazy Fade Effect */
+            opacity: 0; 
         }
 
-        /* --- Floating Bottom Bar (Glassy & Transparent) --- */
+        /* Dynamische Layout Klassen, die via JS gesteuert werden */
+        #results-content.layout-list { display: flex; flex-direction: column; }
+        #results-content.layout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (min-width: 600px) { #results-content.layout-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        /* Loader */
+        #load-more-trigger { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
+        .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        #load-more-trigger.loading .loading-spinner { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Floating Bottom Bar (Permanent & Glassy) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
-            /* Elegante Transparenz */
-            background: rgba(30, 30, 32, 0.55); 
-            backdrop-filter: blur(50px) saturate(250%); -webkit-backdrop-filter: blur(50px) saturate(250%);
+            background: rgba(30, 30, 32, 0.55); backdrop-filter: blur(50px) saturate(250%); -webkit-backdrop-filter: blur(50px) saturate(250%);
             padding: 8px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.08);
-            display: flex; align-items: center; gap: 8px; z-index: 100;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.4); transition: transform 0.3s ease;
+            display: flex; align-items: center; gap: 8px; z-index: 100; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
         }
-        body.hide-bottom-bar #bottom-bar { transform: translate(-50%, 150%); }
 
         .search-circle-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1);
-            border: none; display: flex; justify-content: center; align-items: center;
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: var(--agile); flex-shrink: 0;
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
-        /* --- Reparierter Tab Slider --- */
         .tabs-container { position: relative; display: flex; padding: 4px; }
-        .tab { 
-            padding: 10px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); 
-            cursor: pointer; position: relative; z-index: 2; transition: color 0.25s ease; 
-            text-align: center;
-        }
-        .tab.active { color: #000000; } /* Text auf dem aktiven Tab wird schwarz */
-        
-        .tab-slider { 
-            position: absolute; top: 4px; bottom: 4px; left: 0; 
-            background: #ffffff; /* Weißer Hintergrund für den aktiven Tab */
-            border-radius: 100px; z-index: 1; 
-            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
-        }
+        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; z-index: 2; transition: color 0.25s ease; text-align: center; }
+        .tab.active { color: #000000; }
+        .tab-slider { position: absolute; top: 4px; bottom: 4px; left: 0; background: #ffffff; border-radius: 100px; z-index: 1; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
 
-        /* --- Cards & Native Ambient Color Pills --- */
+        /* --- Cards & Perfect Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card-header { margin-bottom: 14px; }
         
-        /* Die Magie: Ambient Blur Favicon Extraction */
+        /* Absolut perfektionierte Ambient-Pille */
         .color-pill {
             position: relative; overflow: hidden;
-            padding: 6px 14px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1);
+            border-radius: 9999px; /* Forciert immer perfekt runde Ecken */
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08);
         }
         .color-pill img {
-            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            object-fit: cover; filter: blur(14px) saturate(250%) brightness(0.8);
-            opacity: 0.85; z-index: 0; pointer-events: none;
+            position: absolute; top: -100%; left: -100%; width: 300%; height: 300%;
+            object-fit: cover; 
+            filter: blur(24px) saturate(300%) brightness(0.6); /* Extrem aggressiver Blur */
+            z-index: 0; pointer-events: none;
+        }
+        .color-pill::after {
+            content: ''; position: absolute; inset: 0;
+            background: rgba(0,0,0,0.35); /* Dunkler Filter, damit Weiß auf Weiß lesbar bleibt */
+            z-index: 1; border-radius: 9999px;
         }
         .color-pill span {
-            position: relative; z-index: 1; font-size: 13px; font-weight: 600; 
-            letter-spacing: 0.2px; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+            position: relative; z-index: 2;
+            padding: 6px 14px;
+            font-size: 13px; font-weight: 600; letter-spacing: 0.2px;
+            color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.9); /* Harter Schatten für Lesbarkeit */
         }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* --- Grids --- */
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
-        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
-        
+        /* Grids */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
         .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
         .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; }
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .shopping-info { padding: 16px; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 600; color: white; font-size: 16px; }
-
-        /* Loader */
-        #load-more-trigger { display: flex; justify-content: center; align-items: center; padding: 20px 0; }
-        .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-        #load-more-trigger.loading .loading-spinner { display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Setup Modal */
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: var(--agile); }
@@ -225,9 +212,8 @@
         let currentPage = 1;
         let currentQuery = '';
         let isLoading = false;
-        let lastScrollTop = 0;
 
-        // --- Tab Logik & Hintergrund-Pille ---
+        // --- Tab Logik ---
         function updateTabSlider(activeEl) {
             if(!activeEl) return;
             tabSlider.style.width = activeEl.offsetWidth + 'px';
@@ -236,7 +222,6 @@
         
         window.addEventListener('load', () => { 
             checkApiKey(); 
-            // Kleiner Timeout damit CSS korrekt geladen ist
             setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 50); 
         });
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -248,21 +233,26 @@
             updateTabSlider(element);
             
             if (currentQuery) {
-                currentPage = 1; clearResults(); performSearch();
+                currentPage = 1; 
+                resultsContent.style.opacity = '0'; // Lazy Fade Out
+                setTimeout(() => {
+                    clearResults(); 
+                    performSearch();
+                }, 250); // Warten bis der Fade abgeschlossen ist
             }
         }
 
         // --- Suche Auslösen (ENTER = Tastatur einklappen) ---
         homeSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && homeSearchInput.value.trim() !== '') {
-                homeSearchInput.blur(); // Tastatur unter iOS verstecken
+                homeSearchInput.blur(); // Tastatur einfahren
                 startSearchFrom(homeSearchInput.value.trim());
             }
         });
 
         overlaySearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && overlaySearchInput.value.trim() !== '') {
-                overlaySearchInput.blur(); // Tastatur unter iOS verstecken
+                overlaySearchInput.blur(); // Tastatur einfahren
                 closeSearch();
                 startSearchFrom(overlaySearchInput.value.trim());
             }
@@ -276,7 +266,7 @@
             currentQuery = query;
             currentPage = 1;
             
-            // Slider positionieren, sobald das Bottom-Bar sichtbar ist
+            resultsContent.style.opacity = '0'; // Smooth Fade Transition
             setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 10);
             
             clearResults();
@@ -293,25 +283,16 @@
         }
 
         function clearResults() {
-            Array.from(resultsContent.children).forEach(child => {
-                if (child.id !== 'load-more-trigger') child.remove();
-            });
+            resultsContent.innerHTML = '';
+            resultsContent.appendChild(loadMoreTrigger); // Loader wird wieder als erstes eingesetzt
         }
 
-        // Scroll Bar Hide/Show
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop < lastScrollTop - 15) document.body.classList.add('hide-bottom-bar');
-            else if (scrollTop > lastScrollTop + 15) document.body.classList.remove('hide-bottom-bar');
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        }, { passive: true });
-
-        // --- Fetch & Render ---
+        // --- Fetch & Render mit Robustem Scrollen ---
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && currentQuery) {
                 currentPage++; performSearch(true);
             }
-        }, { rootMargin: '200px' });
+        }, { rootMargin: '300px' });
         observer.observe(loadMoreTrigger);
 
         async function performSearch(isLoadMore = false) {
@@ -345,13 +326,22 @@
 
         function renderResults(data, isLoadMore) {
             let rawItems = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
-            if (rawItems.length === 0 && currentPage === 1) return;
+            
+            if (rawItems.length === 0 && currentPage === 1) {
+                resultsContent.style.opacity = '1';
+                return;
+            }
 
-            if (currentType === 'search') {
-                rawItems.forEach(item => {
+            // Wir drehen die neuen Items um, weil Chat-Style (Bestes Ergebnis ist UNTEN)
+            let items = rawItems.reverse();
+            
+            // Ein "Fragment" baut alle neuen Boxen im RAM (spart Ladezeit und Zucken im DOM)
+            const fragment = document.createDocumentFragment();
+
+            items.forEach(item => {
+                if (currentType === 'search') {
                     const domain = getHostname(item.link);
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-                    
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card'; el.target = '_blank';
                     el.innerHTML = `
@@ -364,37 +354,47 @@
                         <div class="card-title">${item.title}</div>
                         <div class="card-snippet">${item.snippet || ''}</div>
                     `;
-                    resultsContent.appendChild(el);
-                });
-            } 
-            else if (currentType === 'images') {
-                const grid = document.createElement('div');
-                grid.className = 'grid-page';
-                rawItems.forEach(item => {
-                    grid.innerHTML += `<a href="${item.link}" class="image-card" target="_blank"><img src="${item.imageUrl}" loading="lazy"></a>`;
-                });
-                resultsContent.appendChild(grid);
-            }
-            else if (currentType === 'shopping') {
-                const grid = document.createElement('div');
-                grid.className = 'grid-page';
-                rawItems.forEach(item => {
-                    grid.innerHTML += `
-                        <a href="${item.link}" class="shopping-card" target="_blank">
-                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
-                            <div class="shopping-info">
-                                <div class="shopping-title">${item.title}</div>
-                                <div class="shopping-price">${item.price || ''}</div>
-                            </div>
-                        </a>`;
-                });
-                resultsContent.appendChild(grid);
-            }
+                    fragment.appendChild(el);
+                } 
+                else if (currentType === 'images') {
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = 'image-card'; el.target = '_blank';
+                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
+                    fragment.appendChild(el);
+                }
+                else if (currentType === 'shopping') {
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = 'shopping-card'; el.target = '_blank';
+                    el.innerHTML = `
+                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
+                        <div class="shopping-info">
+                            <div class="shopping-title">${item.title}</div>
+                            <div class="shopping-price">${item.price || ''}</div>
+                        </div>
+                    `;
+                    fragment.appendChild(el);
+                }
+            });
 
-            // Loader bleibt durch Anfügen ans Ende am nativen "Anfang" (wegen column-reverse)
-            resultsContent.appendChild(loadMoreTrigger);
+            // Vor dem Einfügen merken wir uns, wo wir gescrollt waren
+            const oldScrollHeight = document.documentElement.scrollHeight;
+            const oldScrollTop = document.documentElement.scrollTop;
 
-            if (!isLoadMore) {
+            if (isLoadMore) {
+                // Wir fügen die neuen/älteren Ergebnisse direkt HINTER dem Load-Spinner ein (also ganz oben)
+                loadMoreTrigger.after(fragment);
+                
+                // Mathematik-Trick: Wir korrigieren den Scroll-Punkt exakt um die Höhe der neu geladenen Pixel!
+                // Dadurch zuckt und springt der Bildschirm keinen Millimeter.
+                const newScrollHeight = document.documentElement.scrollHeight;
+                window.scrollTo(0, oldScrollTop + (newScrollHeight - oldScrollHeight));
+            } else {
+                // Bei einer neuen Suche:
+                resultsContent.className = currentType === 'search' ? 'layout-list' : 'layout-grid';
+                resultsContent.appendChild(fragment); // Loader ist ohnehin schon als Erstes drin
+                resultsContent.style.opacity = '1'; // Lazy Fade In
+                
+                // Wir springen sofort zum besten Element ganz unten
                 setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' }), 10);
             }
         }
