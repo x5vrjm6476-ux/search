@@ -60,24 +60,27 @@
             background-color: var(--card-bg); border: none; border-radius: 20px; color: var(--text-main); outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: 16px center; min-width: 0; 
-            -webkit-appearance: none; /* Native iOS Search styling */
+            -webkit-appearance: none;
         }
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; white-space: nowrap; }
 
-        /* --- 3. Results View & Layouts --- */
+        /* --- 3. Results View (Immer Column-Reverse) --- */
         #results-wrapper { display: none; flex-direction: column; min-height: 100vh; }
         #results-wrapper.active { display: flex; }
 
         #results-content { 
+            display: flex; flex-direction: column-reverse; /* Das Herzstück für Bottom-Up Scrolling */
             max-width: 760px; margin: 0 auto; width: 100%;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
             transition: opacity 0.2s ease; opacity: 1; 
         }
 
-        #results-content.layout-list { display: flex; flex-direction: column; }
-        #results-content.layout-grid-wrapper { display: flex; flex-direction: column; }
-        .layout-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
-        @media (min-width: 600px) { .layout-grid { grid-template-columns: repeat(3, 1fr); } }
+        /* Das Grid für Bilder und Shopping als sauberer Block */
+        .grid-page { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; 
+            width: 100%; margin-bottom: 20px; 
+        }
+        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         #load-more-trigger { width: 100%; display: flex; justify-content: center; align-items: center; padding: 30px 0; }
         .loading-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--text-muted); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
@@ -93,22 +96,23 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 0.2; } 100% { opacity: 0.5; } }
 
-        /* --- Floating Bottom Bar (iOS 26 Liquid Glass) --- */
+        /* --- Floating Bottom Bar (PERFEKTES iOS 26 Liquid Glass) --- */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
-            /* Extrem gläserner Hintergrund */
-            background: rgba(20, 20, 22, 0.4); 
-            backdrop-filter: blur(40px) saturate(250%) brightness(1.2); 
-            -webkit-backdrop-filter: blur(40px) saturate(250%) brightness(1.2);
+            background: rgba(45, 45, 48, 0.4); /* Refraktives, leicht helleres Grau für den Glass-Effekt */
+            backdrop-filter: blur(50px) saturate(250%) brightness(1.1); 
+            -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.1);
             padding: 8px; border-radius: 100px; 
-            /* 3D Kanten (Highlights & Schatten) */
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.3), 0 16px 40px rgba(0,0,0,0.6);
+            box-shadow: 
+                inset 0 1px 1px rgba(255, 255, 255, 0.25), /* Heller Lichtkante oben */
+                inset 0 -1px 1px rgba(0, 0, 0, 0.3),       /* Dunkle Kante unten */
+                0 16px 40px rgba(0, 0, 0, 0.7);            /* Weicher Drop-Shadow */
             display: flex; align-items: center; gap: 8px; z-index: 100;
         }
 
         .search-circle-btn {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--agile); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+            cursor: pointer; transition: var(--agile); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -118,20 +122,18 @@
         .tab.active { color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
         .tab-slider { 
             position: absolute; top: 4px; bottom: 4px; left: 0; 
-            /* Milchig-weißer Slider */
             background: rgba(255, 255, 255, 0.15); border-radius: 100px; z-index: 1; 
             border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        /* --- Cards & Neutral First Pills --- */
+        /* --- Cards & Pills --- */
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card-header { margin-bottom: 14px; }
         
         .color-pill {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 6px 14px; border-radius: 9999px;
-            /* Startet Neutral ohne Farbe */
             background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255,255,255,0.05);
             color: var(--text-muted); transition: all 0.5s ease;
         }
@@ -150,39 +152,28 @@
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 600; color: white; font-size: 16px; }
 
-        /* --- Native iOS Image Lightbox (Scroll Snapping) --- */
+        /* --- Native iOS Image Lightbox (Scroll Snap) --- */
         #image-viewer {
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         #image-viewer.active { opacity: 1; pointer-events: all; }
         .viewer-header {
             position: absolute; top: var(--safe-top); left: 0; right: 0;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 20px; z-index: 2010;
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; z-index: 2010;
         }
         .viewer-close {
             background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px;
-            border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-            backdrop-filter: blur(10px);
+            border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
         }
-        
-        /* Die Magie für das native Wischen */
         .viewer-track {
-            display: flex; width: 100vw; height: 100%;
-            overflow-x: auto; overflow-y: hidden;
-            scroll-snap-type: x mandatory; /* Zwingt die Bilder zum Einrasten */
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Versteckt Scrollbar Firefox */
+            display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
-        .viewer-track::-webkit-scrollbar { display: none; } /* Versteckt Scrollbar Safari/Chrome */
-        
+        .viewer-track::-webkit-scrollbar { display: none; }
         .viewer-slide {
-            flex: 0 0 100vw; width: 100vw; height: 100%; 
-            display: flex; align-items: center; justify-content: center;
-            scroll-snap-align: center; /* Rastet in der Mitte ein */
+            flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
         }
         .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; }
 
@@ -281,7 +272,7 @@
                     return result;
                 }
             }
-            return null; // Kein Hash-Fallback mehr. Bleibt neutral.
+            return null; // Kein Grauer/Random Fallback! Bleibt im edlen Glas-Design.
         }
 
         function tryExtractColor(url) {
@@ -309,13 +300,12 @@
 
                         if (count < 10) { resolve(null); return; }
 
-                        r = Math.round(r/count);
-                        g = Math.round(g/count);
-                        b = Math.round(b/count);
+                        r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count);
 
                         resolve({
                             bg:   `rgba(${r}, ${g}, ${b}, 0.22)`,
-                            text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`
+                            text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`,
+                            border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`
                         });
                     } catch { resolve(null); }
                 };
@@ -343,14 +333,14 @@
                 overlaySearchInput.value = queryParam;
                 currentQuery = queryParam;
                 currentPage = 1;
+                
+                // Slider sicher platzieren, nachdem das Layout geladen ist
+                setTimeout(() => updateTabSlider(document.querySelector('.tab.active')), 100);
+
                 if (getCookie('serper_api_key')) performSearch();
             }
 
             checkApiKey(); 
-            setTimeout(() => {
-                homeView.style.transition = ''; 
-                updateTabSlider(document.querySelector('.tab.active'));
-            }, 50); 
         });
         
         window.addEventListener('resize', () => updateTabSlider(document.querySelector('.tab.active')));
@@ -363,12 +353,12 @@
             
             if (currentQuery) {
                 currentPage = 1; 
-                renderSkeletons(); // Zeigt Skeletons beim Wechsel
+                renderSkeletons(); // Skeleton Loader (Lazy Load)
                 performSearch();
             }
         }
 
-        // --- Keyboard Handling ---
+        // --- Keyboard Handling (Native Forms) ---
         function handleHomeSubmit(e) {
             e.preventDefault();
             const q = homeSearchInput.value.trim();
@@ -388,11 +378,9 @@
             }
         }
 
-        // Wenn die Tastatur z.B. über "Fertig" geschlossen wird
+        // Wenn Tastatur via "Fertig" geschlossen wird
         overlaySearchInput.addEventListener('blur', () => {
-            setTimeout(() => {
-                if(searchOverlay.classList.contains('active')) closeSearch();
-            }, 100);
+            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 100);
         });
 
         function startSearchFrom(query) {
@@ -417,9 +405,15 @@
             overlaySearchInput.blur();
         }
 
-        // --- Lazy Load Skeletons ---
+        // --- Skeletons ---
         function renderSkeletons() {
             resultsContent.innerHTML = '';
+            
+            // Lade-Trigger sicher wieder in den DOM legen (am "visuellen" Top)
+            const loadMoreEl = document.createElement('div');
+            loadMoreEl.id = 'load-more-trigger';
+            resultsContent.appendChild(loadMoreEl);
+
             const frag = document.createDocumentFragment();
             
             if (currentType === 'search') {
@@ -429,21 +423,19 @@
                     el.innerHTML = `<div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div>`;
                     frag.appendChild(el);
                 }
-                resultsContent.className = 'layout-list';
-            } else if (currentType === 'images') {
+            } else {
                 const grid = document.createElement('div');
-                grid.className = 'layout-grid';
-                for(let i=0; i<12; i++) grid.innerHTML += `<div class="image-card skeleton"></div>`;
+                grid.className = 'grid-page';
+                const count = currentType === 'images' ? 12 : 8;
+                for(let i=0; i<count; i++) {
+                    if(currentType === 'images') grid.innerHTML += `<div class="image-card skeleton"></div>`;
+                    else grid.innerHTML += `<div class="shopping-card skeleton" style="height:240px;"></div>`;
+                }
                 frag.appendChild(grid);
-                resultsContent.className = 'layout-grid-wrapper';
-            } else if (currentType === 'shopping') {
-                const grid = document.createElement('div');
-                grid.className = 'layout-grid';
-                for(let i=0; i<8; i++) grid.innerHTML += `<div class="shopping-card skeleton" style="height:240px;"></div>`;
-                frag.appendChild(grid);
-                resultsContent.className = 'layout-grid-wrapper';
             }
-            resultsContent.appendChild(frag);
+            
+            // Vor dem Lade-Trigger einfügen
+            loadMoreEl.before(frag);
         }
 
         // --- Fetch & Render ---
@@ -457,11 +449,8 @@
             if (isLoading) return;
             isLoading = true;
             
-            let loadMoreEl;
-            if (isLoadMore) {
-                loadMoreEl = document.getElementById('load-more-trigger');
-                if(loadMoreEl) loadMoreEl.classList.add('loading');
-            }
+            let loadMoreEl = document.getElementById('load-more-trigger');
+            if(loadMoreEl) loadMoreEl.classList.add('loading');
 
             const apiKey = getCookie('serper_api_key');
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
@@ -482,34 +471,32 @@
                 console.error("Fetch error");
             } finally {
                 isLoading = false; 
-                const loader = document.getElementById('load-more-trigger');
-                if(loader) loader.classList.remove('loading');
+                if(loadMoreEl) loadMoreEl.classList.remove('loading');
             }
         }
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
         function renderResults(data, isLoadMore) {
-            let items = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
+            let rawItems = currentType === 'search' ? data.organic : (currentType === 'images' ? data.images : data.shopping) || [];
             
             if (!isLoadMore) {
-                resultsContent.innerHTML = ''; // Skeletons entfernen
+                resultsContent.innerHTML = ''; 
                 if (currentType === 'images') globalImages = [];
             }
             
-            if (items.length === 0 && currentPage === 1) return;
+            if (rawItems.length === 0 && currentPage === 1) return;
 
-            items = items.reverse();
             const fragment = document.createDocumentFragment();
             
-            items.forEach((item, index) => {
-                if (currentType === 'search') {
+            if (currentType === 'search') {
+                // Keine Umkehrung bei Search, damit Bestes Ergebnis unten ist! (wegen column-reverse)
+                rawItems.forEach((item, index) => {
                     const domain = getHostname(item.link);
                     const pillId = `pill-${Date.now()}-${index}`; 
                     const el = document.createElement('a');
                     el.href = item.link; el.className = 'card'; el.target = '_blank';
 
-                    // Pille startet Neutral (kein Hash)
                     el.innerHTML = `
                         <div class="card-header">
                             <div class="color-pill" id="${pillId}">
@@ -527,69 +514,66 @@
                             if (pill && pill.isConnected) {
                                 pill.style.background = color.bg;
                                 pill.style.color = color.text;
-                                pill.style.border = 'none';
+                                pill.style.border = color.border;
                             }
                         }
                     });
+                });
+            } else {
+                // Für Grids fassen wir die Seite in einem Raster zusammen und kehren die Items um, 
+                // damit das beste Element unten rechts ist.
+                const grid = document.createElement('div');
+                grid.className = 'grid-page';
+                
+                let reversedItems = [...rawItems].reverse();
+                
+                reversedItems.forEach((item) => {
+                    if (currentType === 'images') {
+                        const myIndex = globalImages.length;
+                        globalImages.push(item);
+                        
+                        const el = document.createElement('a');
+                        el.href = item.link; el.className = 'image-card';
+                        el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
+                        el.onclick = (e) => { e.preventDefault(); openImageViewer(myIndex); };
+                        grid.appendChild(el);
+                    } else if (currentType === 'shopping') {
+                        const el = document.createElement('a');
+                        el.href = item.link; el.className = 'shopping-card'; el.target = '_blank';
+                        el.innerHTML = `
+                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
+                            <div class="shopping-info">
+                                <div class="shopping-title">${item.title}</div>
+                                <div class="shopping-price">${item.price || ''}</div>
+                            </div>
+                        `;
+                        grid.appendChild(el);
+                    }
+                });
+                fragment.appendChild(grid);
+            }
 
-                } 
-                else if (currentType === 'images') {
-                    const myIndex = globalImages.length;
-                    globalImages.push(item);
-                    
-                    const el = document.createElement('a');
-                    el.href = item.link; el.className = 'image-card';
-                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy">`;
-                    el.onclick = (e) => { e.preventDefault(); openImageViewer(myIndex); };
-                    fragment.appendChild(el);
-                }
-                else if (currentType === 'shopping') {
-                    const el = document.createElement('a');
-                    el.href = item.link; el.className = 'shopping-card'; el.target = '_blank';
-                    el.innerHTML = `
-                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy"></div>
-                        <div class="shopping-info">
-                            <div class="shopping-title">${item.title}</div>
-                            <div class="shopping-price">${item.price || ''}</div>
-                        </div>
-                    `;
-                    fragment.appendChild(el);
-                }
-            });
-
-            // Trigger ans Ende hängen
-            const loadMoreEl = document.createElement('div');
-            loadMoreEl.id = 'load-more-trigger';
-            loadMoreEl.innerHTML = '<div class="loading-spinner"></div>';
-            observer.observe(loadMoreEl);
+            // Sicherstellen, dass der Load-Trigger existiert
+            let loadMoreEl = document.getElementById('load-more-trigger');
+            if(!loadMoreEl) {
+                loadMoreEl = document.createElement('div');
+                loadMoreEl.id = 'load-more-trigger';
+                loadMoreEl.innerHTML = '<div class="loading-spinner"></div>';
+                resultsContent.appendChild(loadMoreEl);
+                observer.observe(loadMoreEl);
+            }
 
             const oldScrollHeight = document.documentElement.scrollHeight;
             const oldScrollTop = document.documentElement.scrollTop;
 
+            // Neue Ergebnisse VOR dem Loader einfügen (was optisch über die alten Karten wandert)
+            loadMoreEl.before(fragment);
+
             if (isLoadMore) {
-                // Bei column-reverse packen wir die neuen VOR den Trigger (optisch oben)
-                const currentLoader = document.getElementById('load-more-trigger');
-                if(currentLoader) currentLoader.remove();
-                
-                resultsContent.appendChild(fragment);
-                resultsContent.appendChild(loadMoreEl);
-                
                 void document.documentElement.offsetHeight;
                 const newScrollHeight = document.documentElement.scrollHeight;
                 window.scrollTo({ top: oldScrollTop + (newScrollHeight - oldScrollHeight), behavior: 'instant' });
             } else {
-                resultsContent.className = currentType === 'search' ? 'layout-list' : 'layout-grid-wrapper';
-                
-                if(currentType === 'images' || currentType === 'shopping') {
-                    const grid = document.createElement('div');
-                    grid.className = 'layout-grid';
-                    grid.appendChild(fragment);
-                    resultsContent.appendChild(grid);
-                } else {
-                    resultsContent.appendChild(fragment);
-                }
-                
-                resultsContent.appendChild(loadMoreEl);
                 setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 10);
             }
         }
@@ -597,11 +581,11 @@
         // --- Native Image Viewer (Scroll Snap) ---
         function openImageViewer(index) {
             viewerIndex = index;
+            // Native DOM Swipe Slide
             track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}"></div>`).join('');
-            
             document.getElementById('image-viewer').classList.add('active');
             
-            // Sofort ans richtige Bild scrollen
+            // Springt synchron zum ausgewählten Bild
             setTimeout(() => {
                 track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
                 updateViewerPill();
@@ -610,10 +594,9 @@
 
         function closeImageViewer() {
             document.getElementById('image-viewer').classList.remove('active');
-            setTimeout(() => { track.innerHTML = ''; }, 300); // Cleanup
+            setTimeout(() => { track.innerHTML = ''; }, 300); 
         }
 
-        // Lauscht auf das Scrollen (Wischen), um die Pille oben anzupassen
         track.addEventListener('scroll', () => {
             const index = Math.round(track.scrollLeft / window.innerWidth);
             if(index !== viewerIndex) {
@@ -630,7 +613,7 @@
             const pillId = `viewer-pill-${Date.now()}`;
 
             pillContainer.innerHTML = `
-                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none;">
                     <span>${domain} ↗</span>
                 </a>
             `;
@@ -640,11 +623,12 @@
                 if (color && pill) {
                     pill.style.background = color.bg;
                     pill.style.color = color.text;
+                    pill.style.border = color.border;
                 }
             });
         }
 
-        // --- Auth & Setup ---
+        // --- Auth Setup ---
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
