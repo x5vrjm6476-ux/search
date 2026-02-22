@@ -667,7 +667,7 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (100% Robust)
+        // Gemini KI Integration (100% Robust, korrekte Payload Struktur)
         // ==========================================
         
         // Helfer-Funktion: Macht aus einfachem Markdown wunderschöne iOS-Widgets
@@ -728,30 +728,49 @@
 
             const systemPrompt = "Du bist ein intelligenter KI-Assistent in einer Such-App. Du hast Zugriff auf aktuelle Internetdaten. Antworte in gut strukturiertem Fließtext. WICHTIG: Nutze Überschriften (##), **Fettdruck** für Schlüsselinfos (wie Währungen, Namen, Adressen) und Aufzählungszeichen. KEINE JSON-Ausgabe. Fass dich kurz und präzise.";
 
-            const basePayload = {
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: historyItems
-            };
+            // FIX: Für Grounding komprimieren wir System-Prompt + History in eine einzige flache User-Nachricht
+            let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
+            if (historyItems.length > 1) {
+                combinedText += "Bisheriger Chat-Verlauf:\n";
+                for (let i = 0; i < historyItems.length - 1; i++) {
+                    const role = historyItems[i].role === 'user' ? 'User' : 'KI';
+                    combinedText += `${role}: ${historyItems[i].parts[0].text}\n`;
+                }
+                combinedText += "\nAktuelle Frage:\n";
+            }
+            combinedText += historyItems[historyItems.length - 1].parts[0].text;
 
-            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Google Search Syntax)
+            const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
+
+            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Google Search Syntax, flache History)
             try {
-                const payload20 = { ...basePayload, tools: [{ google_search: {} }] };
+                const payload20 = { 
+                    contents: flatContents, 
+                    tools: [{ google_search: {} }] 
+                };
                 const res20 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload20)
                 });
                 if (res20.ok) return await res20.json();
             } catch(e) { console.warn("Gemini 2.0 fehlgeschlagen, wechsle auf 1.5 Fallback..."); }
 
-            // 2. Versuch: Fallback auf Gemini 1.5 Flash (Alte Grounding Syntax)
+            // 2. Versuch: Fallback auf Gemini 1.5 Flash (Alte Grounding Syntax, flache History)
             try {
-                const payload15 = { ...basePayload, tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }] };
+                const payload15 = { 
+                    contents: flatContents, 
+                    tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }] 
+                };
                 const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
                 });
                 if (res15.ok) return await res15.json();
             } catch(e) { console.warn("Gemini 1.5 Grounding fehlgeschlagen, wechsle auf reinen Text-Fallback..."); }
 
-            // 3. Absoluter Fallback: KI ohne Tools (Garantiert keine Payload-Errors)
+            // 3. Absoluter Fallback: KI ohne Tools (Unterstützt system_instruction & volle Multi-Turn History)
+            const basePayload = {
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: historyItems
+            };
             const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
             });
