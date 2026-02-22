@@ -1,4 +1,4 @@
-ä<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -126,7 +126,7 @@
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); overflow: hidden; }
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         
@@ -136,8 +136,8 @@
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
-        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
-        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
+        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
 
         /* Sitelinks */
         .sitelink-toggle { background: rgba(255,255,255,0.05); border: none; color: white; border-radius: 16px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; }
@@ -150,17 +150,17 @@
         .answer-box-card:active { transform: none; background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); }
         .answer-box-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
         .answer-box-label { font-size: 12px; font-weight: 700; color: #0a84ff; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .answer-box-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #ffffff; line-height: 1.25; }
-        .answer-box-snippet { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; }
+        .answer-box-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #ffffff; line-height: 1.25; word-break: break-word; overflow-wrap: break-word; }
+        .answer-box-snippet { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; word-break: break-word; overflow-wrap: break-word; }
 
         .kg-card { padding: 28px; cursor: default; }
         .kg-card:active { transform: none; background-color: var(--card-bg); }
         .kg-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
         .kg-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .kg-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .kg-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; }
         .kg-type { font-size: 14px; color: var(--text-muted); font-weight: 500; }
         .kg-img { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-        .kg-desc { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 20px; }
+        .kg-desc { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 20px; word-break: break-word; overflow-wrap: break-word; }
         .kg-attributes { display: flex; flex-direction: column; gap: 12px; }
         .kg-attr { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 16px;}
         .kg-attr:last-child { border-bottom: none; padding-bottom: 0; }
@@ -173,10 +173,10 @@
         .local-list { display: flex; flex-direction: column; gap: 20px; }
         .local-item { display: flex; flex-direction: column; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .local-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .local-item-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+        .local-item-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; word-break: break-word; overflow-wrap: break-word; }
         .local-item-rating { font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; }
         .local-item-rating .star { color: #ffd60a; font-size: 14px; margin-right: 4px; }
-        .local-item-meta { font-size: 13px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px; line-height: 1.4; }
+        .local-item-meta { font-size: 13px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px; line-height: 1.4; word-break: break-word; overflow-wrap: break-word; }
 
         /* Images & Shopping */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
@@ -189,6 +189,8 @@
         .shopping-info { padding: 16px; flex: 1; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 16px; width: 100%; font-weight: 500; }
 
         /* Image Viewer */
         #image-viewer {
@@ -508,6 +510,8 @@
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
+                console.log(`Serper API Data (${type}):`, data); // Debugging im Browser
+                
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
 
@@ -538,7 +542,6 @@
             const content = vp.querySelector('.results-content');
             let trigger = content.querySelector('.load-more-trigger');
 
-            // Sehr robuster Fallback, um TypeErrors zu verhindern!
             let rawItems = [];
             if (type === 'search') rawItems = data.organic || [];
             else if (type === 'images') rawItems = data.images || [];
@@ -547,7 +550,19 @@
             if (isInitial) {
                 Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             }
-            if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.places && data.places.length)) return;
+
+            // Empty State (Keine Ergebnisse gefunden)
+            if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.localResults && data.localResults.length)) {
+                let emptyMsg = "Keine Ergebnisse gefunden.";
+                if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
+                else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
+                
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerText = emptyMsg;
+                content.appendChild(emptyState);
+                return;
+            }
 
             let items = [...rawItems].reverse(); 
             const pageBlock = document.createElement('div');
@@ -557,9 +572,6 @@
                 const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
                 const colors = await Promise.all(colorPromises);
 
-                // Aufbau-Logik (Top-To-Bottom im DOM) = Visuell richtig sortiert durch Flex-Column!
-
-                // 1. Answer Box (Erscheint visuell ganz oben im Feed)
                 if (isInitial && data.answerBox) {
                     const ansData = data.answerBox;
                     const ans = document.createElement('div');
@@ -575,7 +587,6 @@
                     pageBlock.appendChild(ans);
                 }
 
-                // 2. Knowledge Graph (Unter Answer Box)
                 if (isInitial && data.knowledgeGraph) {
                     const kgData = data.knowledgeGraph;
                     const kg = document.createElement('div');
@@ -597,7 +608,6 @@
                     pageBlock.appendChild(kg);
                 }
 
-                // 3. Organische Suchergebnisse (Bestes landet am tiefsten, in Daumennähe)
                 items.forEach((item, index) => {
                     if(!item.link) return;
                     const domain = getHostname(item.link);
@@ -644,8 +654,7 @@
                     pageBlock.appendChild(el);
                 });
 
-                // 4. Local Results (Ganz Unten, direkt über dem Suchschlitz!)
-                if (isInitial && data.places && data.places.length > 0) {
+                if (isInitial && data.localResults && data.localResults.length > 0) {
                     const local = document.createElement('div');
                     local.className = `card local-card ${isInitial ? 'animate-in' : ''}`;
                     local.innerHTML = `
@@ -654,12 +663,12 @@
                             Orte
                         </h3>
                         <div class="local-list">
-                            ${data.places.slice(0, 4).map(p => `
-                                <div class="local-item" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
+                            ${data.localResults.slice(0, 4).map(p => `
+                                <div class="local-item" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
                                     <div class="local-item-title">${p.title || ''}</div>
                                     ${p.rating ? `
                                     <div class="local-item-rating">
-                                        <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${p.ratingCount ? `<span style="opacity:0.6;">(${p.ratingCount})</span>` : ''} 
+                                        <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${(p.ratingCount || p.reviews) ? `<span style="opacity:0.6;">(${p.ratingCount || p.reviews})</span>` : ''} 
                                     </div>` : ''}
                                     ${p.address ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
                                     ${p.category ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> ${p.category}</div>` : ''}
