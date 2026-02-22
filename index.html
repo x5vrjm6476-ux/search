@@ -377,6 +377,9 @@
         let currentQuery = '';
         let isLoading = false;
         
+        // ZENTRALE LÖSUNG GEGEN RACE CONDITIONS
+        let currentSearchId = 0;
+        
         const state = {
             search: { page: 1, loaded: false },
             images: { page: 1, loaded: false },
@@ -467,7 +470,7 @@
             observers[type] = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && !isLoading && currentQuery && state[type].loaded) {
                     state[type].page++;
-                    performSearch(type, true);
+                    performSearch(type, true, false, currentSearchId);
                 }
             }, { root: vp, rootMargin: '1500px' });
             observers[type].observe(trigger);
@@ -517,7 +520,7 @@
             
             if (currentQuery && !state[currentType].loaded) {
                 renderSkeletons(currentType); 
-                performSearch(currentType, false, true);
+                performSearch(currentType, false, true, currentSearchId);
             }
         }
 
@@ -545,7 +548,11 @@
         }
 
         function triggerNewSearch() {
-            // FIX 2: Absoluter Reset der Locks, damit neue Suchen nicht blockiert werden
+            // FIX: Erhöhen der Search ID invalidiert ALLE aktuell noch laufenden Background-Requests
+            currentSearchId++;
+            const myId = currentSearchId;
+
+            // FIX: Explizites Aufheben der Locks
             isLoading = false; 
             isAiThinking = false;
 
@@ -559,13 +566,13 @@
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             renderSkeletons(currentType);
-            performSearch(currentType, false, true);
+            performSearch(currentType, false, true, myId);
             
-            // KI History leeren für neuen Kontext
+            // Background AI aktivieren - Historie resetten
             geminiHistory = [];
             aiChatContent.innerHTML = '';
             aiCompactWidget.classList.remove('active');
-            triggerGemini(currentQuery, false);
+            triggerGemini(currentQuery, false, myId);
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); overlaySearchInput.select(); }
@@ -595,7 +602,8 @@
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
-        async function performSearch(type, isLoadMore = false, isInitial = false) {
+        async function performSearch(type, isLoadMore = false, isInitial = false, searchId) {
+            if (searchId !== currentSearchId) return;
             if (isLoading) return;
             isLoading = true;
 
@@ -604,27 +612,39 @@
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
+                
+                if (searchId !== currentSearchId) return;
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
                     body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 40, page: state[type].page })
                 });
 
+                if (searchId !== currentSearchId) return;
                 if (!response.ok) throw new Error();
+                
                 const data = await response.json();
-                await renderResults(type, data, isLoadMore, isInitial);
+                
+                if (searchId !== currentSearchId) return;
+                await renderResults(type, data, isLoadMore, isInitial, searchId);
+                
+                if (searchId !== currentSearchId) return;
                 state[type].loaded = true;
 
             } catch (error) {
+                if (searchId !== currentSearchId) return;
                 console.error("Fetch error");
             } finally {
-                isLoading = false; 
+                // FIX: Nur entriegeln, wenn es auch noch unsere Suche ist
+                if (searchId === currentSearchId) {
+                    isLoading = false; 
+                }
             }
         }
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
-        async function renderResults(type, data, isLoadMore, isInitial) {
+        async function renderResults(type, data, isLoadMore, isInitial, searchId) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
             let trigger = content.querySelector('.load-more-trigger');
@@ -639,6 +659,9 @@
 
             let domainColors = [];
             if (type === 'search') domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
+
+            // Abbruch, falls zwischenzeitlich eine neue Suche gestartet wurde
+            if (searchId !== currentSearchId) return;
 
             items.forEach((item, index) => {
                 if (type === 'search') {
@@ -692,16 +715,16 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (Apple Style Widgets & 100% Robust)
+        // Gemini KI Integration (100% Robust & Apple Style)
         // ==========================================
         
         function formatAiResponseToHtml(text) {
             let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Schutz
             
-            // Quellen-Links [1], [2] von Google Grounding entfernen (stören oft das Design)
+            // Quellen-Links [1], [2] entfernen
             html = html.replace(/\[\d+\]/g, '');
             
-            // Markdown zu HTML mit iOS-Styling Klassen
+            // Markdown zu HTML
             html = html.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
             html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
@@ -713,7 +736,7 @@
             let inList = false;
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
-                if (!line) continue; // Leere Zeilen überspringen für besseres Padding
+                if (!line) continue; 
                 
                 if (line.startsWith('- ') || line.startsWith('* ')) {
                     line = `<li class="ai-li">${line.substring(2)}</li>`;
@@ -727,7 +750,7 @@
             
             let finalHtml = out.join('<br>').replace(/<br><ul/g, '<ul').replace(/<\/ul><br>/g, '</ul>');
             
-            // Das wunderschöne iOS-Widget Layout!
+            // Das iOS Widget Layout
             return `
                 <div class="ios-ai-widget">
                     <div class="ios-ai-widget-header">
@@ -747,7 +770,7 @@
             
             const lastMsg = geminiHistory[geminiHistory.length - 2]; 
             
-            // FIX 1: Strikter Check korrigiert, damit die erste Suche garantiert ausgeführt wird
+            // FIX: Korrekter Check für leere Historien
             if (aiChatContent.innerHTML.trim() === '' || !lastMsg || lastMsg.parts[0].text !== q) {
                 geminiHistory = [];
                 aiChatContent.innerHTML = '';
@@ -755,7 +778,8 @@
                 userBubble.className = 'ai-bubble-user';
                 userBubble.innerText = q;
                 aiChatContent.appendChild(userBubble);
-                triggerGemini(q, true);
+                // Nutze die currentSearchId, um diesen Context zu sichern
+                triggerGemini(q, true, currentSearchId);
             }
         }
 
@@ -803,7 +827,9 @@
             return await resFallback.json();
         }
 
-        async function triggerGemini(query, isManualTrigger = false) {
+        async function triggerGemini(query, isManualTrigger = false, searchId) {
+            // Check Token
+            if (searchId !== currentSearchId) return;
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) return;
             if (isAiThinking) return;
@@ -827,7 +853,10 @@
             try {
                 const data = await fetchFromGemini(tempHistory);
                 
-                // FIX 3: Super robuster Extraktor für das parts-Array (Ignoriert toolCall etc.)
+                // Abort, wenn während des API-Calls eine neue Suche gestartet wurde
+                if (searchId !== currentSearchId) return;
+
+                // FIX: Super robuster Extraktor, überspringt 'executableCode' & 'toolCall'
                 let textResp = "";
                 if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                     for (let part of data.candidates[0].content.parts) {
@@ -853,21 +882,25 @@
                     appendAiCard(textResp);
                 }
             } catch (e) {
+                if (searchId !== currentSearchId) return; // Silent Abort
+                
                 console.error("Gemini Komplettausfall", e);
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
-                if(isManualTrigger) {
+                if (isManualTrigger) {
                     appendAiCard("Es gab leider einen Fehler bei der Verbindung zur KI. Bitte versuche es noch einmal.");
                 }
             } finally {
-                // GANZ WICHTIG: Lock in jedem Fall lösen
-                isAiThinking = false;
+                // FIX: Nur Lock aufheben, wenn es die aktuelle Suche ist
+                if (searchId === currentSearchId) {
+                    isAiThinking = false;
+                }
             }
         }
 
         function appendAiCard(plainText) {
             const wrapper = document.createElement('div');
             wrapper.className = 'ai-bubble-model';
-            wrapper.innerHTML = formatAiResponseToHtml(plainText); // Wandelt Text in wunderschönes iOS Widget
+            wrapper.innerHTML = formatAiResponseToHtml(plainText);
             aiChatContent.appendChild(wrapper);
             scrollToBottom(aiChatContent);
         }
@@ -884,7 +917,7 @@
             aiChatContent.appendChild(userBubble);
             scrollToBottom(aiChatContent);
 
-            triggerGemini(q, true);
+            triggerGemini(q, true, currentSearchId);
         }
 
         function openAiSheet() {
