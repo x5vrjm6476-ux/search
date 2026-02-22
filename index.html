@@ -125,7 +125,7 @@
         }
         #ai-sheet.compact .ai-sheet-content {
             overflow: hidden;
-            pointer-events: none; /* Clicks gehen an das Sheet durch, um es zu vergrößern */
+            pointer-events: none;
             mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
             padding-bottom: 0;
@@ -137,7 +137,7 @@
             pointer-events: none;
         }
         #ai-sheet.compact .ai-sheet-close {
-            pointer-events: auto; /* Schließen soll trotzdem gehen */
+            pointer-events: auto;
         }
 
         /* Erweiterter Zustand */
@@ -434,7 +434,7 @@
                 currentQuery = queryParam;
                 
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-                if (getCookie('serper_api_key')) triggerNewSearch();
+                if (localStorage.getItem('serper_api_key')) triggerNewSearch();
             } else {
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
@@ -477,7 +477,7 @@
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             renderSkeletons(currentType); performSearch(currentType, false, true);
             
-            if (getCookie('gemini_api_key')) fetchGeminiAI(currentQuery, false);
+            if (localStorage.getItem('gemini_api_key')) fetchGeminiAI(currentQuery, false);
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
@@ -521,7 +521,7 @@
         }
 
         async function fetchGeminiAI(query, isFollowUp = false) {
-            const geminiKey = getCookie('gemini_api_key'); if (!geminiKey) return;
+            const geminiKey = localStorage.getItem('gemini_api_key'); if (!geminiKey) return;
 
             if (!isFollowUp) { aiChatHistory = []; aiContent.innerHTML = ''; } 
             else { aiContent.innerHTML += `<div class="chat-bubble user-message">${query}</div>`; }
@@ -544,7 +544,6 @@
 - Bei "text": Standardwissen. data = {"content": "Ausführlichere Antwort mit **Fett** als Markdown"}`;
 
             try {
-                // Changed model to gemini-2.0-flash and removed responseMimeType
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -623,7 +622,7 @@
 
         async function performSearch(type, isLoadMore = false, isInitial = false) {
             if (isLoading) return; isLoading = true;
-            const apiKey = getCookie('serper_api_key');
+            const apiKey = localStorage.getItem('serper_api_key');
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
 
             try {
@@ -733,17 +732,25 @@
         }
 
         function checkApiKeys() {
-            const serperKey = getCookie('serper_api_key');
+            const serperKey = localStorage.getItem('serper_api_key');
             if (!serperKey) setupModal.classList.add('active');
-            else { document.getElementById('apiKeyInput').value = serperKey; const geminiKey = getCookie('gemini_api_key'); if(geminiKey) document.getElementById('geminiKeyInput').value = geminiKey; }
+            else { 
+                document.getElementById('apiKeyInput').value = serperKey; 
+                const geminiKey = localStorage.getItem('gemini_api_key'); 
+                if(geminiKey) document.getElementById('geminiKeyInput').value = geminiKey; 
+            }
         }
 
-        function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKeys() {
-            const serperKey = document.getElementById('apiKeyInput').value.trim(); const geminiKey = document.getElementById('geminiKeyInput').value.trim();
+            const serperKey = document.getElementById('apiKeyInput').value.trim(); 
+            const geminiKey = document.getElementById('geminiKeyInput').value.trim();
             if (serperKey) { 
-                document.cookie = `serper_api_key=${serperKey}; max-age=31536000; path=/`; 
-                if (geminiKey) document.cookie = `gemini_api_key=${geminiKey}; max-age=31536000; path=/`; 
+                localStorage.setItem('serper_api_key', serperKey);
+                if (geminiKey) {
+                    localStorage.setItem('gemini_api_key', geminiKey);
+                } else {
+                    localStorage.removeItem('gemini_api_key');
+                }
                 setupModal.classList.remove('active'); 
                 if (currentQuery) triggerNewSearch(); 
             }
