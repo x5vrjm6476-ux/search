@@ -102,7 +102,7 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* Das Apple-like Miniatur Widget (Dynamic Island Style) */
+        /* ================== AI MINIATUR WIDGET (Dynamic Island) ================== */
         #ai-compact-widget {
             position: fixed; bottom: calc(var(--safe-bottom) + 85px); left: 50%; transform: translateX(-50%) scale(0.95);
             background: rgba(30, 30, 32, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
@@ -110,8 +110,7 @@
             display: flex; flex-direction: column; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
             transition: all 0.5s cubic-bezier(0.25, 1, 0.2, 1); width: 92%; max-width: 420px;
-            overflow: hidden;
-            display: none; /* Initial hidden */
+            overflow: hidden; display: none; 
         }
         #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
         
@@ -122,31 +121,25 @@
         .compact-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); border-radius: 50%; color: white; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);}
         .compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px;}
         
-        /* Schließen-Button im Widget */
         .compact-close-btn {
-            position: absolute; right: 12px; top: 12px;
-            background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+            position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
             width: 26px; height: 26px; color: white; display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 100; transition: background 0.2s;
         }
         .compact-close-btn:active { background: rgba(255,255,255,0.3); }
 
-        /* Container für das injizierte Widget im Mini-Modus */
         .compact-widget-container {
-            pointer-events: none; 
-            max-height: 240px; overflow: hidden;
+            pointer-events: none; max-height: 240px; overflow: hidden;
             mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-            display: none; 
-            margin-top: -6px; 
+            display: none; margin-top: -6px; 
         }
+        /* Widgets im Compact Mode anpassen */
         .compact-widget-container .ios-ai-widget, 
         .compact-widget-container .ios-currency-card,
-        .compact-widget-container .ios-place-card {
-            box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none;
-        }
+        .compact-widget-container .ios-place-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; }
 
-        /* AI Bottom Sheet */
+        /* ================== AI BOTTOM SHEET & CHAT ================== */
         #ai-sheet-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 2000;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end;
@@ -164,6 +157,7 @@
         .ai-sheet-title { margin-top: 12px; font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;}
         .ai-sheet-close { position: absolute; right: 20px; top: 18px; width: 30px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.1); border: none; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; }
         .ai-sheet-close:active { transform: scale(0.9); }
+        
         .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;}
         .ai-chat-input-area { padding: 16px 20px calc(var(--safe-bottom) + 16px); background: #111112; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end;}
         .ai-chat-input { flex: 1; background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 16px; color: white; font-size: 16px; outline: none; resize: none; max-height: 100px; min-height: 44px;}
@@ -171,71 +165,47 @@
         .ai-send-btn:active { transform: scale(0.9); }
         .ai-send-btn svg { fill: black; width: 20px; height: 20px; }
 
-        /* Wackel-Animation bei Blockade (Spam-Schutz Feedback) */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            50% { transform: translateX(6px); }
-            75% { transform: translateX(-6px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
         .shake-anim { animation: shake 0.3s ease-in-out; border-color: rgba(255,59,48,0.6) !important; }
 
-        /* AI Chat Bubbles & Apple-like Widgets */
         .ai-bubble-user { 
-            align-self: flex-end; background: #2c2c2e; padding: 12px 16px; 
-            border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; 
-            color: white; border: 1px solid rgba(255,255,255,0.05); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; 
+            color: white; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
-        .ai-bubble-model { 
-            align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 16px;
-            animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-        }
+        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 12px; animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
         @keyframes slideInChat { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* ================== ELEGANTES WIDGET DESIGN ================== */
         
-        /* STANDARD TEXT WIDGET (Frosted Glass) */
         .ios-ai-widget {
-            background: linear-gradient(145deg, rgba(40,40,42,0.95), rgba(28,28,30,0.95));
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 24px; padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05);
+            background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-        .ios-ai-widget-header {
-            display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; 
-            color: #a1a1a6; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #a1a1a6; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
         
-        /* WÄHRUNGS WIDGET (Elegant, Dunkel mit starker Akzentfarbe) */
+        /* Neu: Elegante, dunkle Währungskarte mit leuchtendem Highlight */
         .ios-currency-card {
-            background: rgba(28,28,30,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; padding: 22px; color: white;
-            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 24px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; gap: 4px; position: relative;
+            background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; position: relative;
         }
-        .ios-currency-title { font-size: 13px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .ios-currency-amount { font-size: 16px; font-weight: 500; color: #a1a1a6; text-decoration: line-through; }
-        .ios-currency-converted { font-size: 42px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
+        .ios-currency-title { font-size: 13px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .ios-currency-amount { font-size: 16px; font-weight: 500; color: #8e8e93; text-decoration: line-through; }
+        .ios-currency-converted { font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; }
 
-        /* ORTE WIDGET (Apple Maps Style) */
+        /* Neu: Elegante Place-Cards */
         .ios-place-card {
-            background: rgba(28,28,30,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px; padding: 18px; margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
         }
         .ios-place-card:last-child { margin-bottom: 0; }
         .ios-place-name { font-size: 18px; font-weight: 600; color: white; margin-bottom: 14px; letter-spacing: -0.2px;}
         .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
         .ios-place-row:last-child { margin-bottom: 0; }
-        .ios-place-icon { 
-            width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; color: white;
-        }
+        .ios-place-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; flex-shrink: 0; color: #a1a1a6; }
         .ios-place-icon svg { width: 14px; height: 14px; stroke: currentColor; }
 
-        /* Typografie */
         .ai-h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 16px 0 8px 0; letter-spacing: -0.2px;}
         .ai-h2:first-child { margin-top: 0; }
         .ai-h3 { font-size: 16px; font-weight: 600; color: #e5e5ea; margin: 14px 0 6px 0; }
@@ -276,13 +246,8 @@
         .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
-        
-        .color-pill {
-            display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; 
-        }
+        .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
-
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
@@ -297,30 +262,13 @@
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
 
-        #image-viewer {
-            position: fixed; inset: 0; z-index: 999999; 
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; 
-        }
+        #image-viewer { position: fixed; inset: 0; z-index: 999999; background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
         #image-viewer.active { opacity: 1; pointer-events: auto; }
-        
-        .viewer-header {
-            position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0;
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; 
-            z-index: 2147483647; pointer-events: none; 
-        }
+        .viewer-header { position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; z-index: 2147483647; pointer-events: none; }
         .viewer-close, #viewer-pill-container { pointer-events: auto; }
-        
-        .viewer-close {
-            background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
-            border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); transition: transform 0.2s;
-        }
+        .viewer-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); transition: transform 0.2s; }
         .viewer-close:active { transform: scale(0.9); }
-        .viewer-track {
-            display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
-            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x; z-index: 10;
-        }
+        .viewer-track { display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x; z-index: 10; }
         .viewer-slide { flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; }
         .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
 
@@ -374,7 +322,6 @@
         <button class="compact-close-btn" onclick="closeCompactWidget(event)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
         </button>
-        
         <div class="compact-inner-wrap" onclick="openAiSheet()">
             <div class="compact-loading-state" id="compact-loading-state">
                 <div class="compact-icon">
@@ -452,7 +399,6 @@
         let currentQuery = '';
         let isLoading = false;
         
-        // Globale ID um Race Conditions auszuschalten
         let currentSearchId = 0;
         
         const state = {
@@ -468,7 +414,7 @@
         const imageViewer = document.getElementById('image-viewer');
 
         // AI Globals
-        let geminiHistory = [];
+        let geminiHistory = []; // Speichert NUR bereinigten Text, keine API ToolCalls
         let isAiThinking = false;
         const aiCompactWidget = document.getElementById('ai-compact-widget');
         const aiCompactText = document.getElementById('ai-compact-text');
@@ -645,11 +591,9 @@
             renderSkeletons(currentType);
             performSearch(currentType, false, true, myId);
             
-            // AI Vorbereiten - Compact Widget anzeigen
+            // AI History resetten und sauberen Start garantieren
             geminiHistory = [];
             aiChatContent.innerHTML = '';
-            
-            // Display sicherstellen für neue Suche
             aiCompactWidget.style.display = 'flex';
             aiCompactWidget.classList.remove('active');
             
@@ -796,7 +740,7 @@
         // ==========================================
         
         function closeCompactWidget(e) {
-            e.stopPropagation(); // Verhindert Klick aufs Widget
+            e.stopPropagation(); 
             aiCompactWidget.classList.remove('active');
             setTimeout(() => { 
                 if(!aiCompactWidget.classList.contains('active')) {
@@ -806,8 +750,8 @@
         }
 
         function parseAiMarkupToHtml(text, isCompactMode = false) {
-            text = text.replace(/\[\d+\]/g, ''); // Quellen entfernen
-            text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            text = text.replace(/\[\d+\]/g, ''); // Google Grounding Sources entfernen
+            text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Schutz
 
             let html = '';
             const regex = /\[(CURRENCY|PLACE|TEXT)\]([\s\S]*?)\[\/\1\]/g;
@@ -825,7 +769,7 @@
                 const content = match[2].trim();
 
                 if (type === 'CURRENCY') {
-                    const title = (content.match(/Title:\s*(.*)/) || [])[1] || 'Umrechnung';
+                    const title = (content.match(/Title:\s*(.*)/) || [])[1] || 'Währungsumrechnung';
                     const amount = (content.match(/Amount:\s*(.*)/) || [])[1] || '';
                     const converted = (content.match(/Converted:\s*(.*)/) || [])[1] || '';
                     const color = (content.match(/Color:\s*(.*)/) || [])[1] || '#0A84FF';
@@ -909,7 +853,6 @@
             
             openAiSheet();
             
-            // Verhindert Error wenn Array leer ist
             const lastMsg = geminiHistory.length >= 2 ? geminiHistory[geminiHistory.length - 2] : null;
             
             if (aiChatContent.innerHTML.trim() === '' || !lastMsg || !lastMsg.parts || !lastMsg.parts[0] || lastMsg.parts[0].text !== q) {
@@ -923,11 +866,12 @@
             }
         }
 
+        // Dynamischer API-Kaskaden-Router (Löst alle 400er Fehler)
         async function fetchFromGemini(query) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
-            const systemPrompt = `Du bist ein brillanter KI-Assistent. Du hast Zugriff auf Live-Internetdaten. 
+            const systemPrompt = `Du bist ein brillanter KI-Assistent in einer Suche-App. Du hast Zugriff auf Live-Internetdaten. 
 WICHTIG: Antworte niemals in JSON! Verwende EXAKT und AUSSCHLIESSLICH diese Text-Blöcke zur Formatierung:
 
 Für Währungen:
@@ -954,52 +898,55 @@ Für Text/Antworten/Fakten:
 
 Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
-            let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
+            // Wir verpacken die gesamte Historie in einen einzigen Prompt, damit Gemini nicht durch kaputte toolCalls verwirrt wird
+            let fullPrompt = "System-Anweisung: " + systemPrompt + "\n\n";
             if (geminiHistory.length > 0) {
-                combinedText += "Bisheriger Verlauf:\n";
+                fullPrompt += "Bisheriger Chatverlauf:\n";
                 for (let msg of geminiHistory) {
                     const role = msg.role === 'user' ? 'User' : 'KI';
-                    combinedText += `${role}: ${msg.parts[0].text}\n`;
+                    fullPrompt += `${role}: ${msg.parts[0].text}\n\n`;
                 }
-                combinedText += "\nAktuelle Frage:\n";
             }
-            combinedText += query;
+            fullPrompt += "Aktuelle Frage: " + query;
 
-            const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
-
-            // 1. Versuch: Gemini 2.5 Flash + Grounding google_search
-            try {
-                const payload1 = { contents: flatContents, tools: [{ google_search: {} }] };
-                const res1 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload1)
-                });
-                if (res1.ok) return await res1.json();
-            } catch(e) {}
-
-            // 1.5 Versuch: Gemini 2.5 Flash + Grounding googleSearch (CamelCase)
-            try {
-                const payload15 = { contents: flatContents, tools: [{ googleSearch: {} }] };
-                const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
-                });
-                if (res15.ok) return await res15.json();
-            } catch(e) {}
-
-            // 2. Absoluter Fallback: KI ohne Tools (sicher und fehlerfrei)
-            const multiTurnContents = [...geminiHistory, { role: "user", parts: [{ text: query }] }];
-            const basePayload = {
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: multiTurnContents
+            const payloadGrounding = {
+                contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+                tools: [{ googleSearch: {} }] 
             };
-            const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
-            });
-            
-            if (!resFallback.ok) {
-                const errorData = await resFallback.json().catch(() => ({}));
-                throw new Error(errorData?.error?.message || `HTTP Error ${resFallback.status}`);
+
+            const payloadFallback = {
+                contents: [{ role: "user", parts: [{ text: fullPrompt }] }]
+            };
+
+            const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+            let lastError = null;
+
+            // Phase 1: Versuche Grounding auf allen Modellen
+            for (let model of models) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payloadGrounding)
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.candidates) return data;
+                    if (data.error) lastError = data.error.message;
+                } catch(e) { lastError = e.message; }
             }
-            return await resFallback.json();
+
+            // Phase 2: Wenn Grounding überall fehlschlägt, absoluter Text-Fallback
+            for (let model of models) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payloadFallback)
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.candidates) return data;
+                } catch(e) {}
+            }
+
+            throw new Error("Alle API-Versuche fehlgeschlagen. Letzter Fehler: " + lastError);
         }
 
         function setCompactLoadingState(isLoading) {
@@ -1048,9 +995,12 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                     }
                 }
 
-                if (!textResp.trim()) { throw new Error("Kein Text in der KI-Antwort gefunden."); }
+                if (!textResp.trim()) { 
+                    const finishReason = data.candidates && data.candidates[0] ? data.candidates[0].finishReason : "Unbekannt";
+                    textResp = `[TEXT]Die Antwort wurde blockiert oder abgebrochen (Grund: ${finishReason}).[/TEXT]`; 
+                }
                 
-                // HISTORY FIX: Speichert ausschließlich reinen Text ab! Keine Tool-Aufrufe!
+                // HISTORY FIX: Speichert AUSSCHLIESSLICH REINEN TEXT ab!
                 geminiHistory.push({ role: "user", parts: [{ text: query }] });
                 geminiHistory.push({ role: "model", parts: [{ text: textResp }] });
 
@@ -1069,7 +1019,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                 
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
                 if(isManualTrigger) {
-                    appendAiCard("[TEXT]Es gab leider einen Fehler bei der Verbindung zur KI. Bitte versuche es nochmal.[/TEXT]");
+                    appendAiCard(`[TEXT]Es gab leider einen Fehler bei der Verbindung zur KI. (${e.message})[/TEXT]`);
                 } else {
                     aiCompactWidget.classList.remove('active');
                     setTimeout(() => { 
@@ -1079,7 +1029,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                     }, 300);
                 }
             } finally {
-                // FIX: IMMER den Lock aufheben, damit weitere Fragen möglich sind!
+                // FIX: IMMER den Lock aufheben (unabhängig von der searchId), damit der Chat nie einfriert
                 isAiThinking = false;
                 aiSendBtn.style.opacity = '1';
             }
@@ -1095,6 +1045,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
         function handleAiChat(e) {
             e.preventDefault();
+            
             // ANIMATIONS FIX: Shake Animation wenn AI noch denkt
             if (isAiThinking) {
                 aiChatInput.classList.add('shake-anim');
@@ -1128,6 +1079,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
             aiSheetOverlay.classList.remove('active');
             aiChatInput.blur();
             if (aiChatContent.innerHTML.trim() !== '' && geminiHistory.length > 0) {
+                aiCompactWidget.style.display = 'flex';
                 aiCompactWidget.classList.add('active');
             }
         }
