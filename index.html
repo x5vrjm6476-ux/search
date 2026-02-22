@@ -21,7 +21,8 @@
             --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --spring-fast: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --spring-fast: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --spring-smooth: all 0.4s cubic-bezier(0.25, 1, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; overflow-anchor: none; }
@@ -45,7 +46,7 @@
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 140px); 
             overflow-anchor: auto;
         }
 
@@ -100,27 +101,79 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
+        /* AI Compact Widget */
+        #ai-compact-widget {
+            position: fixed; bottom: calc(var(--safe-bottom) + 85px); left: 50%; transform: translateX(-50%) scale(0.9);
+            background: rgba(30, 30, 32, 0.6); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 100px; padding: 10px 18px 10px 14px;
+            display: flex; align-items: center; gap: 10px; z-index: 90; opacity: 0; pointer-events: none;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); transition: var(--spring-smooth); max-width: 90%; cursor: pointer;
+        }
+        #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: all; }
+        #ai-compact-widget:active { transform: translateX(-50%) scale(0.95); }
+        .ai-icon-small { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 50%; color: white; flex-shrink: 0; }
+        .ai-compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* AI Bottom Sheet */
+        #ai-sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 2000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        #ai-sheet-overlay.active { opacity: 1; pointer-events: all; }
+        .ai-sheet {
+            background: #111112; width: 100%; height: 85vh; border-radius: 32px 32px 0 0;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -20px 40px rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        #ai-sheet-overlay.active .ai-sheet { transform: translateY(0); }
+        .ai-sheet-header { padding: 16px; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ai-sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; position: absolute; top: 12px; }
+        .ai-sheet-title { margin-top: 12px; font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;}
+        .ai-sheet-close { position: absolute; right: 20px; top: 18px; width: 30px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.1); border: none; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; }
+        .ai-sheet-close:active { transform: scale(0.9); }
+        .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; -webkit-overflow-scrolling: touch; }
+        .ai-chat-input-area { padding: 16px 20px calc(var(--safe-bottom) + 16px); background: #111112; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end;}
+        .ai-chat-input { flex: 1; background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 16px; color: white; font-size: 16px; outline: none; resize: none; max-height: 100px; min-height: 44px;}
+        .ai-send-btn { width: 44px; height: 44px; border-radius: 22px; background: white; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;}
+        .ai-send-btn:active { transform: scale(0.9); }
+        .ai-send-btn svg { fill: black; width: 20px; height: 20px; }
+
+        /* AI Cards / Bubbles */
+        .ai-bubble-user { align-self: flex-end; background: #1c1c1e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; color: white; }
+        .ai-bubble-model { align-self: flex-start; max-width: 95%; display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        
+        /* Currency Widget iOS Style */
+        .widget-currency { background: var(--bg-color); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
+        .widget-currency-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
+        .widget-currency-amount { font-size: 32px; font-weight: 700; }
+        .widget-currency-converted { font-size: 20px; font-weight: 500; opacity: 0.9; }
+
+        /* Place Widget iOS Style */
+        .widget-place { background: #1c1c1e; border-radius: 24px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .widget-place-name { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+        .widget-place-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 15px; color: #d1d1d6; }
+        .widget-place-row:last-child { margin-bottom: 0; }
+        .widget-place-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; }
+        
+        /* Fact Widget */
+        .widget-fact { background: #1c1c1e; padding: 16px 20px; border-radius: 20px 20px 20px 4px; font-size: 16px; line-height: 1.5; color: white; border: 1px solid rgba(255,255,255,0.05);}
+
+        /* Bottom Bar */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.45); 
             backdrop-filter: blur(50px) saturate(250%) brightness(1.15); -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.15);
             padding: 8px; border-radius: 100px; 
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.6);
-            display: flex; align-items: center; gap: 8px; z-index: 100; transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+            display: flex; align-items: center; gap: 8px; z-index: 100;
         }
         .search-circle-btn {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15); color: white;
+            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-
-        .ai-reopen-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; display: none; backdrop-filter: blur(10px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); color: white;
-        }
-        .ai-reopen-btn.active { display: flex; }
-        .ai-reopen-btn:active { transform: scale(0.9); }
 
         .tabs-container { position: relative; display: flex; padding: 4px; }
         .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.65); cursor: pointer; position: relative; z-index: 2; transition: color 0.2s ease; text-align: center; }
@@ -132,7 +185,7 @@
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); overflow: hidden; }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         
@@ -142,13 +195,8 @@
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
-        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
-        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
-
-        .sitelink-toggle { background: rgba(255,255,255,0.05); border: none; color: white; border-radius: 16px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; }
-        .sitelink-toggle:active { transform: scale(0.85); background: rgba(255,255,255,0.1); }
-        .sitelink-btn { background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 14px; font-size: 13px; color: white; text-decoration: none; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: var(--spring-fast); cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
-        .sitelink-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
+        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
+        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
         .image-card:active { transform: scale(0.96); transition: transform 0.15s; }
@@ -160,92 +208,54 @@
         .shopping-info { padding: 16px; flex: 1; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
-        
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 16px; width: 100%; font-weight: 500; }
 
-        /* KI WIDGETS & SHEET */
-        #ai-sheet {
-            position: fixed; z-index: 2000;
-            background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column;
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), border-radius 0.4s ease, height 0.4s ease, bottom 0.4s ease, left 0.4s ease, right 0.4s ease;
-            transform: translateY(150%);
-            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        #image-viewer {
+            position: fixed; inset: 0; z-index: 999999; 
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; 
         }
-
-        /* Compact Kapsel über der Suchleiste */
-        #ai-sheet.compact-mode {
-            bottom: calc(var(--safe-bottom) + 80px);
-            left: 16px; right: 16px; max-width: 728px; margin: 0 auto;
-            border-radius: 28px;
-            height: auto; max-height: 320px;
-            transform: translateY(0);
-            cursor: pointer;
+        #image-viewer.active { opacity: 1; pointer-events: all; }
+        
+        .viewer-header {
+            position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; 
+            z-index: 2147483647; pointer-events: none; 
         }
-        #ai-sheet.compact-mode:active { transform: scale(0.98); }
-
-        /* Expanded Vollbild Sheet */
-        #ai-sheet.expanded-mode {
-            bottom: 0; left: 0; right: 0; max-width: 100%; margin: 0;
-            border-radius: 32px 32px 0 0;
-            height: 85vh; max-height: 85vh;
-            transform: translateY(0);
-            cursor: default;
+        .viewer-close, #viewer-pill-container { pointer-events: auto; }
+        
+        .viewer-close {
+            background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px;
+            border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); transition: transform 0.2s;
         }
-
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 12px; flex-shrink: 0; pointer-events: none;}
-        .ai-sheet-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; }
-        
-        .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); pointer-events: auto;}
-        #ai-sheet.expanded-mode .ai-sheet-close { display: flex; }
-        .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
-        
-        .ai-sheet-content { padding: 0 24px 24px; overflow-y: auto; flex: 1; scrollbar-width: none; font-size: 16px; line-height: 1.6; color: #fff; pointer-events: none; }
-        #ai-sheet.expanded-mode .ai-sheet-content { pointer-events: auto; } /* Erst im Vollbild scrollbar/klickbar */
-
-        .ai-sheet-input-container { padding: 16px 24px calc(var(--safe-bottom) + 16px); border-top: 1px solid rgba(255,255,255,0.05); display: none; background: rgba(25, 25, 28, 0.95); flex-shrink: 0; }
-        #ai-sheet.expanded-mode .ai-sheet-input-container { display: block; }
-        
-        .ai-sheet-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 16px 20px; color: white; font-size: 16px; outline: none; transition: var(--spring-fast); }
-        .ai-sheet-input:focus { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.15); }
-
-        /* WIDGET STYLES (Apple Modern, Solid Colors) */
-        .widget-currency { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-        .widget-currency-box { flex: 1; padding: 20px; border-radius: 24px; color: #fff; text-align: center; }
-        .widget-currency-code { font-size: 14px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; text-transform: uppercase; }
-        .widget-currency-amount { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; word-break: break-word; line-height: 1.2;}
-        
-        .widget-places-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px;}
-        .widget-place-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); padding: 20px; border-radius: 24px; }
-        .widget-place-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 6px; }
-        .widget-place-meta { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px; line-height: 1.5; }
-        .widget-place-actions { display: flex; gap: 8px; flex-wrap: wrap;}
-        .widget-place-btn { background: rgba(255,255,255,0.12); color: #fff; padding: 10px 16px; border-radius: 16px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-        
-        .ai-short-text { font-size: 20px; font-weight: 500; line-height: 1.4; color: #fff; margin-bottom: 8px; }
-        .ai-full-text { font-size: 16px; color: rgba(255,255,255,0.85); margin-top: 24px; display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;}
-        #ai-sheet.expanded-mode .ai-full-text { display: block; }
-        .ai-full-text b { color: #fff; font-weight: 600; }
+        .viewer-close:active { transform: scale(0.9); }
+        .viewer-track {
+            display: flex; width: 100vw; height: 100%; overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x; z-index: 10;
+        }
+        .viewer-slide { flex: 0 0 100vw; width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; }
+        .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
 
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content input.gemini-input { margin-top: 0; background: rgba(255,255,255,0.08); }
-        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
+        .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 360px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-content input { width: 100%; padding: 16px; margin: 10px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 15px; outline: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);}
+        .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast); margin-top: 10px;}
         .modal-content button:active { transform: scale(0.95); }
+        .modal-title { font-weight: 600; font-size: 20px; margin-bottom: 16px; }
+        .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; text-align: left; padding-left: 8px;}
     </style>
 </head>
 <body>
 
     <div id="setup-modal">
         <div class="modal-content">
-            <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
-            <input type="text" id="apiKeyInput" placeholder="Serper Key (Suche)" autocomplete="off" spellcheck="false">
-            <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
+            <h2 class="modal-title">API Setup</h2>
+            <div class="modal-subtitle">Serper Key (Web Search)</div>
+            <input type="text" id="apiKeyInput" placeholder="Serper Key eingeben" autocomplete="off" spellcheck="false">
+            <div class="modal-subtitle" style="margin-top: 12px;">Gemini Key (AI Widgets - Optional)</div>
+            <input type="text" id="geminiKeyInput" placeholder="Gemini API Key eingeben" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 16px; line-height: 1.4;">Gemini liefert interaktive Widgets & Echtzeit-Antworten.</p>
         </div>
     </div>
 
@@ -266,10 +276,40 @@
         <div class="viewer-header" id="viewer-header">
             <div id="viewer-pill-container"></div>
             <button class="viewer-close" onclick="closeImageViewer()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
             </button>
         </div>
         <div class="viewer-track" id="viewer-track"></div>
+    </div>
+
+    <div id="ai-compact-widget" onclick="openAiSheet()">
+        <div class="ai-icon-small">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
+        </div>
+        <div class="ai-compact-text" id="ai-compact-text">Antwort laden...</div>
+    </div>
+
+    <div id="ai-sheet-overlay">
+        <div class="ai-sheet">
+            <div class="ai-sheet-header">
+                <div class="ai-sheet-handle"></div>
+                <div class="ai-sheet-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
+                    Intelligente Antwort
+                </div>
+                <button class="ai-sheet-close" onclick="closeAiSheet()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="ai-chat-content" id="ai-chat-content">
+                </div>
+            <form class="ai-chat-input-area" onsubmit="handleAiChat(event)">
+                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Folgefrage stellen..." autocomplete="off">
+                <button type="submit" class="ai-send-btn">
+                    <svg viewBox="0 0 24 24"><path d="M3 20V4l19 8-19 8zm2-3l11.85-5L5 7v3.5l6 1.5-6 1.5V17z"/></svg>
+                </button>
+            </form>
+        </div>
     </div>
 
     <div id="results-wrapper">
@@ -282,38 +322,18 @@
         <div id="view-shopping" data-type="shopping" class="scroll-viewport">
             <div class="results-content"><div class="load-more-trigger"></div></div>
         </div>
-    </div>
 
-    <div id="ai-sheet" onclick="expandAiSheet(event)">
-        <div class="ai-sheet-header">
-            <div class="ai-sheet-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                KI Antwort
-            </div>
-            <button class="ai-sheet-close" onclick="closeAiSheet(event)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <div id="bottom-bar">
+            <button class="search-circle-btn" onclick="openSearch()">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
-        </div>
-        <div class="ai-sheet-content" id="ai-sheet-content">
+            <div class="tabs-container">
+                <div class="tab-slider" id="tabSlider"></div>
+                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
+                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
+                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
             </div>
-        <form class="ai-sheet-input-container" onsubmit="handleAiFollowUp(event)">
-            <input type="text" id="aiFollowUpInput" class="ai-sheet-input" placeholder="Nachfragen..." autocomplete="off">
-        </form>
-    </div>
-
-    <div id="bottom-bar">
-        <button class="search-circle-btn" onclick="openSearch()">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </button>
-        <div class="tabs-container">
-            <div class="tab-slider" id="tabSlider"></div>
-            <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
-            <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
-            <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
-        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheetCompact(true)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-        </button>
     </div>
 
     <script>
@@ -326,22 +346,29 @@
         const tabSlider = document.getElementById('tabSlider');
         const tabs = document.querySelectorAll('.tab');
         
-        const aiSheet = document.getElementById('ai-sheet');
-        const aiContent = document.getElementById('ai-sheet-content');
-        const aiReopenBtn = document.getElementById('aiReopenBtn');
-        const aiFollowUpInput = document.getElementById('aiFollowUpInput');
-        const bottomBar = document.getElementById('bottom-bar');
-        
         let currentType = 'search';
         let currentQuery = '';
         let isLoading = false;
-        let aiHistory = []; 
         
         const state = {
-            search: { page: 1, loaded: false, lastSearchData: null },
-            images: { page: 1, loaded: false, lastSearchData: null },
-            shopping: { page: 1, loaded: false, lastSearchData: null }
+            search: { page: 1, loaded: false },
+            images: { page: 1, loaded: false },
+            shopping: { page: 1, loaded: false }
         };
+        
+        let globalImages = [];
+        let viewerIndex = 0;
+        const track = document.getElementById('viewer-track');
+        const viewerHeader = document.getElementById('viewer-header');
+        const imageViewer = document.getElementById('image-viewer');
+
+        // AI Globals
+        let geminiHistory = [];
+        const aiCompactWidget = document.getElementById('ai-compact-widget');
+        const aiCompactText = document.getElementById('ai-compact-text');
+        const aiSheetOverlay = document.getElementById('ai-sheet-overlay');
+        const aiChatContent = document.getElementById('ai-chat-content');
+        const aiChatInput = document.getElementById('ai-chat-input');
 
         const colorCache = new Map();
 
@@ -357,8 +384,10 @@
                     return result;
                 }
             }
-            colorCache.set(domain, null);
-            return null; 
+            // Fallback Dark Styling
+            const fallback = { bg: `rgba(255,255,255,0.08)`, text: `#ffffff`, border: `1px solid rgba(255,255,255,0.05)` };
+            colorCache.set(domain, fallback);
+            return fallback;
         }
 
         function tryExtractColor(url) {
@@ -417,12 +446,20 @@
             observers[type].observe(trigger);
         }
 
+        function checkApiKeys() {
+            const serper = getCookie('serper_api_key');
+            if(serper) {
+                document.getElementById('apiKeyInput').value = serper;
+                document.getElementById('geminiKeyInput').value = getCookie('gemini_api_key') || '';
+                return true;
+            }
+            return false;
+        }
+
         window.addEventListener('load', () => { 
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
             
-            checkApiKeys();
-
             if (queryParam) {
                 homeView.style.display = 'none';
                 resultsWrapper.classList.add('active');
@@ -431,9 +468,11 @@
                 currentQuery = queryParam;
                 
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-                if (localStorage.getItem('serper_api_key')) triggerNewSearch();
+                if (checkApiKeys()) triggerNewSearch();
+                else setupModal.classList.add('active');
             } else {
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
+                if (!checkApiKeys()) setupModal.classList.add('active');
             }
             Object.keys(state).forEach(k => setupObserver(k));
         });
@@ -449,13 +488,6 @@
             document.getElementById(`view-${type}`).classList.add('active');
             currentType = type;
             
-            if (type !== 'search') {
-                forceCloseAiSheet();
-                aiReopenBtn.classList.remove('active');
-            } else if (state['search'].loaded && localStorage.getItem('gemini_api_key')) {
-                aiReopenBtn.classList.add('active');
-            }
-
             if (currentQuery && !state[currentType].loaded) {
                 renderSkeletons(currentType); 
                 performSearch(currentType, false, true);
@@ -489,244 +521,28 @@
             triggerNewSearch();
         }
 
-        async function triggerNewSearch() {
-            forceCloseAiSheet();
-            aiReopenBtn.classList.remove('active');
-
+        function triggerNewSearch() {
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
-                state[k].lastSearchData = null;
-                const vp = document.getElementById(`view-${k}`);
-                const content = vp.querySelector('.results-content');
-                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
+                const content = document.querySelector(`#view-${k} .results-content`);
+                content.innerHTML = '<div class="load-more-trigger"></div>'; 
+                setupObserver(k);
             });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             renderSkeletons(currentType);
+            performSearch(currentType, false, true);
             
-            const autoOpen = shouldAutoOpenAI(currentQuery);
-            if (currentType === 'search' && localStorage.getItem('gemini_api_key')) {
-                if (autoOpen) {
-                    openAiSheetCompact(false);
-                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Erstelle Antwort...</span>';
-                }
-            }
-
-            // Warte auf Serper (Search), damit Gemini die echten Livedaten als Kontext bekommt!
-            await performSearch(currentType, false, true);
-            
-            if (currentType === 'search' && localStorage.getItem('gemini_api_key')) {
-                aiHistory = []; 
-                fetchGeminiAI(currentQuery, true, autoOpen);
-            }
+            // Trigger KI Background Check
+            triggerGemini(currentQuery, false);
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
-        // --- GEMINI KI WIDGET LOGIK ---
-        
-        function shouldAutoOpenAI(query) {
-            const q = query.toLowerCase();
-            const questionWords = /^(wie|was|wer|wo|wann|warum|welche|wieviel|wetter)/.test(q);
-            const conversion = /\b(in|zu|to)\b/.test(q) && /\d/.test(q); 
-            const local = /\b(restaurant|hotel|kino|öffnungszeiten|nähe|arzt|apotheke|vegan|pizza|bar)\b/.test(q);
-            const isMath = /^[0-9\+\-\*\/\(\)\.\,\s]+$/.test(q) && /\d/.test(q);
-            return questionWords || conversion || local || isMath || q.includes('?');
-        }
-
-        function openAiSheetCompact(manual = false) {
-            aiSheet.classList.add('compact-mode');
-            aiSheet.classList.remove('expanded-mode');
-            aiReopenBtn.classList.remove('active');
-            bottomBar.style.transform = 'translate(-50%, 150%)'; 
-            
-            if (manual && aiHistory.length === 0) {
-                fetchGeminiAI(currentQuery, false, true);
-            }
-        }
-
-        function expandAiSheet(e) {
-            if (aiSheet.classList.contains('compact-mode')) {
-                if (e && e.target.closest('.ai-sheet-close')) return;
-                if (e && e.target.closest('a')) return; 
-                
-                aiSheet.classList.remove('compact-mode');
-                aiSheet.classList.add('expanded-mode');
-                
-                setTimeout(() => aiFollowUpInput.focus(), 350);
-            }
-        }
-
-        function closeAiSheet(e) {
-            if (e) e.stopPropagation();
-            forceCloseAiSheet();
-            if (currentType === 'search' && localStorage.getItem('gemini_api_key')) {
-                aiReopenBtn.classList.add('active'); 
-            }
-        }
-
-        function forceCloseAiSheet() {
-            aiSheet.classList.remove('compact-mode');
-            aiSheet.classList.remove('expanded-mode');
-            aiFollowUpInput.blur();
-            bottomBar.style.transform = 'translate(-50%, 0)'; 
-        }
-
-        function getCurrencyColor(code) {
-            const colors = {
-                'EUR': '#0A84FF', 
-                'USD': '#30D158', 
-                'CHF': '#FF453A', 
-                'GBP': '#BF5AF2', 
-                'JPY': '#FF9F0A', 
-                'AUD': '#32ADE6', 
-                'CAD': '#FFD60A'  
-            };
-            return colors[(code || '').toUpperCase()] || '#3A3A3C';
-        }
-
-        function renderJsonWidget(data) {
-            let html = '';
-            
-            if (data.type === 'currency' && data.currency) {
-                const c = data.currency;
-                html += `
-                    <div class="widget-currency">
-                        <div class="widget-currency-box" style="background:${getCurrencyColor(c.from)};">
-                            <div class="widget-currency-code">${c.from}</div>
-                            <div class="widget-currency-amount">${c.amount_from}</div>
-                        </div>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        <div class="widget-currency-box" style="background:${getCurrencyColor(c.to)};">
-                            <div class="widget-currency-code">${c.to}</div>
-                            <div class="widget-currency-amount">${c.amount_to}</div>
-                        </div>
-                    </div>
-                `;
-            } 
-            else if (data.type === 'places' && data.places && data.places.length > 0) {
-                html += `<div class="widget-places-grid">`;
-                data.places.forEach(p => {
-                    // KORREKTER MAPS LINK!
-                    const searchUrl = `https://maps.google.com/?q=${encodeURIComponent((p.name||'') + ' ' + (p.address||''))}`;
-                    html += `
-                        <div class="widget-place-card">
-                            <div class="widget-place-name">${p.name}</div>
-                            <div class="widget-place-meta">
-                                ${p.address ? `${p.address}<br>` : ''}
-                                ${p.hours ? `<span style="color:#fff; font-weight:500;">${p.hours}</span>` : ''}
-                            </div>
-                            <div class="widget-place-actions">
-                                <a href="${searchUrl}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Karte</a>
-                                ${p.phone ? `<a href="tel:${p.phone.replace(/[^\d+]/g,'')}" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Anrufen</a>` : ''}
-                                ${p.website ? `<a href="${p.website}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Website</a>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-            } 
-            else {
-                html += `<div class="ai-short-text">${data.short_answer || 'Antwort geladen.'}</div>`;
-            }
-
-            if (data.full_text) {
-                let formattedFull = data.full_text.replace(/\n/g, '<br>');
-                html += `<div class="ai-full-text">${formattedFull}</div>`;
-            }
-
-            return html;
-        }
-
-        async function fetchGeminiAI(query, isInitialSearch, shouldShowLoading) {
-            const geminiKey = localStorage.getItem('gemini_api_key');
-            if (!geminiKey) return;
-
-            if (isInitialSearch) {
-                if (!shouldShowLoading) {
-                    aiReopenBtn.classList.add('active'); 
-                    return; 
-                }
-            } else {
-                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Generiere Antwort...</span>';
-            }
-
-            aiHistory.push({ role: "user", parts: [{ text: query }] });
-
-            // CLEVERER TRICK: Wir nutzen die Serper Suchergebnisse als Live-Kontext (Grounding) für Gemini, um den API Tool Error zu umgehen!
-            let contextText = "Keine Zusatzdaten.";
-            if (state.search.lastSearchData) {
-                const d = state.search.lastSearchData;
-                let parts = [];
-                if (d.answerBox) parts.push(`Direkte Antwort: ${d.answerBox.answer || d.answerBox.snippet}`);
-                if (d.organic) parts.push(`Web-Ergebnisse:\n` + d.organic.slice(0,3).map(o => `${o.title}: ${o.snippet}`).join('\n'));
-                if (d.localResults) parts.push(`Lokale Orte:\n` + d.localResults.slice(0,3).map(l => `${l.title} (${l.address})`).join(' | '));
-                if (parts.length > 0) contextText = parts.join('\n\n');
-            }
-
-            const systemInstruction = `Du bist ein hilfreicher KI-Suchassistent. Beantworte die Anfrage extrem präzise.
-            Nutze dafür zwingend die folgenden ECHTZEIT-Suchergebnisse (Wichtig für Kurse, Wetter, Fakten, Orte):
-            ---
-            ${contextText}
-            ---
-            Antworte AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Erklärungen vor oder nach dem JSON!
-            
-            {
-              "type": "currency" | "places" | "text",
-              "short_answer": "Sehr kurze, direkte Antwort in 1 Satz ohne Einleitung.",
-              "full_text": "Ausführlichere Erklärung und Details. Nutze <b> für fettgedrucktes.",
-              "currency": { "from": "CHF", "to": "EUR", "amount_from": "100", "amount_to": "105.20" },
-              "places": [ { "name": "Ort 1", "address": "Mustergasse 1", "phone": "+41...", "website": "https...", "hours": "Geöffnet bis 18:00" } ]
-            }`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: aiHistory,
-                        systemInstruction: { parts: [{ text: systemInstruction }] },
-                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
-                    })
-                });
-
-                if (!response.ok) throw new Error('API Error');
-                const data = await response.json();
-                
-                const answerRaw = data.candidates[0].content.parts[0].text;
-                aiHistory.push({ role: "model", parts: [{ text: answerRaw }] });
-
-                try {
-                    const parsedJson = JSON.parse(answerRaw);
-                    aiContent.innerHTML = renderJsonWidget(parsedJson);
-                } catch (parseError) {
-                    aiContent.innerHTML = `<div class="ai-short-text">Fehler beim Formatieren.</div><div class="ai-full-text">${answerRaw}</div>`;
-                }
-
-            } catch (error) {
-                aiContent.innerHTML = '<span style="color:#FF453A; font-size: 16px; font-weight:500;">Verbindungsfehler zur KI. Bitte prüfe den API Key in den Einstellungen.</span>';
-                aiHistory.pop(); 
-            }
-        }
-
-        function handleAiFollowUp(e) {
-            e.preventDefault();
-            const q = aiFollowUpInput.value.trim();
-            if(q) {
-                aiFollowUpInput.value = '';
-                aiFollowUpInput.blur();
-                fetchGeminiAI(q, false, true);
-            }
-        }
-        // --- ENDE KI LOGIK ---
-
         function renderSkeletons(type) {
-            const vp = document.getElementById(`view-${type}`);
-            const content = vp.querySelector('.results-content');
-            const trigger = content.querySelector('.load-more-trigger');
-            
+            const content = document.querySelector(`#view-${type} .results-content`);
             const frag = document.createDocumentFragment();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
@@ -742,8 +558,12 @@
                 }
             }
             frag.appendChild(pageBlock);
-            content.insertBefore(frag, trigger);
+            content.appendChild(frag);
             
+            const trigger = content.querySelector('.load-more-trigger');
+            if (trigger) content.appendChild(trigger);
+            
+            const vp = document.getElementById(`view-${type}`);
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
@@ -751,12 +571,11 @@
             if (isLoading) return;
             isLoading = true;
 
-            const apiKey = localStorage.getItem('serper_api_key');
+            const apiKey = getCookie('serper_api_key');
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
-                
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
@@ -765,16 +584,11 @@
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
-                
-                if (type === 'search' && isInitial) {
-                    state[type].lastSearchData = data;
-                }
-                
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
 
             } catch (error) {
-                console.error("Fetch error", error);
+                console.error("Fetch error");
             } finally {
                 isLoading = false; 
             }
@@ -782,133 +596,74 @@
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
-        window.toggleSitelinks = function(btn) {
-            const container = btn.closest('.card').querySelector('.sitelinks-container');
-            if (container.style.gridTemplateRows === '1fr') {
-                container.style.gridTemplateRows = '0fr';
-                btn.style.transform = 'rotate(0deg)';
-                btn.style.background = 'rgba(255,255,255,0.05)';
-            } else {
-                container.style.gridTemplateRows = '1fr';
-                btn.style.transform = 'rotate(180deg)';
-                btn.style.background = 'rgba(255,255,255,0.15)';
-            }
-        };
-
+        // Render Results - JETZT MIT AWAIT FÜR FARBEN (Kein Flashing mehr)
         async function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
-            const trigger = content.querySelector('.load-more-trigger');
+            let trigger = content.querySelector('.load-more-trigger');
 
-            let rawItems = [];
-            if (type === 'search') rawItems = data.organic || [];
-            else if (type === 'images') rawItems = data.images || [];
-            else if (type === 'shopping') rawItems = data.shopping || [];
+            let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
             
             if (isInitial) {
-                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
+                Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             }
+            if (rawItems.length === 0) return;
 
-            if (rawItems.length === 0) {
-                if (isInitial) {
-                    let emptyMsg = "Keine Ergebnisse gefunden.";
-                    if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
-                    else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
-                    
-                    const emptyState = document.createElement('div');
-                    emptyState.className = 'empty-state';
-                    emptyState.innerText = emptyMsg;
-                    content.insertBefore(emptyState, trigger);
-                }
-                return;
-            }
-
-            let items = [...rawItems].reverse(); 
+            let items = rawItems.reverse();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
+            // Alle Farben asynchron vorab laden!
+            let domainColors = [];
             if (type === 'search') {
-                const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
-                const colors = await Promise.all(colorPromises);
+                domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
+            }
 
-                items.forEach((item, index) => {
-                    if(!item.link) return;
-                    const domain = getHostname(item.link);
-                    const color = colors[index] || { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: '1px solid rgba(255,255,255,0.05)' };
-                    const hasSitelinks = item.sitelinks && item.sitelinks.length > 0;
-                    
-                    const el = document.createElement('div');
-                    el.className = `card ${isInitial ? 'animate-in' : ''}`; 
-                    el.style.cursor = 'pointer';
-                    el.onclick = (e) => {
-                        if(!e.target.closest('.sitelink-toggle') && !e.target.closest('.sitelink-btn')) {
-                            window.open(item.link, '_blank');
-                        }
-                    };
+            items.forEach((item, index) => {
+                const domain = getHostname(item.link);
+                
+                if (type === 'search') {
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+
+                    const color = domainColors[index];
+                    const styleStr = color ? `background: ${color.bg}; color: ${color.text}; border: ${color.border};` : '';
 
                     el.innerHTML = `
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <div class="color-pill" style="background: ${color.bg}; color: ${color.text}; border: ${color.border};">
-                                <span>${domain}</span>
-                            </div>
-                            ${hasSitelinks ? `
-                            <button class="sitelink-toggle" onclick="event.preventDefault(); toggleSitelinks(this);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            ` : ''}
-                        </div>
-                        <div class="card-title">${item.title || 'Ohne Titel'}</div>
-                        ${item.snippet ? `<div class="card-snippet">${item.snippet}</div>` : ''}
-                        
-                        ${hasSitelinks ? `
-                        <div class="sitelinks-container" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);">
-                            <div style="overflow: hidden;">
-                                <div class="sitelinks-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    ${item.sitelinks.slice(0, 6).map(sl => `
-                                        <div onclick="window.open('${sl.link}', '_blank')" class="sitelink-btn">${sl.title}</div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        ` : ''}
+                        <div class="card-header"><div class="color-pill" style="${styleStr}"><span>${domain}</span></div></div>
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-snippet">${item.snippet || ''}</div>
                     `;
                     pageBlock.appendChild(el);
-                });
-
-            } 
-            else {
-                items.forEach((item) => {
-                    if (type === 'images') {
-                        if(!item.imageUrl) return;
-                        const el = document.createElement('a');
-                        el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                        el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
-                        el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
-                        pageBlock.appendChild(el);
-                    } 
-                    else if (type === 'shopping') {
-                        const el = document.createElement('a');
-                        el.href = item.link || '#'; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                        el.innerHTML = `
-                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
-                            <div class="shopping-info">
-                                <div class="shopping-title">${item.title || 'Artikel'}</div>
-                                <div class="shopping-price">${item.price || ''}</div>
-                            </div>
-                        `;
-                        pageBlock.appendChild(el);
-                    }
-                });
-            }
+                } 
+                else if (type === 'images') {
+                    const myIndex = globalImages.length;
+                    globalImages.push(item);
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
+                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
+                    el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
+                    pageBlock.appendChild(el);
+                } 
+                else if (type === 'shopping') {
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+                    el.innerHTML = `
+                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
+                        <div class="shopping-info">
+                            <div class="shopping-title">${item.title}</div>
+                            <div class="shopping-price">${item.price || ''}</div>
+                        </div>
+                    `;
+                    pageBlock.appendChild(el);
+                }
+            });
 
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
 
-            if (pageBlock.children.length > 0) {
-                content.insertBefore(pageBlock, trigger);
-            }
+            content.appendChild(pageBlock);
+            if (trigger) content.appendChild(trigger); 
 
             if (isInitial) {
                 requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
@@ -920,6 +675,135 @@
             }
         }
 
+        // ==========================================
+        // Gemini KI Integration
+        // ==========================================
+        
+        async function triggerGemini(query, isFollowUp = false) {
+            const apiKey = getCookie('gemini_api_key');
+            if (!apiKey) return;
+
+            if (!isFollowUp) {
+                geminiHistory = [];
+                aiCompactWidget.classList.remove('active');
+                aiChatContent.innerHTML = '';
+            } else {
+                // User Bubble hinzufügen
+                const userBubble = document.createElement('div');
+                userBubble.className = 'ai-bubble-user';
+                userBubble.innerText = query;
+                aiChatContent.appendChild(userBubble);
+                scrollToBottom(aiChatContent);
+            }
+
+            const systemPrompt = `Du bist eine KI in einer Apple-Such-App. Antworte IMMER in striktem JSON. Analysiere die Suchanfrage.
+            - Währung (z.B. "100 chf in euro"): {"type": "currency", "shortAnswer": "100 CHF = 104.50 EUR", "color": "#E54D2E", "title": "Währungsumrechnung", "amount": "100 CHF", "converted": "104.50 EUR"} (Nutze eine passende kräftige Solid-Color HEX für "color". Dollar=Grün, Euro=Blau, CHF=Rot. KEINE Verläufe).
+            - Ort/Restaurant: {"type": "place", "shortAnswer": "Restaurant XYZ", "name": "...", "address": "...", "phone": "...", "website": "...", "email": "..."}
+            - Kurzer Fakt/Person: {"type": "fact", "shortAnswer": "Kurze Antwort (max 40 Zeichen)", "details": "Ausführliche Beschreibung..."}
+            - Normale Chat-Frage (Folgefragen): {"type": "chat", "shortAnswer": "Antwort", "details": "Längerer Text..."}
+            - Wenn Web-Suche besser ist und keine klaren Daten existieren: {"type": "none"}
+            Gib KEIN Markdown um das JSON aus (kein \`\`\`json). Nur das pure JSON Objekt.`;
+
+            if(!isFollowUp) {
+                geminiHistory.push({ role: "user", parts: [{ text: query }] });
+            }
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        system_instruction: { parts: [{ text: systemPrompt }] },
+                        contents: geminiHistory,
+                        generationConfig: { response_mime_type: "application/json" }
+                    })
+                });
+                
+                if (!res.ok) throw new Error("Gemini API Error");
+                const data = await res.json();
+                const textResp = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const parsed = JSON.parse(textResp);
+                
+                // Add model response to history
+                geminiHistory.push(data.candidates[0].content);
+
+                if (!isFollowUp) {
+                    if (parsed.type !== 'none') {
+                        aiCompactText.innerText = parsed.shortAnswer;
+                        aiCompactWidget.classList.add('active');
+                        appendAiCard(parsed);
+                    }
+                } else {
+                    appendAiCard(parsed);
+                }
+            } catch (e) {
+                console.error("Gemini Error", e);
+            }
+        }
+
+        function appendAiCard(data) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ai-bubble-model';
+
+            if (data.type === 'currency') {
+                wrapper.innerHTML = `
+                    <div class="widget-currency" style="background-color: ${data.color || '#2E8B57'};">
+                        <div class="widget-currency-title" style="color: rgba(255,255,255,0.7);">${data.title || 'Umrechnung'}</div>
+                        <div class="widget-currency-amount" style="color: white;">${data.amount}</div>
+                        <div class="widget-currency-converted" style="color: rgba(255,255,255,0.9);">${data.converted}</div>
+                    </div>
+                `;
+            } else if (data.type === 'place') {
+                let details = '';
+                if(data.address) details += `<div class="widget-place-row"><div class="widget-place-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span>${data.address}</span></div>`;
+                if(data.phone) details += `<div class="widget-place-row"><div class="widget-place-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span>${data.phone}</span></div>`;
+                if(data.website) details += `<div class="widget-place-row"><div class="widget-place-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span>${data.website}</span></div>`;
+                
+                wrapper.innerHTML = `
+                    <div class="widget-place">
+                        <div class="widget-place-name" style="color: white;">${data.name}</div>
+                        ${details}
+                    </div>
+                `;
+            } else if (data.type === 'fact' || data.type === 'chat') {
+                wrapper.innerHTML = `<div class="widget-fact">${data.details || data.shortAnswer}</div>`;
+            }
+
+            if(wrapper.innerHTML.trim() !== '') {
+                aiChatContent.appendChild(wrapper);
+                scrollToBottom(aiChatContent);
+            }
+        }
+
+        function handleAiChat(e) {
+            e.preventDefault();
+            const q = aiChatInput.value.trim();
+            if(!q) return;
+            aiChatInput.value = '';
+            
+            geminiHistory.push({ role: "user", parts: [{ text: q }] });
+            triggerGemini(q, true);
+        }
+
+        function openAiSheet() {
+            aiCompactWidget.classList.remove('active');
+            aiSheetOverlay.classList.add('active');
+            setTimeout(() => scrollToBottom(aiChatContent), 50);
+        }
+
+        function closeAiSheet() {
+            aiSheetOverlay.classList.remove('active');
+            aiCompactWidget.classList.add('active');
+        }
+
+        function scrollToBottom(el) {
+            el.scrollTop = el.scrollHeight;
+        }
+
+
+        // ==========================================
+        // Image Viewer Logic
+        // ==========================================
         let startX = 0, startY = 0;
         let isSwipingY = false, isSwipingX = false;
 
@@ -999,7 +883,7 @@
             }
         });
 
-        function updateViewerPill() {
+        async function updateViewerPill() {
             if(!globalImages[viewerIndex]) return;
             const item = globalImages[viewerIndex];
             const domain = getHostname(item.link);
@@ -1012,35 +896,28 @@
                 </a>
             `;
 
-            getDominantColor(domain).then(color => {
-                const pill = document.getElementById(pillId);
-                if (color && pill) {
-                    pill.style.background = color.bg;
-                    pill.style.color = color.text;
-                    pill.style.border = color.border;
-                }
-            });
-        }
-
-        function checkApiKeys() {
-            const serperKey = localStorage.getItem('serper_api_key');
-            if (!serperKey) {
-                setupModal.classList.add('active');
-            } else {
-                document.getElementById('apiKeyInput').value = serperKey;
-                const geminiKey = localStorage.getItem('gemini_api_key');
-                if(geminiKey) document.getElementById('geminiKeyInput').value = geminiKey;
+            const color = await getDominantColor(domain);
+            const pill = document.getElementById(pillId);
+            if (color && pill) {
+                pill.style.background = color.bg;
+                pill.style.color = color.text;
+                pill.style.border = color.border;
             }
         }
 
+        // ==========================================
+        // Settings & Cookies
+        // ==========================================
+        function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
+        
         function saveApiKeys() {
             const serperKey = document.getElementById('apiKeyInput').value.trim();
             const geminiKey = document.getElementById('geminiKeyInput').value.trim();
+            
             if (serperKey) { 
-                localStorage.setItem('serper_api_key', serperKey);
-                if (geminiKey) {
-                    localStorage.setItem('gemini_api_key', geminiKey);
-                }
+                document.cookie = `serper_api_key=${serperKey}; max-age=31536000; path=/`; 
+                if(geminiKey) document.cookie = `gemini_api_key=${geminiKey}; max-age=31536000; path=/`;
+                
                 setupModal.classList.remove('active'); 
                 if (currentQuery) triggerNewSearch(); 
             }
