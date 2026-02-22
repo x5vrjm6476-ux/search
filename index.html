@@ -230,6 +230,8 @@
 </head>
 <body>
 
+    <button onclick="testSpecialCards()" style="position:fixed;top:60px;right:20px;z-index:99999;background:red;color:white;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:600;">TEST</button>
+
     <div id="setup-modal">
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px;">API Key</h2>
@@ -273,8 +275,22 @@
         </div>
     </div>
 
-    <div id="special-cards" style="display:none; position:fixed; bottom: 90px; left:50%; transform:translateX(-50%); width:100%; max-width:760px; padding: 0 20px; z-index: 50; flex-direction: column; gap: 16px; max-height: 65vh; overflow-y: auto; scrollbar-width: none; pointer-events: none;">
-    </div>
+    <div id="special-cards" style="
+        display: none;
+        position: fixed;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 760px;
+        padding: 0 20px;
+        z-index: 9999;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 60vh;
+        overflow-y: auto;
+        pointer-events: auto;
+    "></div>
 
     <div id="bottom-bar">
         <button class="search-circle-btn" onclick="openSearch()">
@@ -289,6 +305,21 @@
     </div>
 
     <script>
+        // TEST FUNCTION
+        function testSpecialCards() {
+            const special = document.getElementById('special-cards');
+            special.innerHTML = `
+                <div class="card answer-box-card">
+                    <div class="answer-box-label">Direkte Antwort</div>
+                    <h2 class="answer-box-title">Test: 1889</h2>
+                    <p class="answer-box-snippet">Der Eiffelturm wurde 1889 erbaut.</p>
+                </div>
+            `;
+            special.style.display = 'flex';
+            console.log('Special cards display:', special.style.display);
+            console.log('Special cards element:', special);
+        }
+
         const homeView = document.getElementById('home-view');
         const resultsWrapper = document.getElementById('results-wrapper');
         const searchOverlay = document.getElementById('search-overlay');
