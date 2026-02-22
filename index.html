@@ -43,6 +43,7 @@
         }
         .scroll-viewport.active { visibility: visible; opacity: 1; pointer-events: auto; z-index: 10; }
 
+        /* Magie: column-reverse rendert das DOM von unten nach oben. Bestes = Unten! */
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
@@ -126,7 +127,7 @@
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); overflow: hidden; }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 28px; text-decoration: none; color: inherit; display: block; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.02); }
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         
@@ -136,49 +137,9 @@
         }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
-        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
-        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
+        .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
+        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Sitelinks */
-        .sitelink-toggle { background: rgba(255,255,255,0.05); border: none; color: white; border-radius: 16px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; }
-        .sitelink-toggle:active { transform: scale(0.85); background: rgba(255,255,255,0.1); }
-        .sitelink-btn { background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 14px; font-size: 13px; color: white; text-decoration: none; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: var(--spring-fast); cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
-        .sitelink-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
-
-        /* Special Cards */
-        .answer-box-card { background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); position: relative; cursor: default; margin-bottom: 0; pointer-events: auto; }
-        .answer-box-card:active { transform: none; background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); }
-        .answer-box-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
-        .answer-box-label { font-size: 12px; font-weight: 700; color: #0a84ff; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .answer-box-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #ffffff; line-height: 1.25; word-break: break-word; overflow-wrap: break-word; }
-        .answer-box-snippet { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; word-break: break-word; overflow-wrap: break-word; }
-
-        .kg-card { padding: 28px; cursor: default; margin-bottom: 0; pointer-events: auto;}
-        .kg-card:active { transform: none; background-color: var(--card-bg); }
-        .kg-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-        .kg-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .kg-title { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; word-break: break-word; overflow-wrap: break-word; }
-        .kg-type { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-        .kg-img { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-        .kg-desc { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 20px; word-break: break-word; overflow-wrap: break-word; }
-        .kg-attributes { display: flex; flex-direction: column; gap: 12px; }
-        .kg-attr { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 16px;}
-        .kg-attr:last-child { border-bottom: none; padding-bottom: 0; }
-        .kg-attr-k { color: var(--text-muted); white-space: nowrap; }
-        .kg-attr-v { color: #fff; font-weight: 500; text-align: right; }
-
-        .local-card { padding: 24px 28px; cursor: default; margin-bottom: 0; pointer-events: auto;}
-        .local-card:active { transform: none; background-color: var(--card-bg); }
-        .local-header { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .local-list { display: flex; flex-direction: column; gap: 20px; }
-        .local-item { display: flex; flex-direction: column; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .local-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .local-item-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; word-break: break-word; overflow-wrap: break-word; }
-        .local-item-rating { font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; }
-        .local-item-rating .star { color: #ffd60a; font-size: 14px; margin-right: 4px; }
-        .local-item-meta { font-size: 13px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px; line-height: 1.4; word-break: break-word; overflow-wrap: break-word; }
-
-        /* Images & Shopping */
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
         .image-card:active { transform: scale(0.96); transition: transform 0.15s; }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -189,10 +150,7 @@
         .shopping-info { padding: 16px; flex: 1; }
         .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .shopping-price { font-weight: 700; color: white; font-size: 16px; }
-        
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 16px; width: 100%; font-weight: 500; }
 
-        /* Image Viewer */
         #image-viewer {
             position: fixed; inset: 0; z-index: 999999; 
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -229,8 +187,6 @@
     </style>
 </head>
 <body>
-
-    <button onclick="testSpecialCards()" style="position:fixed;top:60px;right:20px;z-index:99999;background:red;color:white;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:600;">TEST</button>
 
     <div id="setup-modal">
         <div class="modal-content">
@@ -273,53 +229,21 @@
         <div id="view-shopping" data-type="shopping" class="scroll-viewport">
             <div class="results-content"><div class="load-more-trigger"></div></div>
         </div>
-    </div>
 
-    <div id="special-cards" style="
-        display: none;
-        position: fixed;
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 760px;
-        padding: 0 20px;
-        z-index: 9999;
-        flex-direction: column;
-        gap: 12px;
-        max-height: 60vh;
-        overflow-y: auto;
-        pointer-events: auto;
-    "></div>
-
-    <div id="bottom-bar">
-        <button class="search-circle-btn" onclick="openSearch()">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </button>
-        <div class="tabs-container">
-            <div class="tab-slider" id="tabSlider"></div>
-            <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
-            <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
-            <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
+        <div id="bottom-bar">
+            <button class="search-circle-btn" onclick="openSearch()">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <div class="tabs-container">
+                <div class="tab-slider" id="tabSlider"></div>
+                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
+                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
+                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // TEST FUNCTION
-        function testSpecialCards() {
-            const special = document.getElementById('special-cards');
-            special.innerHTML = `
-                <div class="card answer-box-card">
-                    <div class="answer-box-label">Direkte Antwort</div>
-                    <h2 class="answer-box-title">Test: 1889</h2>
-                    <p class="answer-box-snippet">Der Eiffelturm wurde 1889 erbaut.</p>
-                </div>
-            `;
-            special.style.display = 'flex';
-            console.log('Special cards display:', special.style.display);
-            console.log('Special cards element:', special);
-        }
-
         const homeView = document.getElementById('home-view');
         const resultsWrapper = document.getElementById('results-wrapper');
         const searchOverlay = document.getElementById('search-overlay');
@@ -359,7 +283,6 @@
                     return result;
                 }
             }
-            colorCache.set(domain, null);
             return null; 
         }
 
@@ -450,12 +373,6 @@
             document.getElementById(`view-${type}`).classList.add('active');
             currentType = type;
             
-            if (type !== 'search') {
-                document.getElementById('special-cards').style.display = 'none';
-            } else if (state['search'].loaded && document.getElementById('special-cards').innerHTML.trim() !== '') {
-                document.getElementById('special-cards').style.display = 'flex';
-            }
-
             if (currentQuery && !state[currentType].loaded) {
                 renderSkeletons(currentType); 
                 performSearch(currentType, false, true);
@@ -490,21 +407,12 @@
         }
 
         function triggerNewSearch() {
-            // Hide and clear special cards
-            const specialCards = document.getElementById('special-cards');
-            if(specialCards) {
-                specialCards.style.display = 'none';
-                specialCards.innerHTML = '';
-            }
-
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
-                
-                const vp = document.getElementById(`view-${k}`);
-                const content = vp.querySelector('.results-content');
-                
-                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
+                const content = document.querySelector(`#view-${k} .results-content`);
+                content.innerHTML = '<div class="load-more-trigger"></div>'; 
+                setupObserver(k);
             });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
@@ -516,10 +424,7 @@
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
         function renderSkeletons(type) {
-            const vp = document.getElementById(`view-${type}`);
-            const content = vp.querySelector('.results-content');
-            const trigger = content.querySelector('.load-more-trigger');
-            
+            const content = document.querySelector(`#view-${type} .results-content`);
             const frag = document.createDocumentFragment();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
@@ -535,8 +440,12 @@
                 }
             }
             frag.appendChild(pageBlock);
-            content.insertBefore(frag, trigger);
+            content.appendChild(frag);
             
+            const trigger = content.querySelector('.load-more-trigger');
+            if (trigger) content.appendChild(trigger);
+            
+            const vp = document.getElementById(`view-${type}`);
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
@@ -549,38 +458,19 @@
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
-                const body = JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 40, page: state[type].page });
-                const headers = { 'Content-Type': 'application/json', 'X-API-KEY': apiKey };
+                const response = await fetch(`https://google.serper.dev/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
+                    body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 40, page: state[type].page })
+                });
 
-                // Zwei parallele Anfragen beim ersten Load
-                const requests = [fetch(`https://google.serper.dev/${endpoint}`, { method: 'POST', headers, body })];
-                
-                // Zweite Anfrage nur beim initialen Search-Load
-                if (type === 'search' && isInitial) {
-                    requests.push(fetch('https://google.serper.dev/search', {
-                        method: 'POST', headers,
-                        body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 10 })
-                    }));
-                }
-
-                const responses = await Promise.all(requests);
-                const data = await responses[0].json();
-                const specialData = responses[1] ? await responses[1].json() : null;
-
-                // Special data aus zweiter Anfrage übernehmen falls erste nichts hat
-                if (specialData) {
-                    if (!data.answerBox && specialData.answerBox) data.answerBox = specialData.answerBox;
-                    if (!data.knowledgeGraph && specialData.knowledgeGraph) data.knowledgeGraph = specialData.knowledgeGraph;
-                    if (!data.localResults && specialData.localResults) data.localResults = specialData.localResults;
-                }
-
-                console.log(`Serper API Data (${type}):`, data); 
-                
-                await renderResults(type, data, isLoadMore, isInitial);
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
 
             } catch (error) {
-                console.error("Fetch error", error);
+                console.error("Fetch error");
             } finally {
                 isLoading = false; 
             }
@@ -588,203 +478,74 @@
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
-        window.toggleSitelinks = function(btn) {
-            const container = btn.closest('.card').querySelector('.sitelinks-container');
-            if (container.style.gridTemplateRows === '1fr') {
-                container.style.gridTemplateRows = '0fr';
-                btn.style.transform = 'rotate(0deg)';
-                btn.style.background = 'rgba(255,255,255,0.05)';
-            } else {
-                container.style.gridTemplateRows = '1fr';
-                btn.style.transform = 'rotate(180deg)';
-                btn.style.background = 'rgba(255,255,255,0.15)';
-            }
-        };
-
-        async function renderResults(type, data, isLoadMore, isInitial) {
+        function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
-            const trigger = content.querySelector('.load-more-trigger');
+            let trigger = content.querySelector('.load-more-trigger');
 
-            let rawItems = [];
-            if (type === 'search') rawItems = data.organic || [];
-            else if (type === 'images') rawItems = data.images || [];
-            else if (type === 'shopping') rawItems = data.shopping || [];
+            let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
             
             if (isInitial) {
-                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
+                Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             }
+            if (rawItems.length === 0) return;
 
-            if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.localResults && data.localResults.length)) {
-                if (isInitial) {
-                    let emptyMsg = "Keine Ergebnisse gefunden.";
-                    if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
-                    else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
-                    
-                    const emptyState = document.createElement('div');
-                    emptyState.className = 'empty-state';
-                    emptyState.innerText = emptyMsg;
-                    content.insertBefore(emptyState, trigger);
-                }
-                return;
-            }
-
-            let items = [...rawItems].reverse(); 
+            let items = rawItems.reverse();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
-            if (type === 'search') {
-                const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
-                const colors = await Promise.all(colorPromises);
+            items.forEach(item => getDominantColor(getHostname(item.link)));
 
-                items.forEach((item, index) => {
-                    if(!item.link) return;
-                    const domain = getHostname(item.link);
-                    const color = colors[index] || { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: '1px solid rgba(255,255,255,0.05)' };
-                    const hasSitelinks = item.sitelinks && item.sitelinks.length > 0;
-                    
-                    const el = document.createElement('div');
-                    el.className = `card ${isInitial ? 'animate-in' : ''}`; 
-                    el.style.cursor = 'pointer';
-                    el.onclick = (e) => {
-                        if(!e.target.closest('.sitelink-toggle') && !e.target.closest('.sitelink-btn')) {
-                            window.open(item.link, '_blank');
-                        }
-                    };
+            items.forEach((item, index) => {
+                const domain = getHostname(item.link);
+                
+                if (type === 'search') {
+                    const pillId = `pill-${type}-${Date.now()}-${index}`; 
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
 
                     el.innerHTML = `
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <div class="color-pill" style="background: ${color.bg}; color: ${color.text}; border: ${color.border};">
-                                <span>${domain}</span>
-                            </div>
-                            ${hasSitelinks ? `
-                            <button class="sitelink-toggle" onclick="event.preventDefault(); toggleSitelinks(this);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            ` : ''}
-                        </div>
-                        <div class="card-title">${item.title || 'Ohne Titel'}</div>
-                        ${item.snippet ? `<div class="card-snippet">${item.snippet}</div>` : ''}
-                        
-                        ${hasSitelinks ? `
-                        <div class="sitelinks-container" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);">
-                            <div style="overflow: hidden;">
-                                <div class="sitelinks-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    ${item.sitelinks.slice(0, 6).map(sl => `
-                                        <div onclick="window.open('${sl.link}', '_blank')" class="sitelink-btn">${sl.title}</div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        ` : ''}
+                        <div class="card-header"><div class="color-pill" id="${pillId}"><span>${domain}</span></div></div>
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-snippet">${item.snippet || ''}</div>
                     `;
                     pageBlock.appendChild(el);
-                });
 
-                // SPECIAL CARDS LOGIK - Rendert direkt ins fixierte Container DIV
-                if (isInitial) {
-                    const special = document.getElementById('special-cards');
-                    special.innerHTML = '';
-                    let hasSpecial = false;
-
-                    if (data.answerBox) {
-                        hasSpecial = true;
-                        const ansData = data.answerBox;
-                        special.innerHTML += `
-                            <div class="card answer-box-card animate-in">
-                                <div class="answer-box-label">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 
-                                    Direkte Antwort
-                                </div>
-                                <h2 class="answer-box-title">${ansData.answer || ansData.title || 'Ergebnis'}</h2>
-                                ${ansData.snippet ? `<p class="answer-box-snippet">${ansData.snippet}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                    if (data.knowledgeGraph) {
-                        hasSpecial = true;
-                        const kgData = data.knowledgeGraph;
-                        special.innerHTML += `
-                            <div class="card kg-card animate-in">
-                                <div class="kg-header">
-                                    <div class="kg-info">
-                                        <h2 class="kg-title">${kgData.title || ''}</h2>
-                                        ${kgData.type ? `<div class="kg-type">${kgData.type}</div>` : ''}
-                                    </div>
-                                    ${kgData.imageUrl ? `<img src="${kgData.imageUrl}" class="kg-img">` : ''}
-                                </div>
-                                ${kgData.description ? `<div class="kg-desc">${kgData.description}</div>` : ''}
-                                ${kgData.attributes ? `
-                                <div class="kg-attributes">
-                                    ${Object.entries(kgData.attributes).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
-                                </div>` : ''}
-                            </div>
-                        `;
-                    }
-                    if (data.localResults && data.localResults.length > 0) {
-                        hasSpecial = true;
-                        special.innerHTML += `
-                            <div class="card local-card animate-in">
-                                <h3 class="local-header">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                    Orte
-                                </h3>
-                                <div class="local-list">
-                                    ${data.localResults.slice(0, 4).map(p => `
-                                        <div class="local-item" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
-                                            <div class="local-item-title">${p.title || ''}</div>
-                                            ${p.rating ? `
-                                            <div class="local-item-rating">
-                                                <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${(p.ratingCount || p.reviews) ? `<span style="opacity:0.6;">(${p.ratingCount || p.reviews})</span>` : ''} 
-                                            </div>` : ''}
-                                            ${p.address ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
-                                            ${p.category ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> ${p.category}</div>` : ''}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    special.style.display = hasSpecial ? 'flex' : 'none';
+                    getDominantColor(domain).then(color => {
+                        if (color) {
+                            const pill = document.getElementById(pillId);
+                            if (pill) { pill.style.background = color.bg; pill.style.color = color.text; pill.style.border = color.border; }
+                        }
+                    });
+                } 
+                else if (type === 'images') {
+                    const myIndex = globalImages.length;
+                    globalImages.push(item);
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
+                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
+                    el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
+                    pageBlock.appendChild(el);
+                } 
+                else if (type === 'shopping') {
+                    const el = document.createElement('a');
+                    el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+                    el.innerHTML = `
+                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
+                        <div class="shopping-info">
+                            <div class="shopping-title">${item.title}</div>
+                            <div class="shopping-price">${item.price || ''}</div>
+                        </div>
+                    `;
+                    pageBlock.appendChild(el);
                 }
-
-            } 
-            else {
-                items.forEach((item) => {
-                    if (type === 'images') {
-                        if(!item.imageUrl) return;
-                        const myIndex = globalImages.length;
-                        globalImages.push(item);
-                        const el = document.createElement('a');
-                        el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                        el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
-                        el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
-                        pageBlock.appendChild(el);
-                    } 
-                    else if (type === 'shopping') {
-                        const el = document.createElement('a');
-                        el.href = item.link || '#'; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                        el.innerHTML = `
-                            <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
-                            <div class="shopping-info">
-                                <div class="shopping-title">${item.title || 'Artikel'}</div>
-                                <div class="shopping-price">${item.price || ''}</div>
-                            </div>
-                        `;
-                        pageBlock.appendChild(el);
-                    }
-                });
-            }
+            });
 
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
 
-            if (pageBlock.children.length > 0) {
-                content.insertBefore(pageBlock, trigger);
-            }
+            content.appendChild(pageBlock);
+            if (trigger) content.appendChild(trigger); 
 
             if (isInitial) {
                 requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
@@ -898,12 +659,6 @@
             });
         }
 
-        function checkApiKey() {
-            if (!getCookie('serper_api_key')) {
-                setupModal.classList.add('active');
-            }
-        }
-
         function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
@@ -916,3 +671,4 @@
     </script>
 </body>
 </html>
+
