@@ -68,7 +68,7 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
-        /* Overlay fixes: Z-Index high, pointer-events absorb all clicks */
+        /* Robustes Overlay blockiert alle Hintergrundklicks */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -76,7 +76,7 @@
             padding: calc(var(--safe-top) + 20px) 16px 20px;
             opacity: 0; pointer-events: none; transition: opacity 0.15s ease;
         }
-        #search-overlay.active { opacity: 1; pointer-events: all; }
+        #search-overlay.active { opacity: 1; pointer-events: auto; }
         
         .overlay-bar-container { display: flex; width: 100%; max-width: 600px; gap: 12px; align-items: center; }
         .overlay-input {
@@ -110,7 +110,7 @@
             display: flex; align-items: center; gap: 10px; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); transition: var(--spring-smooth); max-width: 90%; cursor: pointer;
         }
-        #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: all; }
+        #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
         #ai-compact-widget:active { transform: translateX(-50%) scale(0.95); }
         .ai-icon-small { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(255,255,255,0.15); border-radius: 50%; color: white; flex-shrink: 0; }
         .ai-compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -120,7 +120,7 @@
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 2000;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end;
         }
-        #ai-sheet-overlay.active { opacity: 1; pointer-events: all; }
+        #ai-sheet-overlay.active { opacity: 1; pointer-events: auto; }
         .ai-sheet {
             background: #111112; width: 100%; height: 85vh; border-radius: 32px 32px 0 0;
             transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -140,19 +140,23 @@
         .ai-send-btn:active { transform: scale(0.9); }
         .ai-send-btn svg { fill: black; width: 20px; height: 20px; }
 
-        /* AI Cards / Bubbles */
+        /* AI Chat Bubbles & Text Styling */
         .ai-bubble-user { align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; color: white; border: 1px solid rgba(255,255,255,0.05); }
         .ai-bubble-model { align-self: flex-start; max-width: 95%; display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
-        /* Stylized generic widget for AI Text */
+        /* Das ist die Magic! iOS Style direkt aus normalem Text */
         .widget-fact { 
             background: #1c1c1e; padding: 20px; border-radius: 24px 24px 24px 8px; 
-            font-size: 15px; line-height: 1.5; color: #e5e5ea; border: 1px solid rgba(255,255,255,0.08);
+            font-size: 16px; line-height: 1.5; color: #d1d1d6; border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .widget-fact strong { color: #ffffff; font-weight: 600; }
-        .widget-fact ul { padding-left: 20px; margin-top: 8px; margin-bottom: 8px; }
-        .widget-fact li { margin-bottom: 6px; }
+        .ai-h2 { font-size: 19px; font-weight: 700; color: #fff; margin: 20px 0 10px 0; letter-spacing: -0.3px;}
+        .ai-h2:first-child { margin-top: 0; }
+        .ai-h3 { font-size: 17px; font-weight: 600; color: #fff; margin: 16px 0 8px 0; }
+        .ai-highlight { color: #fff; font-weight: 700; background: rgba(255, 255, 255, 0.12); padding: 2px 6px; border-radius: 6px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
+        .ai-ul { padding-left: 10px; margin: 12px 0; list-style: none; }
+        .ai-li { margin-bottom: 8px; position: relative; padding-left: 16px; }
+        .ai-li::before { content: "•"; color: #8e8e93; position: absolute; left: 0; font-weight: bold; }
 
         .ai-loader { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; padding-left: 8px; }
         @keyframes pulse-opacity { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
@@ -212,7 +216,7 @@
             background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; 
         }
-        #image-viewer.active { opacity: 1; pointer-events: all; }
+        #image-viewer.active { opacity: 1; pointer-events: auto; }
         
         .viewer-header {
             position: absolute; top: max(env(safe-area-inset-top), 20px); left: 0; right: 0;
@@ -235,7 +239,7 @@
         .viewer-slide img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
 
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
-        #setup-modal.active { opacity: 1; pointer-events: all; }
+        #setup-modal.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 360px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 10px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 15px; outline: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);}
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast); margin-top: 10px;}
@@ -533,8 +537,10 @@
             renderSkeletons(currentType);
             performSearch(currentType, false, true);
             
-            // Background AI is disabled to save requests until requested, or we only trigger on short queries.
-            // Let's trigger it automatically for background info.
+            // Background AI aktivieren - Historie resetten
+            geminiHistory = [];
+            aiChatContent.innerHTML = '';
+            aiCompactWidget.classList.remove('active');
             triggerGemini(currentQuery, false);
         }
 
@@ -662,63 +668,95 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (OHNE JSON, SEHR ROBUST)
+        // Gemini KI Integration (Super-Robust, ohne JSON)
         // ==========================================
         
-        // Helfer-Funktion für schöne Markdown/Textformatierung
+        // Helfer-Funktion: Macht aus einfachem Markdown wunderschöne iOS-Widgets
         function formatAiResponseToHtml(text) {
-            let html = text;
-            // Überschriften (z.B. **Titel**)
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: white; font-weight: 600; font-size: 16px;">$1</strong>');
-            // Kursiv
+            let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Schutz
+            
+            // Markdown zu HTML mit iOS-Styling Klassen
+            html = html.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
+            html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            // Listenpunkte (- Item)
-            html = html.replace(/^- (.*)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-            // Zeilenumbrüche
-            html = html.replace(/\n/g, '<br>');
-            // Bereinigen von doppelten Breaks
-            html = html.replace(/<br><br><br>/g, '<br><br>');
+            
+            // Listen umwandeln
+            let lines = html.split('\n');
+            let inList = false;
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line.startsWith('- ') || line.startsWith('* ')) {
+                    lines[i] = `<li class="ai-li">${line.substring(2)}</li>`;
+                    if (!inList) { lines[i] = `<ul class="ai-ul">` + lines[i]; inList = true; }
+                } else {
+                    if (inList) { lines[i] = `</ul>` + line; inList = false; }
+                    else { lines[i] = line; }
+                }
+            }
+            if (inList) lines.push('</ul>');
+            
+            // Zeilenumbrüche säubern
+            html = lines.join('<br>').replace(/<br><br><br>/g, '<br><br>').replace(/<br><ul/g, '<ul').replace(/<\/ul><br>/g, '</ul>');
+            html = html.replace(/^(<br>)+|(<br>)+$/g, '');
             
             return `<div class="widget-fact">${html}</div>`;
         }
 
         function triggerManualAi() {
-            if (!currentQuery) return;
+            let q = currentQuery || document.getElementById('homeSearchInput').value;
+            if (!q) { openAiSheet(); return; }
+            
             openAiSheet();
-            // Nur auslösen, wenn der Chat leer ist (sonst haben wir schon gesucht)
-            if (aiChatContent.innerHTML.trim() === '') {
+            
+            // Prüfen, ob die KI schon die exakt selbe Frage geladen hat
+            const lastMsg = geminiHistory[geminiHistory.length - 2]; 
+            if (aiChatContent.innerHTML.trim() === '' || (lastMsg && lastMsg.parts[0].text !== q)) {
+                geminiHistory = [];
+                aiChatContent.innerHTML = '';
                 const userBubble = document.createElement('div');
                 userBubble.className = 'ai-bubble-user';
-                userBubble.innerText = currentQuery;
+                userBubble.innerText = q;
                 aiChatContent.appendChild(userBubble);
-                triggerGemini(currentQuery, true);
+                triggerGemini(q, true);
             }
         }
 
-        async function fetchFromGemini(historyItems, useGrounding = true) {
+        async function fetchFromGemini(historyItems) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
-            const systemPrompt = "Du bist ein hilfreicher KI-Assistent. Deine Antworten sollen extrem gut strukturiert, visuell ansprechend und leicht lesbar sein. Benutze kurze Sätze, Absätze und für Hervorhebungen Fettdruck (**Text**). WICHTIG: Antworte NICHT in JSON, sondern in ganz normalem, sauber formatiertem Text.";
+            const systemPrompt = "Du bist ein intelligenter KI-Assistent in einer Such-App. Du hast Zugriff auf aktuelle Internetdaten. Antworte in gut strukturiertem Fließtext. WICHTIG: Nutze Überschriften (##), **Fettdruck** für Schlüsselinfos (wie Währungen, Namen, Adressen) und Aufzählungszeichen. KEINE JSON-Ausgabe. Fass dich kurz und präzise.";
 
-            let payload = {
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: historyItems
+            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Grounding Syntax)
+            try {
+                const payload20 = {
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    contents: historyItems,
+                    tools: [{ googleSearch: {} }]
+                };
+                const res20 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload20)
+                });
+                if (res20.ok) return await res20.json();
+            } catch(e) { console.warn("Gemini 2.0 fehlgeschlagen, wechsle auf 1.5 Fallback...", e); }
+
+            // 2. Versuch: Fallback auf Gemini 1.5 Flash (Alte Grounding Syntax)
+            const payload15 = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: historyItems,
+                tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }]
             };
-
-            if (useGrounding) {
-                payload.tools = [{ google_search: {} }];
-            }
-
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+            const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
             });
-
-            if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
-            return await res.json();
+            
+            if (!res15.ok) {
+                const errorData = await res15.json().catch(() => ({}));
+                console.error("Gemini 1.5 Error:", errorData);
+                throw new Error(errorData?.error?.message || `HTTP Error ${res15.status}`);
+            }
+            return await res15.json();
         }
 
         async function triggerGemini(query, isManualTrigger = false) {
@@ -726,12 +764,10 @@
             if (!apiKey) return;
             if (isAiThinking) return;
 
-            if (!isManualTrigger && geminiHistory.length === 0) {
-                aiCompactWidget.classList.remove('active');
-                aiChatContent.innerHTML = '';
-            }
-
-            geminiHistory.push({ role: "user", parts: [{ text: query }] });
+            const userMsg = { role: "user", parts: [{ text: query }] };
+            // Temporäre History nutzen, damit bei einem Fehler der Verlauf nicht kaputtgeht
+            const tempHistory = [...geminiHistory, userMsg];
+            
             isAiThinking = true;
 
             let loaderId = 'loader-' + Date.now();
@@ -740,30 +776,23 @@
                 loader.id = loaderId;
                 loader.className = 'ai-loader';
                 loader.style.animation = 'pulse-opacity 1.5s infinite';
-                loader.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg> Suche im Web nach Echtzeitdaten...`;
+                loader.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg> Suche im Live-Web...`;
                 aiChatContent.appendChild(loader);
                 scrollToBottom(aiChatContent);
             }
 
             try {
-                let data;
-                try {
-                    // Erster Versuch: Mit Google Search Grounding
-                    data = await fetchFromGemini(geminiHistory, true);
-                } catch(e) {
-                    console.warn("Grounding fehlgeschlagen, probiere Fallback...", e);
-                    // Zweiter Versuch: Ohne Grounding (falls die Region/Key es verbietet)
-                    data = await fetchFromGemini(geminiHistory, false);
-                }
-
+                const data = await fetchFromGemini(tempHistory);
                 let textResp = data.candidates[0].content.parts[0].text;
+                
+                // Bei Erfolg speichern wir die Unterhaltung fest ab
+                geminiHistory.push(userMsg);
                 geminiHistory.push(data.candidates[0].content);
 
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
 
                 if (!isManualTrigger) {
-                    // Kompakte Ansicht aktualisieren
-                    const snippet = textResp.split('.')[0].substring(0, 50) + "..."; 
+                    const snippet = textResp.split('\n')[0].replace(/[*#]/g, '').substring(0, 50) + "..."; 
                     aiCompactText.innerText = snippet;
                     aiCompactWidget.classList.add('active');
                     appendAiCard(textResp);
@@ -784,9 +813,7 @@
         function appendAiCard(plainText) {
             const wrapper = document.createElement('div');
             wrapper.className = 'ai-bubble-model';
-            // Formatiert den Text wunderschön in ein Widget
-            wrapper.innerHTML = formatAiResponseToHtml(plainText);
-            
+            wrapper.innerHTML = formatAiResponseToHtml(plainText); // Wandelt Text in iOS-Widgets um
             aiChatContent.appendChild(wrapper);
             scrollToBottom(aiChatContent);
         }
@@ -824,7 +851,7 @@
         }
 
         function scrollToBottom(el) { 
-            el.scrollTop = el.scrollHeight; 
+            el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); 
         }
 
         // ==========================================
