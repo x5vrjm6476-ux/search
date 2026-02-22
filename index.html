@@ -263,13 +263,21 @@
 
     <div id="results-wrapper">
         <div id="view-search" data-type="search" class="scroll-viewport active">
-            <div class="results-content"><div class="load-more-trigger"></div></div>
+            <div class="results-content">
+                <div class="local-anchor" style="width: 100%; display: flex; flex-direction: column;"></div>
+                <div class="load-more-trigger"></div>
+                <div class="top-anchor" style="width: 100%; display: flex; flex-direction: column;"></div>
+            </div>
         </div>
         <div id="view-images" data-type="images" class="scroll-viewport">
-            <div class="results-content"><div class="load-more-trigger"></div></div>
+            <div class="results-content">
+                <div class="load-more-trigger"></div>
+            </div>
         </div>
         <div id="view-shopping" data-type="shopping" class="scroll-viewport">
-            <div class="results-content"><div class="load-more-trigger"></div></div>
+            <div class="results-content">
+                <div class="load-more-trigger"></div>
+            </div>
         </div>
 
         <div id="bottom-bar">
@@ -453,9 +461,19 @@
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
-                const content = document.querySelector(`#view-${k} .results-content`);
-                content.innerHTML = '<div class="load-more-trigger"></div>'; 
-                setupObserver(k);
+                
+                const vp = document.getElementById(`view-${k}`);
+                const content = vp.querySelector('.results-content');
+                
+                // Wir räumen nur noch dynamische Blöcke weg, der Trigger und die Anker bleiben!
+                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
+                
+                if (k === 'search') {
+                    vp.querySelector('.local-anchor').innerHTML = '';
+                    vp.querySelector('.top-anchor').innerHTML = '';
+                }
+                
+                // SetupObserver muss nicht mehr neu aufgerufen werden, da der Trigger erhalten bleibt!
             });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
@@ -467,7 +485,10 @@
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
         function renderSkeletons(type) {
-            const content = document.querySelector(`#view-${type} .results-content`);
+            const vp = document.getElementById(`view-${type}`);
+            const content = vp.querySelector('.results-content');
+            const trigger = content.querySelector('.load-more-trigger');
+            
             const frag = document.createDocumentFragment();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
@@ -483,12 +504,10 @@
                 }
             }
             frag.appendChild(pageBlock);
-            content.appendChild(frag);
             
-            const trigger = content.querySelector('.load-more-trigger');
-            if (trigger) content.appendChild(trigger);
+            // Seite VOR dem Trigger einfügen
+            content.insertBefore(frag, trigger);
             
-            const vp = document.getElementById(`view-${type}`);
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
@@ -540,7 +559,7 @@
         async function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
-            let trigger = content.querySelector('.load-more-trigger');
+            const trigger = content.querySelector('.load-more-trigger');
 
             let rawItems = [];
             if (type === 'search') rawItems = data.organic || [];
@@ -548,19 +567,26 @@
             else if (type === 'shopping') rawItems = data.shopping || [];
             
             if (isInitial) {
-                Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
+                // Nur dynamisch geladene Blöcke entfernen
+                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
+                if (type === 'search') {
+                    vp.querySelector('.local-anchor').innerHTML = '';
+                    vp.querySelector('.top-anchor').innerHTML = '';
+                }
             }
 
             // Empty State (Keine Ergebnisse gefunden)
             if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.localResults && data.localResults.length)) {
-                let emptyMsg = "Keine Ergebnisse gefunden.";
-                if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
-                else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
-                
-                const emptyState = document.createElement('div');
-                emptyState.className = 'empty-state';
-                emptyState.innerText = emptyMsg;
-                content.appendChild(emptyState);
+                if (isInitial) {
+                    let emptyMsg = "Keine Ergebnisse gefunden.";
+                    if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
+                    else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
+                    
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerText = emptyMsg;
+                    content.insertBefore(emptyState, trigger);
+                }
                 return;
             }
 
@@ -572,6 +598,10 @@
                 const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
                 const colors = await Promise.all(colorPromises);
 
+                const topAnchor = vp.querySelector('.top-anchor');
+                const localAnchor = vp.querySelector('.local-anchor');
+
+                // 1. Answer Box -> Kommt exklusiv in den Top Anchor!
                 if (isInitial && data.answerBox) {
                     const ansData = data.answerBox;
                     const ans = document.createElement('div');
@@ -584,9 +614,10 @@
                         <h2 class="answer-box-title">${ansData.answer || ansData.title || 'Ergebnis'}</h2>
                         ${ansData.snippet ? `<p class="answer-box-snippet">${ansData.snippet}</p>` : ''}
                     `;
-                    pageBlock.appendChild(ans);
+                    topAnchor.appendChild(ans);
                 }
 
+                // 2. Knowledge Graph -> Kommt exklusiv in den Top Anchor!
                 if (isInitial && data.knowledgeGraph) {
                     const kgData = data.knowledgeGraph;
                     const kg = document.createElement('div');
@@ -605,9 +636,10 @@
                             ${Object.entries(kgData.attributes).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
                         </div>` : ''}
                     `;
-                    pageBlock.appendChild(kg);
+                    topAnchor.appendChild(kg);
                 }
 
+                // 3. Organische Suchergebnisse
                 items.forEach((item, index) => {
                     if(!item.link) return;
                     const domain = getHostname(item.link);
@@ -654,6 +686,7 @@
                     pageBlock.appendChild(el);
                 });
 
+                // 4. Local Results -> Kommt exklusiv in den Local Anchor!
                 if (isInitial && data.localResults && data.localResults.length > 0) {
                     const local = document.createElement('div');
                     local.className = `card local-card ${isInitial ? 'animate-in' : ''}`;
@@ -676,7 +709,7 @@
                             `).join('')}
                         </div>
                     `;
-                    pageBlock.appendChild(local);
+                    localAnchor.appendChild(local);
                 }
 
             } 
@@ -710,8 +743,10 @@
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
 
-            content.appendChild(pageBlock);
-            if (trigger) content.appendChild(trigger); 
+            // Die neuen Seite IMMER direkt VOR dem Load-More Trigger einfügen!
+            if (pageBlock.children.length > 0) {
+                content.insertBefore(pageBlock, trigger);
+            }
 
             if (isInitial) {
                 requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
