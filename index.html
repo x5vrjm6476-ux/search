@@ -89,14 +89,14 @@
         .cancel-btn:active { opacity: 0.6; }
 
         .page-block { display: flex; flex-direction: column; width: 100%; gap: 20px; }
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; align-content: start; }
+        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 16px; align-content: start; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         .animate-in { animation: slideIn 0.4s cubic-bezier(0.32, 0.72, 0, 1) both; }
         @keyframes slideIn { 0% { opacity: 0; transform: translateY(15px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
         .skeleton { animation: pulse 1.2s infinite ease-in-out; background: rgba(255,255,255,0.06); }
-        .skeleton-card { border-radius: var(--border-radius); padding: 28px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); }
+        .skeleton-card { border-radius: var(--border-radius); padding: 28px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px;}
         .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
         .s-title { height: 24px; width: 75%; border-radius: 8px; }
         .s-text { height: 16px; width: 100%; border-radius: 6px; }
@@ -111,16 +111,34 @@
             display: flex; flex-direction: column; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
             transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); width: 92%; max-width: 420px;
-            overflow: hidden; display: none; 
+            overflow: hidden; display: none; touch-action: pan-y;
         }
         #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
         
         .compact-inner-wrap { flex: 1; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
         .compact-inner-wrap:active { transform: scale(0.97); }
 
-        .compact-loading-state { display: flex; align-items: center; gap: 12px; padding: 6px 12px 6px 6px; }
-        .compact-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); border-radius: 50%; color: white; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);}
-        .compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px;}
+        /* Siri Glow Loader */
+        .ai-glow-loader {
+            display: flex; align-items: center; gap: 14px; padding: 8px 16px 8px 8px;
+        }
+        .glow-orb {
+            width: 28px; height: 28px; border-radius: 50%; position: relative;
+            background: conic-gradient(from 0deg, #FF2A5F, #00C6FF, #C200FF, #FF2A5F);
+            animation: spin-orb 2s linear infinite; box-shadow: 0 0 12px rgba(0, 198, 255, 0.4);
+        }
+        .glow-orb::after {
+            content: ''; position: absolute; inset: 3px; background: rgba(30, 30, 32, 0.9); border-radius: 50%;
+        }
+        @keyframes spin-orb { 100% { transform: rotate(360deg); } }
+        
+        .glow-text {
+            font-size: 15px; font-weight: 500;
+            background: linear-gradient(90deg, #fff, #8e8e93, #fff); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: text-shine 2s linear infinite;
+        }
+        @keyframes text-shine { to { background-position: 200% center; } }
         
         .compact-close-btn {
             position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
@@ -137,7 +155,8 @@
         }
         .compact-widget-container .ios-ai-widget, 
         .compact-widget-container .ios-currency-card,
-        .compact-widget-container .ios-place-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; }
+        .compact-widget-container .ios-place-card,
+        .compact-widget-container .ios-person-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; }
 
         /* AI BOTTOM SHEET */
         #ai-sheet-overlay {
@@ -185,7 +204,7 @@
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-        .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #a1a1a6; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #a1a1a6; margin-bottom: 14px; letter-spacing: 0.5px; }
         .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
         
         .ios-currency-card {
@@ -193,22 +212,39 @@
             border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; color: white;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; position: relative;
         }
-        .ios-currency-title { font-size: 13px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .ios-currency-title { font-size: 13px; font-weight: 500; color: #8e8e93; margin-bottom: 6px; }
         .ios-currency-row { display: flex; align-items: baseline; gap: 10px; margin-top: 2px;}
         .ios-currency-amount { font-size: 20px; font-weight: 500; color: #8e8e93; }
         .ios-currency-converted { font-size: 38px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
         .ios-currency-icon { color: #8e8e93; display: flex; align-items: center;}
 
-        .ios-place-card {
+        /* Orte & Personen Karten (Interaktiv & Clean) */
+        .ios-place-card, .ios-person-card {
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
         }
-        .ios-place-card:last-child { margin-bottom: 0; }
+        .ios-place-card:last-child, .ios-person-card:last-child { margin-bottom: 0; }
+        
         .ios-place-name { font-size: 18px; font-weight: 600; color: white; margin-bottom: 14px; letter-spacing: -0.2px;}
-        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
+        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
         .ios-place-row:last-child { margin-bottom: 0; }
-        .ios-place-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; flex-shrink: 0; color: #a1a1a6; }
+        .ios-place-row a { color: inherit; text-decoration: none; }
+        .ios-place-row a:active { opacity: 0.6; }
+        .ios-place-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; flex-shrink: 0; color: #a1a1a6; }
         .ios-place-icon svg { width: 14px; height: 14px; stroke: currentColor; }
+
+        .ios-person-card { cursor: pointer; transition: transform 0.2s, background 0.2s; }
+        .ios-person-card:active { transform: scale(0.98); background: rgba(40,40,42,0.6); }
+        .ios-person-header { display: flex; align-items: center; gap: 14px; }
+        .ios-person-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); display: flex; justify-content: center; align-items: center; color: white; flex-shrink: 0;}
+        .ios-person-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .ios-person-name { font-size: 17px; font-weight: 600; color: white; }
+        .ios-person-role { font-size: 14px; color: #8e8e93; }
+        .ios-person-chevron { color: #8e8e93; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+        .ios-person-bio { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 15px; line-height: 1.5; color: #d1d1d6; animation: slideDown 0.3s ease; }
+        .ios-person-card.expanded .ios-person-chevron { transform: rotate(180deg); }
+        .ios-person-card.expanded .ios-person-bio { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .ai-h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 16px 0 8px 0; letter-spacing: -0.2px;}
         .ai-h2:first-child { margin-top: 0; }
@@ -217,9 +253,6 @@
         .ai-ul { padding-left: 0; margin: 12px 0; list-style: none; }
         .ai-li { margin-bottom: 8px; position: relative; padding-left: 18px; color: #d1d1d6;}
         .ai-li::before { content: "•"; color: #ffffff; position: absolute; left: 0; font-weight: bold; }
-
-        .ai-loader { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; padding-left: 8px; }
-        @keyframes pulse-opacity { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         /* Kompakteres Bottom Bar */
         #bottom-bar {
@@ -247,7 +280,7 @@
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), width 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 24px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 24px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px;}
         .card:active { transform: scale(0.97); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 12px; }
         .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
@@ -328,10 +361,10 @@
         </button>
         <div class="compact-inner-wrap" onclick="openAiSheet()">
             <div class="compact-loading-state" id="compact-loading-state">
-                <div class="compact-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
+                <div class="ai-glow-loader">
+                    <div class="glow-orb"></div>
+                    <div class="glow-text">intelligente antwort laden...</div>
                 </div>
-                <div class="compact-text" id="ai-compact-text">Antwort laden...</div>
             </div>
             <div class="compact-widget-container" id="compact-widget-container"></div>
         </div>
@@ -343,7 +376,7 @@
                 <div class="ai-sheet-handle"></div>
                 <div class="ai-sheet-title">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                    Intelligente Antwort
+                    intelligente antwort
                 </div>
                 <button class="ai-sheet-close" onclick="closeAiSheet()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
@@ -352,7 +385,7 @@
             <div class="ai-chat-content" id="ai-chat-content">
                 </div>
             <form class="ai-chat-input-area" onsubmit="handleAiChat(event)">
-                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Folgefrage stellen..." autocomplete="off">
+                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="folgefrage stellen..." autocomplete="off">
                 <button type="submit" class="ai-send-btn" id="ai-send-btn">
                     <svg viewBox="0 0 24 24"><path d="M3 20V4l19 8-19 8zm2-3l11.85-5L5 7v3.5l6 1.5-6 1.5V17z"/></svg>
                 </button>
@@ -378,9 +411,9 @@
             
             <div class="tabs-container">
                 <div class="tab-slider" id="tabSlider"></div>
-                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
-                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
-                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
+                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">web</div>
+                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">bilder</div>
+                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">shopping</div>
             </div>
 
             <button class="search-circle-btn" onclick="triggerManualAi()">
@@ -421,7 +454,6 @@
         let activeGeminiModel = null; 
         let isAiThinking = false;
         const aiCompactWidget = document.getElementById('ai-compact-widget');
-        const aiCompactText = document.getElementById('ai-compact-text');
         const aiCompactLoadingState = document.getElementById('compact-loading-state');
         const aiCompactContainer = document.getElementById('compact-widget-container');
         const aiSheetOverlay = document.getElementById('ai-sheet-overlay');
@@ -567,16 +599,10 @@
             if(q) startSearchFrom(q);
         }
 
-        // Overlay Close Fix auf Keyboard "Done"
         overlaySearchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleOverlaySubmit(e);
-            }
+            if (e.key === 'Enter') { e.preventDefault(); handleOverlaySubmit(e); }
         });
-        overlaySearchInput.addEventListener('blur', () => {
-            setTimeout(closeSearch, 150);
-        });
+        overlaySearchInput.addEventListener('blur', () => { setTimeout(closeSearch, 150); });
 
         function startSearchFrom(query) {
             homeView.classList.add('hidden');
@@ -695,23 +721,19 @@
             
             if (rawItems.length === 0) return;
 
-            // Verwende Master Container um Grid Lücken zu verhindern!
-            let masterContainer = content.querySelector('.master-grid-container');
-            if (!masterContainer) {
-                masterContainer = document.createElement('div');
-                masterContainer.className = type === 'search' ? 'page-block master-grid-container' : 'grid-page master-grid-container';
-                content.appendChild(masterContainer);
-            }
+            // Originale Array-Reihenfolge und Page-Block Logik, damit bestes Resultat bei column-reverse unten ist
+            let items = rawItems.reverse();
+            const pageBlock = document.createElement('div');
+            pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
             let domainColors = [];
-            // Domain Colors Background Pre-Caching
             if (type === 'search' || type === 'images') {
-                domainColors = await Promise.all(rawItems.map(item => getDominantColor(getHostname(item.link))));
+                domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
             }
 
             if (searchId !== currentSearchId) return;
 
-            rawItems.forEach((item, index) => {
+            items.forEach((item, index) => {
                 if (type === 'search') {
                     const domain = getHostname(item.link);
                     const el = document.createElement('a');
@@ -723,38 +745,39 @@
                         <div class="card-title">${item.title}</div>
                         <div class="card-snippet">${item.snippet || ''}</div>
                     `;
-                    masterContainer.appendChild(el);
+                    pageBlock.appendChild(el);
                 } 
                 else if (type === 'images') {
                     globalImages.push({ 
                         link: item.link, 
                         imageUrl: item.imageUrl, 
-                        color: domainColors[index] // Save Pre-cached color
+                        color: domainColors[index] 
                     });
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                    // Nutzen ThumbnailUrl für Performance & Grid Struktur
-                    el.innerHTML = `<img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
+                    // Bessere Qualität reinladen
+                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                     el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
-                    masterContainer.appendChild(el);
+                    pageBlock.appendChild(el);
                 } 
                 else if (type === 'shopping') {
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                    // Nutzen ThumbnailUrl für Performance
                     el.innerHTML = `
-                        <div class="shopping-img-wrapper"><img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
+                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
                         <div class="shopping-info">
                             <div class="shopping-title">${item.title}</div>
                             <div class="shopping-price">${item.price || ''}</div>
                         </div>
                     `;
-                    masterContainer.appendChild(el);
+                    pageBlock.appendChild(el);
                 }
             });
 
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
+            
+            content.appendChild(pageBlock);
             if (trigger) content.appendChild(trigger); 
 
             if (isInitial) {
@@ -772,7 +795,7 @@
         // ==========================================
         
         function closeCompactWidget(e) {
-            e.stopPropagation(); 
+            e?.stopPropagation(); 
             aiCompactWidget.classList.remove('active');
             setTimeout(() => { 
                 if(!aiCompactWidget.classList.contains('active')) {
@@ -781,12 +804,42 @@
             }, 400);
         }
 
+        // Mini Widget Swipe Down
+        let compactStartY = 0;
+        let compactCurrentY = 0;
+        aiCompactWidget.addEventListener('touchstart', (e) => {
+            compactStartY = e.touches[0].clientY;
+            aiCompactWidget.style.transition = 'none';
+        }, {passive: true});
+
+        aiCompactWidget.addEventListener('touchmove', (e) => {
+            if (!compactStartY) return;
+            compactCurrentY = e.touches[0].clientY - compactStartY;
+            if (compactCurrentY > 0) {
+                aiCompactWidget.style.transform = `translateX(-50%) translateY(${compactCurrentY}px) scale(1)`;
+            }
+        }, {passive: true});
+
+        aiCompactWidget.addEventListener('touchend', (e) => {
+            if (!compactStartY) return;
+            aiCompactWidget.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+            if (compactCurrentY > 40) {
+                closeCompactWidget();
+                setTimeout(() => aiCompactWidget.style.transform = '', 400);
+            } else {
+                aiCompactWidget.style.transform = `translateX(-50%) scale(1)`;
+            }
+            compactStartY = 0;
+            compactCurrentY = 0;
+        });
+
         function parseAiMarkupToHtml(text, isCompactMode = false) {
             text = text.replace(/\[\d+\]/g, ''); 
             text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
             let html = '';
-            const regex = /\[(CURRENCY|PLACE|TEXT)\]([\s\S]*?)\[\/\1\]/g;
+            // Regex matcht jetzt klein und groß geschrieben sicherheitshalber (gi)
+            const regex = /\[(currency|place|person|text)\]([\s\S]*?)\[\/\1\]/gi;
             let match;
             let foundAny = false;
             let blockCount = 0;
@@ -796,14 +849,14 @@
                 blockCount++;
                 if (isCompactMode && blockCount > 1) break;
 
-                const type = match[1];
+                const type = match[1].toLowerCase();
                 const content = match[2].trim();
 
-                if (type === 'CURRENCY') {
-                    const title = (content.match(/Title:\s*(.*)/) || [])[1] || 'Währungsumrechnung';
-                    const amount = (content.match(/Amount:\s*(.*)/) || [])[1] || '';
-                    const converted = (content.match(/Converted:\s*(.*)/) || [])[1] || '';
-                    const color = (content.match(/Color:\s*(.*)/) || [])[1] || '#0A84FF';
+                if (type === 'currency') {
+                    const title = (content.match(/titel:\s*(.*)/i) || [])[1] || 'Währungsumrechnung';
+                    const amount = (content.match(/betrag:\s*(.*)/i) || [])[1] || '';
+                    const converted = (content.match(/ziel:\s*(.*)/i) || [])[1] || '';
+                    const color = (content.match(/farbe:\s*(.*)/i) || [])[1] || '#0A84FF';
                     
                     html += `
                         <div class="ios-currency-card">
@@ -818,18 +871,26 @@
                         </div>
                     `;
                 } 
-                else if (type === 'PLACE') {
-                    const name = (content.match(/Name:\s*(.*)/) || [])[1] || '';
-                    const address = (content.match(/Address:\s*(.*)/) || [])[1] || '';
-                    const phone = (content.match(/Phone:\s*(.*)/) || [])[1] || '';
-                    const hours = (content.match(/Hours:\s*(.*)/) || [])[1] || '';
-                    const website = (content.match(/Website:\s*(.*)/) || [])[1] || '';
+                else if (type === 'place') {
+                    const name = (content.match(/name:\s*(.*)/i) || [])[1] || '';
+                    const address = (content.match(/adresse:\s*(.*)/i) || [])[1] || '';
+                    const phone = (content.match(/telefon:\s*(.*)/i) || [])[1] || '';
+                    const hours = (content.match(/zeiten:\s*(.*)/i) || [])[1] || '';
+                    const website = (content.match(/website:\s*(.*)/i) || [])[1] || '';
                     
                     let details = '';
-                    if(address && address !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span>${address}</span></div>`;
-                    if(hours && hours !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
-                    if(phone && phone !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span>${phone}</span></div>`;
-                    if(website && website !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span>${website}</span></div>`;
+                    if(address && address !== 'nicht verfügbar') {
+                        details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span><a href="https://maps.apple.com/?q=${encodeURIComponent(address)}" target="_blank">${address}</a></span></div>`;
+                    }
+                    if(hours && hours !== 'nicht verfügbar') {
+                        details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
+                    }
+                    if(phone && phone !== 'nicht verfügbar') {
+                        details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span><a href="tel:${phone}">${phone}</a></span></div>`;
+                    }
+                    if(website && website !== 'nicht verfügbar') {
+                        details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span><a href="${website}" target="_blank">website besuchen</a></span></div>`;
+                    }
 
                     html += `
                         <div class="ios-place-card">
@@ -838,7 +899,31 @@
                         </div>
                     `;
                 } 
-                else if (type === 'TEXT') {
+                else if (type === 'person') {
+                    const name = (content.match(/name:\s*(.*)/i) || [])[1] || '';
+                    const role = (content.match(/rolle:\s*(.*)/i) || [])[1] || '';
+                    const info = (content.match(/info:\s*(.*)/i) || [])[1] || '';
+                    const bio = (content.match(/bio:\s*([\s\S]*)/i) || [])[1] || '';
+
+                    html += `
+                        <div class="ios-person-card" onclick="this.classList.toggle('expanded')">
+                            <div class="ios-person-header">
+                                <div class="ios-person-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                </div>
+                                <div class="ios-person-info">
+                                    <div class="ios-person-name">${name}</div>
+                                    <div class="ios-person-role">${role} • ${info}</div>
+                                </div>
+                                <div class="ios-person-chevron">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                                </div>
+                            </div>
+                            <div class="ios-person-bio">${formatBasicTextToHtml(bio, true)}</div>
+                        </div>
+                    `;
+                }
+                else if (type === 'text') {
                     html += formatBasicTextToHtml(content);
                 }
             }
@@ -847,7 +932,7 @@
             return html;
         }
 
-        function formatBasicTextToHtml(content) {
+        function formatBasicTextToHtml(content, isInner = false) {
             let html = content.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
             html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
@@ -872,11 +957,13 @@
             
             let finalHtml = out.join('<br>').replace(/<br><ul/g, '<ul').replace(/<\/ul><br>/g, '</ul>');
             
+            if(isInner) return finalHtml;
+
             return `
                 <div class="ios-ai-widget">
                     <div class="ios-ai-widget-header">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                        <span>Intelligente Antwort</span>
+                        <span>intelligente antwort</span>
                     </div>
                     <div class="ios-ai-widget-content">${finalHtml}</div>
                 </div>
@@ -929,38 +1016,45 @@
 
             const modelName = await getValidModel(apiKey);
 
-            const systemPrompt = `Du bist ein brillanter KI-Assistent. Greife präzise und zügig auf Live-Internetdaten zu. 
-Antworte niemals in JSON! Verwende EXAKT und AUSSCHLIESSLICH diese Text-Blöcke zur Formatierung:
+            const systemPrompt = `du bist ein brillanter ki-assistent. antworte niemals in json! verwende exakt und ausschließlich diese text-blöcke zur formatierung (alles kleingeschrieben bei den tags, niemals durchgehend capslock im text):
 
-Für Währungen:
-[CURRENCY]
-Title: Währungsumrechnung
-Amount: <Ursprung>
-Converted: <Zielbetrag>
-Color: <#0A84FF für €, #30D158 für $, #FF453A für CHF, #BF5AF2 für £, #FF9F0A für ¥, sonst #5E5CE6>
-[/CURRENCY]
+für währungen:
+[currency]
+titel: währungsumrechnung
+betrag: <ursprung>
+ziel: <zielbetrag>
+farbe: <#007aff für €, #34c759 für $, #ff3b30 für chf, #af52de für £, #ff9500 für ¥, sonst #5e5ce6>
+[/currency]
 
-Für Orte/Restaurants (mehrere erlaubt):
-[PLACE]
-Name: <Name>
-Address: <Adresse>
-Phone: <Telefon>
-Hours: <Öffnungszeiten heute>
-Website: <Website>
-[/PLACE]
+für orte/restaurants:
+[place]
+name: <name>
+adresse: <adresse>
+telefon: <telefon>
+zeiten: <öffnungszeiten heute>
+website: <website>
+[/place]
 
-Für Text/Fakten:
-[TEXT]
-<Dein Text. Nutze **Fettdruck** für Wichtiges>
-[/TEXT]`;
+für bekannte personen:
+[person]
+name: <name>
+rolle: <beruf/rolle>
+info: <kurze info/alter>
+bio: <ausführlicher text>
+[/person]
 
-            let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
+für normalen text/fakten:
+[text]
+<dein text. nutze **fettdruck** für wichtiges>
+[/text]`;
+
+            let combinedText = "anweisung: " + systemPrompt + "\n\n";
             if (geminiHistory.length > 0) {
                 for (let msg of geminiHistory) {
-                    const role = msg.role === 'user' ? 'User' : 'KI';
+                    const role = msg.role === 'user' ? 'user' : 'ki';
                     combinedText += `${role}: ${msg.parts[0].text}\n`;
                 }
-                combinedText += "\nAktuelle Frage:\n";
+                combinedText += "\naktuelle frage:\n";
             }
             combinedText += query;
 
@@ -981,7 +1075,7 @@ Für Text/Fakten:
             
             if (!resFallback.ok) {
                 activeGeminiModel = null;
-                throw new Error("API Limit oder Fehler");
+                throw new Error("api limit oder fehler");
             }
             return await resFallback.json();
         }
@@ -1012,9 +1106,12 @@ Für Text/Fakten:
             if (isManualTrigger) {
                 const loader = document.createElement('div');
                 loader.id = loaderId;
-                loader.className = 'ai-loader';
-                loader.style.animation = 'pulse-opacity 1.5s infinite';
-                loader.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg> Suche im Live-Web...`;
+                loader.innerHTML = `
+                    <div class="ai-glow-loader" style="padding-left: 0;">
+                        <div class="glow-orb" style="width:20px; height:20px;"></div>
+                        <div class="glow-text">ich denke nach...</div>
+                    </div>
+                `;
                 aiChatContent.appendChild(loader);
                 scrollToBottom(aiChatContent);
             } else {
@@ -1032,7 +1129,7 @@ Für Text/Fakten:
                     }
                 }
 
-                if (!textResp.trim()) { throw new Error("Kein Text gefunden."); }
+                if (!textResp.trim()) { throw new Error("kein text gefunden."); }
                 
                 geminiHistory.push({ role: "user", parts: [{ text: query }] });
                 geminiHistory.push({ role: "model", parts: [{ text: textResp }] });
@@ -1050,9 +1147,9 @@ Für Text/Fakten:
                 if (searchId !== currentSearchId) return;
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
                 if(isManualTrigger) {
-                    appendAiCard(`[TEXT]Es gab leider einen Fehler bei der Verbindung zur KI. (${e.message})[/TEXT]`);
+                    appendAiCard(`[text]es gab leider einen fehler bei der verbindung zur ki. (${e.message})[/text]`);
                 } else {
-                    closeCompactWidget(new Event('close'));
+                    closeCompactWidget();
                 }
             } finally {
                 isAiThinking = false;
@@ -1089,10 +1186,13 @@ Für Text/Fakten:
         }
 
         function openAiSheet() {
+            // Widget ausblenden und Overlay öffnen
             aiCompactWidget.classList.remove('active');
             aiSheetOverlay.classList.add('active');
+            
             setTimeout(() => {
-                scrollToBottom(aiChatContent);
+                // Ganz nach oben scrollen wie gewünscht
+                aiChatContent.scrollTo({ top: 0, behavior: 'instant' });
                 aiChatInput.focus();
             }, 300);
         }
@@ -1100,10 +1200,8 @@ Für Text/Fakten:
         function closeAiSheet() {
             aiSheetOverlay.classList.remove('active');
             aiChatInput.blur();
-            if (aiChatContent.innerHTML.trim() !== '' && geminiHistory.length > 0) {
-                aiCompactWidget.style.display = 'flex';
-                aiCompactWidget.classList.add('active');
-            }
+            // Widget NICHT wieder einblenden wie gewünscht
+            closeCompactWidget();
         }
 
         function scrollToBottom(el) { 
@@ -1154,11 +1252,9 @@ Für Text/Fakten:
         let isSwipingY = false, isSwipingX = false;
 
         function openImageViewer(clickedCard) {
-            // Hole nur die eigentlichen Image-Cards
             const allCards = Array.from(document.querySelectorAll('#view-images .image-card'));
             viewerIndex = allCards.indexOf(clickedCard);
             
-            // Render High Quality Bilder im Track
             track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.display='none'"></div>`).join('');
             imageViewer.classList.add('active');
             document.body.classList.add('no-scroll'); 
@@ -1236,7 +1332,6 @@ Für Text/Fakten:
             const domain = getHostname(item.link);
             const pillContainer = document.getElementById('viewer-pill-container');
             
-            // Da Color Pre-Cached ist, können wir direkt rendern!
             const color = item.color || { bg: `rgba(255,255,255,0.08)`, text: `#ffffff`, border: `1px solid rgba(255,255,255,0.05)` };
             
             pillContainer.innerHTML = `
