@@ -101,7 +101,7 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* KI BOTTOM SHEET (Interactive Apple Style) */
+        /* KI BOTTOM SHEET (Apple Style mit Compact/Expanded State) */
         #ai-sheet {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
             background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
@@ -109,85 +109,78 @@
             padding: 12px 20px calc(var(--safe-bottom) + 16px) 20px; 
             box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
             border-top: 1px solid rgba(255,255,255,0.15);
-            transform: translateY(100%); transition: var(--spring-smooth);
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), height 0.5s cubic-bezier(0.32, 0.72, 0, 1);
             display: flex; flex-direction: column;
-        }
-        
-        /* Kompakter Zustand */
-        #ai-sheet.compact {
-            transform: translateY(0);
-            height: auto;
-            max-height: 40vh;
+            
+            /* Compact defaults */
+            height: 140px; 
             cursor: pointer;
         }
-        #ai-sheet.compact:active {
-            background: rgba(35, 35, 38, 0.9);
-        }
-        #ai-sheet.compact .ai-sheet-content {
-            overflow: hidden;
-            pointer-events: none;
-            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-            padding-bottom: 0;
-        }
-        #ai-sheet.compact .ai-followup-form {
-            display: none;
-        }
-        #ai-sheet.compact .ai-sheet-header {
-            pointer-events: none;
-        }
-        #ai-sheet.compact .ai-sheet-close {
-            pointer-events: auto;
-        }
-
-        /* Erweiterter Zustand */
-        #ai-sheet.expanded {
-            transform: translateY(0);
-            height: 85vh;
-        }
-        #ai-sheet.expanded .ai-sheet-content {
-            pointer-events: auto;
-            overflow-y: auto;
-        }
-
-        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; }
+        #ai-sheet.active { transform: translateY(0); }
         
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
+        #ai-sheet.expanded {
+            height: 85vh;
+            cursor: default;
+        }
+
+        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; flex-shrink: 0;}
+        
+        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; transition: opacity 0.2s; }
         .ai-sheet-title { font-size: 16px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
         .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
         .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
         
-        .ai-sheet-content { flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 8px 4px 20px; scroll-behavior: smooth; }
+        /* Verstecke header & input in compact modus */
+        #ai-sheet:not(.expanded) .ai-sheet-header,
+        #ai-sheet:not(.expanded) .ai-followup-form {
+            display: none;
+        }
+
+        .ai-sheet-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 0 4px 20px; scroll-behavior: smooth; }
         
+        /* In compact modus kein Scrolling und nur das letzte Bubble zeigen */
+        #ai-sheet:not(.expanded) .ai-sheet-content {
+            overflow: hidden; padding-bottom: 0; pointer-events: none;
+        }
+        #ai-sheet:not(.expanded) .chat-bubble:not(:last-child) {
+            display: none;
+        }
+
         /* Chat Bubbles */
         .chat-bubble { font-size: 16px; line-height: 1.5; padding: 14px 18px; position: relative; animation: slideIn 0.3s cubic-bezier(0.2,0.9,0.3,1) both; }
-        .ai-message { background: rgba(255,255,255,0.06); color: white; border-radius: 22px; border-bottom-left-radius: 4px; align-self: flex-start; max-width: 95%; width: 100%; border: 1px solid rgba(255,255,255,0.03); }
+        .ai-message { background: rgba(255,255,255,0.06); color: white; border-radius: 22px; border-bottom-left-radius: 4px; align-self: flex-start; max-width: 95%; border: 1px solid rgba(255,255,255,0.03); }
         .user-message { background: rgba(255,255,255,0.15); color: white; border-radius: 22px; border-bottom-right-radius: 4px; align-self: flex-end; max-width: 85%; }
         
+        /* Widget Styling in Bubbles */
+        .ai-message.widget-container {
+            background: transparent; border: none; padding: 0; max-width: 100%; width: 100%;
+        }
+        
+        .ai-widget {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* Currency Widget (Solid Colors) */
+        .widget-currency { display: flex; border-radius: 20px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .curr-box { flex: 1; padding: 16px 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .curr-val { font-size: 20px; font-weight: 700; }
+        .curr-arrow { background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; padding: 0 12px; }
+
+        /* Location Widget */
+        .widget-loc { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .loc-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .loc-row { display: flex; gap: 10px; font-size: 14px; align-items: flex-start; color: rgba(255,255,255,0.8); }
+        .loc-icon { opacity: 0.6; font-size: 14px; flex-shrink: 0; margin-top: 2px;}
+        .loc-row a { color: #fff; text-decoration: none; font-weight: 500; }
+
         .ai-message b { font-weight: 600; color: #fff; }
         .ai-message p { margin-bottom: 8px; }
         .ai-message p:last-child { margin-bottom: 0; }
-        .ai-message ul { padding-left: 20px; margin-bottom: 8px; }
         
-        /* AI Structured Widgets */
-        .compact-text { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        
-        .currency-widget {
-            background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px; padding: 20px; text-align: center; margin-top: 14px;
-        }
-        .currency-from { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 6px; font-weight: 500; }
-        .currency-to { font-size: 38px; font-weight: 700; letter-spacing: -1px; }
-
-        .apple-card {
-            background: rgba(0,0,0,0.25); border-radius: 18px; padding: 18px;
-            margin-top: 14px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-        }
-        .card-title-sm { font-size: 17px; font-weight: 600; margin-bottom: 12px; color: #fff; }
-        .apple-info-row { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 8px; line-height: 1.4; }
-        .apple-info-row svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; opacity: 0.6; }
-        .apple-info-row a { color: #fff; text-decoration: none; font-weight: 500; }
-
         /* Follow-up Input */
         .ai-followup-form { display: flex; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
         .ai-followup-form input { flex: 1; background: transparent; border: none; color: white; font-size: 16px; padding: 0 16px; outline: none; -webkit-appearance: none; }
@@ -231,7 +224,10 @@
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         
-        .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
+        .color-pill {
+            display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; 
+        }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
@@ -262,9 +258,6 @@
         .modal-content input.gemini-input { margin-top: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; }
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
         .modal-content button:active { transform: scale(0.95); }
-        
-        .typing-indicator { display: inline-block; width: 12px; animation: ellipsis 1.2s infinite; }
-        @keyframes ellipsis { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } }
     </style>
 </head>
 <body>
@@ -272,10 +265,10 @@
     <div id="setup-modal">
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
-            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suche)" autocomplete="off" spellcheck="false">
+            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suce)" autocomplete="off" spellcheck="false">
             <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert intelligente Widget-Antworten. Serper liefert das Web.</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert schnelle Direktantworten. Serper liefert das Web.</p>
         </div>
     </div>
 
@@ -304,19 +297,18 @@
         </div>
     </div>
 
-    <div id="ai-sheet" onclick="expandAiSheet(event)">
+    <div id="ai-sheet">
         <div class="drag-pill"></div>
         <div class="ai-sheet-header">
             <div class="ai-sheet-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                 Intelligence
             </div>
-            <button class="ai-sheet-close" onclick="closeAiSheet(event)">
+            <button class="ai-sheet-close" onclick="event.stopPropagation(); closeAiSheet();">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="ai-sheet-content" id="ai-sheet-content">
-        </div>
+        <div class="ai-sheet-content" id="ai-sheet-content"></div>
         <form class="ai-followup-form" onsubmit="handleAiFollowup(event)">
             <input type="text" id="aiFollowupInput" placeholder="Fragen..." autocomplete="off">
             <button type="submit">
@@ -335,7 +327,7 @@
             <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
             <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
-        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheet(false, true)">
+        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheet(true)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
         </button>
     </div>
@@ -361,7 +353,12 @@
         let isLoading = false;
         let aiChatHistory = [];
         
-        const state = { search: { page: 1, loaded: false }, images: { page: 1, loaded: false }, shopping: { page: 1, loaded: false } };
+        const state = {
+            search: { page: 1, loaded: false },
+            images: { page: 1, loaded: false },
+            shopping: { page: 1, loaded: false }
+        };
+
         const colorCache = new Map();
 
         async function getDominantColor(domain) {
@@ -371,19 +368,27 @@
 
             for (const url of [faviconUrl, proxyUrl]) {
                 const result = await tryExtractColor(url);
-                if (result) { colorCache.set(domain, result); return result; }
+                if (result) {
+                    colorCache.set(domain, result);
+                    return result;
+                }
             }
-            colorCache.set(domain, null); return null; 
+            colorCache.set(domain, null);
+            return null; 
         }
 
         function tryExtractColor(url) {
             return new Promise((resolve) => {
-                const img = new Image(); img.crossOrigin = 'anonymous';
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.onload = () => {
-                    const size = 16; const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+                    const size = 16;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size; canvas.height = size;
                     const ctx = canvas.getContext('2d');
                     try {
-                        ctx.drawImage(img, 0, 0, size, size); const data = ctx.getImageData(0, 0, size, size).data;
+                        ctx.drawImage(img, 0, 0, size, size);
+                        const data = ctx.getImageData(0, 0, size, size).data;
                         let r = 0, g = 0, b = 0, count = 0;
                         for (let i = 0; i < data.length; i += 4) {
                             if (data[i+3] < 128) continue;
@@ -394,11 +399,14 @@
                         if (count < 10) { resolve(null); return; }
                         r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count);
                         resolve({
-                            bg: `rgba(${r}, ${g}, ${b}, 0.22)`, text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`, border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`
+                            bg: `rgba(${r}, ${g}, ${b}, 0.22)`,
+                            text: `rgb(${Math.min(r+60,255)}, ${Math.min(g+60,255)}, ${Math.min(b+60,255)})`,
+                            border: `1px solid rgba(${r}, ${g}, ${b}, 0.4)`
                         });
                     } catch { resolve(null); }
                 };
-                img.onerror = () => resolve(null); img.src = url;
+                img.onerror = () => resolve(null);
+                img.src = url;
             });
         }
 
@@ -409,6 +417,7 @@
         }
         
         const observers = {};
+
         function setupObserver(type) {
             if (observers[type]) observers[type].disconnect();
             const vp = document.getElementById(`view-${type}`);
@@ -417,7 +426,8 @@
 
             observers[type] = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && !isLoading && currentQuery && state[type].loaded) {
-                    state[type].page++; performSearch(type, true);
+                    state[type].page++;
+                    performSearch(type, true);
                 }
             }, { root: vp, rootMargin: '1500px' });
             observers[type].observe(trigger);
@@ -426,15 +436,18 @@
         window.addEventListener('load', () => { 
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('q');
+            
             checkApiKeys();
 
             if (queryParam) {
-                homeView.style.display = 'none'; resultsWrapper.classList.add('active');
-                homeSearchInput.value = queryParam; overlaySearchInput.value = queryParam;
+                homeView.style.display = 'none';
+                resultsWrapper.classList.add('active');
+                homeSearchInput.value = queryParam;
+                overlaySearchInput.value = queryParam;
                 currentQuery = queryParam;
                 
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-                if (localStorage.getItem('serper_api_key')) triggerNewSearch();
+                if (getCookie('serper_api_key')) triggerNewSearch();
             } else {
                 requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             }
@@ -449,194 +462,280 @@
             updateTabSlider(element);
             
             document.querySelectorAll('.scroll-viewport').forEach(vp => vp.classList.remove('active'));
-            document.getElementById(`view-${type}`).classList.add('active'); currentType = type;
+            document.getElementById(`view-${type}`).classList.add('active');
+            currentType = type;
             
             if (currentQuery && !state[currentType].loaded) {
-                renderSkeletons(currentType); performSearch(currentType, false, true);
+                renderSkeletons(currentType); 
+                performSearch(currentType, false, true);
             }
         }
 
-        function handleHomeSubmit(e) { e.preventDefault(); const q = homeSearchInput.value.trim(); if(q) { homeSearchInput.blur(); startSearchFrom(q); } }
-        function handleOverlaySubmit(e) { e.preventDefault(); const q = overlaySearchInput.value.trim(); overlaySearchInput.blur(); closeSearch(); if(q) startSearchFrom(q); }
+        function handleHomeSubmit(e) {
+            e.preventDefault();
+            const q = homeSearchInput.value.trim();
+            if(q) { homeSearchInput.blur(); startSearchFrom(q); }
+        }
 
-        overlaySearchInput.addEventListener('blur', () => { setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 50); });
+        function handleOverlaySubmit(e) {
+            e.preventDefault();
+            const q = overlaySearchInput.value.trim();
+            overlaySearchInput.blur(); 
+            closeSearch(); 
+            if(q) startSearchFrom(q);
+        }
+
+        overlaySearchInput.addEventListener('blur', () => {
+            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 50);
+        });
 
         function startSearchFrom(query) {
-            homeView.classList.add('hidden'); resultsWrapper.classList.add('active');
-            homeSearchInput.value = query; overlaySearchInput.value = query; currentQuery = query;
+            homeView.classList.add('hidden');
+            resultsWrapper.classList.add('active');
+            homeSearchInput.value = query;
+            overlaySearchInput.value = query;
+            currentQuery = query;
             triggerNewSearch();
         }
 
         function triggerNewSearch() {
             Object.keys(state).forEach(k => {
-                state[k].page = 1; state[k].loaded = false;
+                state[k].page = 1;
+                state[k].loaded = false;
                 const vp = document.getElementById(`view-${k}`);
                 const content = vp.querySelector('.results-content');
                 content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
             });
-            requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
-            renderSkeletons(currentType); performSearch(currentType, false, true);
             
-            if (localStorage.getItem('gemini_api_key')) fetchGeminiAI(currentQuery, false);
+            requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
+            renderSkeletons(currentType);
+            
+            performSearch(currentType, false, true);
+            
+            if (getCookie('gemini_api_key')) {
+                fetchGeminiAI(currentQuery, false);
+            }
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
-        // --- GEMINI KI LOGIK (Kompakt & Strukturiert) ---
+        // --- GEMINI KI LOGIK (Kompakt & Custom Widgets) ---
         
-        function openAiSheet(isFollowUp = false, forceExpand = false) {
-            if(forceExpand || isFollowUp) {
-                aiSheet.className = 'expanded active';
-                setTimeout(() => followupInput.focus(), 300);
+        aiSheet.addEventListener('click', (e) => {
+            if (!aiSheet.classList.contains('expanded') && !e.target.closest('.ai-sheet-close')) {
+                expandAiSheet();
+            }
+        });
+
+        function openAiSheet(forceCompact = true) {
+            aiSheet.classList.add('active');
+            if(forceCompact) {
+                aiSheet.classList.remove('expanded');
             } else {
-                aiSheet.className = 'compact active';
+                expandAiSheet();
             }
             aiReopenBtn.classList.remove('active');
             bottomBar.style.transform = 'translate(-50%, 150%)'; 
         }
 
-        function expandAiSheet(e) {
-            if(aiSheet.classList.contains('compact')) {
-                aiSheet.className = 'expanded active';
-                setTimeout(() => followupInput.focus(), 200);
-            }
+        function expandAiSheet() {
+            aiSheet.classList.add('expanded');
+            requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
+            setTimeout(() => followupInput.focus(), 300);
         }
 
-        function closeAiSheet(e) {
-            if(e) e.stopPropagation(); // Verhindert expand() Klick
-            aiSheet.className = '';
+        function closeAiSheet() {
+            aiSheet.classList.remove('active');
+            aiSheet.classList.remove('expanded');
             aiReopenBtn.classList.add('active'); 
             bottomBar.style.transform = 'translate(-50%, 0)'; 
             followupInput.blur();
         }
 
-        function formatMarkdown(text) {
-            return text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*(.*?)\*/g, '<i>$1</i>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>').replace(/^- (.*)/gm, '<li>$1</li>').replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        // Hilfsfunktion für Währungsfarben
+        function getCurrencyColor(code) {
+            const colors = {
+                'EUR': '#1c4c8f', 'USD': '#1e5e31', 'CHF': '#a32020', 'GBP': '#4a1c8f',
+                'JPY': '#8c1f36', 'AUD': '#143b6b', 'CAD': '#a82c2c', 'BTC': '#b87f18'
+            };
+            return colors[code.toUpperCase()] || '#333333';
+        }
+
+        function parseAndFormatWidgets(text, containerId) {
+            let hasWidget = false;
+            
+            // 1. Währung prüfen: [[WÄHRUNG | 100 USD | 92.50 EUR]]
+            let formattedText = text.replace(/\[\[WÄHRUNG\s*\|\s*([^|]+)\s*\|\s*([^\]]+)\]\]/gi, (match, from, to) => {
+                hasWidget = true;
+                const fromCode = (from.match(/[A-Z]{3}/i) || [''])[0];
+                const toCode = (to.match(/[A-Z]{3}/i) || [''])[0];
+                const c1 = getCurrencyColor(fromCode);
+                const c2 = getCurrencyColor(toCode);
+                
+                return `
+                <div class="ai-widget widget-currency">
+                    <div class="curr-box" style="background-color: ${c1};">
+                        <span class="curr-val">${from.trim()}</span>
+                    </div>
+                    <div class="curr-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </div>
+                    <div class="curr-box" style="background-color: ${c2};">
+                        <span class="curr-val">${to.trim()}</span>
+                    </div>
+                </div>`;
+            });
+
+            // 2. Ort prüfen: [[ORT | Name | Adresse | Telefon | Email | Website]]
+            formattedText = formattedText.replace(/\[\[ORT\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*([^\]]*)\]\]/gi, (match, name, addr, phone, email, web) => {
+                hasWidget = true;
+                let html = `<div class="ai-widget widget-loc"><div class="loc-title">${name.trim()}</div>`;
+                if(addr.trim()) html += `<div class="loc-row"><span class="loc-icon">📍</span> <span>${addr.trim()}</span></div>`;
+                if(phone.trim()) html += `<div class="loc-row"><span class="loc-icon">📞</span> <span><a href="tel:${phone.trim()}">${phone.trim()}</a></span></div>`;
+                if(email.trim()) html += `<div class="loc-row"><span class="loc-icon">✉️</span> <span><a href="mailto:${email.trim()}">${email.trim()}</a></span></div>`;
+                if(web.trim()) html += `<div class="loc-row"><span class="loc-icon">🌐</span> <span><a href="${web.trim()}" target="_blank">${web.trim()}</a></span></div>`;
+                html += `</div>`;
+                return html;
+            });
+
+            // Standard Markdown Formatierung für den Rest
+            if (!hasWidget) {
+                formattedText = formattedText
+                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+                    .replace(/\n\n/g, '</p><p>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/^- (.*)/gm, '<li>$1</li>')
+                    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            } else {
+                // Falls Widgets generiert wurden, säubern wir überschüssige Zeilenumbrüche rund um das Widget
+                formattedText = formattedText.replace(/<br>/g, '').trim();
+                document.getElementById(containerId).classList.add('widget-container');
+            }
+
+            return hasWidget ? formattedText : `<p>${formattedText}</p>`;
         }
 
         function handleAiFollowup(e) {
-            e.preventDefault(); const q = followupInput.value.trim();
-            if(q) { followupInput.value = ''; followupInput.blur(); fetchGeminiAI(q, true); }
+            e.preventDefault();
+            const q = followupInput.value.trim();
+            if(q) {
+                followupInput.value = '';
+                followupInput.blur();
+                fetchGeminiAI(q, true);
+            }
         }
 
         async function fetchGeminiAI(query, isFollowUp = false) {
-            const geminiKey = localStorage.getItem('gemini_api_key'); if (!geminiKey) return;
+            const geminiKey = getCookie('gemini_api_key');
+            if (!geminiKey) return;
 
-            if (!isFollowUp) { aiChatHistory = []; aiContent.innerHTML = ''; } 
-            else { aiContent.innerHTML += `<div class="chat-bubble user-message">${query}</div>`; }
+            if (!isFollowUp) {
+                aiChatHistory = [];
+                aiContent.innerHTML = '';
+            } else {
+                aiContent.innerHTML += `<div class="chat-bubble user-message">${query}</div>`;
+            }
 
             const loadingId = `loading-${Date.now()}`;
-            aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><span style="opacity:0.6;">Denke nach...</span></div>`;
+            aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><span style="opacity:0.6;">...</span></div>`;
+            
             requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
-            openAiSheet(isFollowUp);
+            
+            // Standardmäßig im Compact-Modus öffnen, bei Followup bleibt es expanded
+            if (!isFollowUp) {
+                openAiSheet(true);
+            }
 
-            aiChatHistory.push({ role: "user", parts: [{ text: query }] });
+            const prompt = isFollowUp 
+                ? `Neue Frage: "${query}". Antworte kurz und präzise. Falls zutreffend, verwende das Format [[WÄHRUNG | Betrag1 Währung1 | Betrag2 Währung2]] oder [[ORT | Name | Adresse | Telefon | Email | Website]].`
+                : `Suchanfrage: "${query}". Antworte extrem kurz im ersten Satz. Keine langen Einleitungen.
+WICHTIG FORMATIERUNG:
+1. Wenn es eine Währungsumrechnung ist, gib NUR DAS zurück (und erfinde kein anderes Format): [[WÄHRUNG | 100 USD | 92.50 EUR]]
+2. Wenn es um einen Ort oder Restaurant geht, gib NUR DAS zurück: [[ORT | Name | Adresse | Telefon | Email | Website]] (Lass leere Felder einfach mit || leer)
+3. Ansonsten gib mir direkt in einem sehr kurzen Satz die Faktenantwort. Keine Markdown Code-Blöcke verwenden!`;
 
-            const systemPrompt = `Du bist ein präziser Assistent. Antworte IMMER strikt in folgendem JSON Format, um Widgets zu rendern:
-{
-  "type": "currency" | "place" | "text",
-  "compact_answer": "Kürzestmögliche Info als String. Ein Satz max.",
-  "data": {}
-}
-- Bei "currency": Gib Umrechnungen zurück. data = {"from": "1 USD", "to": "0.92 EUR", "color": "#HexCode (Spezifische feste Farbe zur Währung, kein Gradient. USD=#34C759, EUR=#007AFF, CHF=#FF3B30)"}
-- Bei "place": Gib Restaurants/Orte zurück. data = [{"name": "...", "address": "...", "phone": "...", "website": "..."}]
-- Bei "text": Standardwissen. data = {"content": "Ausführlichere Antwort mit **Fett** als Markdown"}`;
+            aiChatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
                         contents: aiChatHistory,
-                        generationConfig: { temperature: 0.1 } 
+                        generationConfig: { temperature: 0.1, maxOutputTokens: 250 }
                     })
                 });
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
-                let answerJsonText = data.candidates[0].content.parts[0].text;
                 
-                aiChatHistory.push({ role: "model", parts: [{ text: answerJsonText }] });
+                let answerText = data.candidates[0].content.parts[0].text;
+                aiChatHistory.push({ role: "model", parts: [{ text: answerText }] });
 
-                // Strip possible markdown blocks before parsing
-                let cleanJsonText = answerJsonText.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-                let parsed;
-                try { parsed = JSON.parse(cleanJsonText); } 
-                catch(e) { parsed = { type: 'text', compact_answer: cleanJsonText, data: { content: cleanJsonText } }; }
-
-                let finalHtml = '';
-                if(parsed.compact_answer) {
-                    finalHtml += `<div class="compact-text">${formatMarkdown(parsed.compact_answer)}</div>`;
-                }
-
-                if (parsed.type === 'currency' && parsed.data) {
-                    finalHtml += `
-                    <div class="currency-widget">
-                        <div class="currency-from">${parsed.data.from}</div>
-                        <div class="currency-to" style="color: ${parsed.data.color || '#fff'};">${parsed.data.to}</div>
-                    </div>`;
-                } else if (parsed.type === 'place' && Array.isArray(parsed.data)) {
-                    parsed.data.forEach(place => {
-                        finalHtml += `
-                        <div class="apple-card">
-                            <div class="card-title-sm">${place.name}</div>
-                            ${place.address ? `<div class="apple-info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${place.address}</div>` : ''}
-                            ${place.phone ? `<div class="apple-info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> ${place.phone}</div>` : ''}
-                            ${place.website ? `<div class="apple-info-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> <a href="${place.website}" target="_blank">${getHostname(place.website)}</a></div>` : ''}
-                        </div>`;
-                    });
-                } else if (parsed.type === 'text' && parsed.data?.content && parsed.data.content !== parsed.compact_answer) {
-                    finalHtml += `<div style="margin-top:8px; font-weight:400; color:rgba(255,255,255,0.85);">${formatMarkdown(parsed.data.content)}</div>`;
-                }
-
-                document.getElementById(loadingId).innerHTML = finalHtml;
+                const container = document.getElementById(loadingId);
+                container.innerHTML = parseAndFormatWidgets(answerText, loadingId);
+                
             } catch (error) {
-                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">KI konnte nicht laden. Bitte überprüfe den API Key.</span>';
-                aiChatHistory.pop(); 
+                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">Fehler beim Laden der KI-Antwort.</span>';
+                aiChatHistory.pop();
             }
             requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
         }
-
-        // --- WEB SEARCH LOGIK ---
 
         function renderSkeletons(type) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
             const trigger = content.querySelector('.load-more-trigger');
+            
             const frag = document.createDocumentFragment();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
             
             const count = type === 'search' ? 6 : (type === 'images' ? 12 : 8);
             for(let i=0; i<count; i++) {
-                if(type === 'search') pageBlock.innerHTML += `<div class="skeleton-card skeleton"><div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div></div>`;
-                else if(type === 'images') pageBlock.innerHTML += `<div class="image-card skeleton"></div>`;
-                else pageBlock.innerHTML += `<div class="shopping-card skeleton" style="height:260px;"></div>`;
+                if(type === 'search') {
+                    pageBlock.innerHTML += `<div class="skeleton-card skeleton"><div class="s-pill skeleton"></div><div class="s-title skeleton"></div><div class="s-text skeleton"></div><div class="s-text short skeleton"></div></div>`;
+                } else if(type === 'images') {
+                    pageBlock.innerHTML += `<div class="image-card skeleton"></div>`;
+                } else {
+                    pageBlock.innerHTML += `<div class="shopping-card skeleton" style="height:260px;"></div>`;
+                }
             }
-            frag.appendChild(pageBlock); content.insertBefore(frag, trigger);
+            frag.appendChild(pageBlock);
+            content.insertBefore(frag, trigger);
+            
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
 
         async function performSearch(type, isLoadMore = false, isInitial = false) {
-            if (isLoading) return; isLoading = true;
-            const apiKey = localStorage.getItem('serper_api_key');
+            if (isLoading) return;
+            isLoading = true;
+
+            const apiKey = getCookie('serper_api_key');
             if (!apiKey) { setupModal.classList.add('active'); isLoading = false; return; }
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
+                
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
                     body: JSON.stringify({ q: currentQuery, gl: 'ch', hl: 'de', num: 40, page: state[type].page })
                 });
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
+                
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
-            } catch (error) { console.error("Fetch error", error); } finally { isLoading = false; }
+
+            } catch (error) {
+                console.error("Fetch error", error);
+            } finally {
+                isLoading = false; 
+            }
         }
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
@@ -644,9 +743,13 @@
         window.toggleSitelinks = function(btn) {
             const container = btn.closest('.card').querySelector('.sitelinks-container');
             if (container.style.gridTemplateRows === '1fr') {
-                container.style.gridTemplateRows = '0fr'; btn.style.transform = 'rotate(0deg)'; btn.style.background = 'rgba(255,255,255,0.05)';
+                container.style.gridTemplateRows = '0fr';
+                btn.style.transform = 'rotate(0deg)';
+                btn.style.background = 'rgba(255,255,255,0.05)';
             } else {
-                container.style.gridTemplateRows = '1fr'; btn.style.transform = 'rotate(180deg)'; btn.style.background = 'rgba(255,255,255,0.15)';
+                container.style.gridTemplateRows = '1fr';
+                btn.style.transform = 'rotate(180deg)';
+                btn.style.background = 'rgba(255,255,255,0.15)';
             }
         };
 
@@ -660,20 +763,27 @@
             else if (type === 'images') rawItems = data.images || [];
             else if (type === 'shopping') rawItems = data.shopping || [];
             
-            if (isInitial) content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
+            if (isInitial) {
+                content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
+            }
 
             if (rawItems.length === 0) {
                 if (isInitial) {
                     let emptyMsg = "Keine Ergebnisse gefunden.";
-                    if (type === 'images') emptyMsg = "Keine Bilder gefunden."; else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
-                    const emptyState = document.createElement('div'); emptyState.className = 'empty-state';
-                    emptyState.innerText = emptyMsg; content.insertBefore(emptyState, trigger);
+                    if (type === 'images') emptyMsg = "Keine Bilder gefunden.";
+                    else if (type === 'shopping') emptyMsg = "Keine Produkte gefunden.";
+                    
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerText = emptyMsg;
+                    content.insertBefore(emptyState, trigger);
                 }
                 return;
             }
 
             let items = [...rawItems].reverse(); 
-            const pageBlock = document.createElement('div'); pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
+            const pageBlock = document.createElement('div');
+            pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
             if (type === 'search') {
                 const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
@@ -685,71 +795,104 @@
                     const color = colors[index] || { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: '1px solid rgba(255,255,255,0.05)' };
                     const hasSitelinks = item.sitelinks && item.sitelinks.length > 0;
                     
-                    const el = document.createElement('div'); el.className = `card ${isInitial ? 'animate-in' : ''}`;  el.style.cursor = 'pointer';
-                    el.onclick = (e) => { if(!e.target.closest('.sitelink-toggle') && !e.target.closest('.sitelink-btn')) { window.open(item.link, '_blank'); } };
+                    const el = document.createElement('div');
+                    el.className = `card ${isInitial ? 'animate-in' : ''}`; 
+                    el.style.cursor = 'pointer';
+                    el.onclick = (e) => {
+                        if(!e.target.closest('.sitelink-toggle') && !e.target.closest('.sitelink-btn')) {
+                            window.open(item.link, '_blank');
+                        }
+                    };
 
                     el.innerHTML = `
                         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <div class="color-pill" style="background: ${color.bg}; color: ${color.text}; border: ${color.border};"><span>${domain}</span></div>
-                            ${hasSitelinks ? `<button class="sitelink-toggle" onclick="event.preventDefault(); toggleSitelinks(this);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>` : ''}
+                            <div class="color-pill" style="background: ${color.bg}; color: ${color.text}; border: ${color.border};">
+                                <span>${domain}</span>
+                            </div>
+                            ${hasSitelinks ? `
+                            <button class="sitelink-toggle" onclick="event.preventDefault(); toggleSitelinks(this);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            ` : ''}
                         </div>
                         <div class="card-title">${item.title || 'Ohne Titel'}</div>
                         ${item.snippet ? `<div class="card-snippet">${item.snippet}</div>` : ''}
+                        
                         ${hasSitelinks ? `
                         <div class="sitelinks-container" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);">
                             <div style="overflow: hidden;">
                                 <div class="sitelinks-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    ${item.sitelinks.slice(0, 6).map(sl => `<div onclick="window.open('${sl.link}', '_blank')" class="sitelink-btn">${sl.title}</div>`).join('')}
+                                    ${item.sitelinks.slice(0, 6).map(sl => `
+                                        <div onclick="window.open('${sl.link}', '_blank')" class="sitelink-btn">${sl.title}</div>
+                                    `).join('')}
                                 </div>
                             </div>
-                        </div>` : ''}
+                        </div>
+                        ` : ''}
                     `;
                     pageBlock.appendChild(el);
                 });
 
-            } else {
+            } 
+            else {
                 items.forEach((item) => {
                     if (type === 'images') {
                         if(!item.imageUrl) return;
-                        const el = document.createElement('a'); el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
+                        const el = document.createElement('a');
+                        el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
                         el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                         pageBlock.appendChild(el);
-                    } else if (type === 'shopping') {
-                        const el = document.createElement('a'); el.href = item.link || '#'; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+                    } 
+                    else if (type === 'shopping') {
+                        const el = document.createElement('a');
+                        el.href = item.link || '#'; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
                         el.innerHTML = `
                             <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
-                            <div class="shopping-info"><div class="shopping-title">${item.title || 'Artikel'}</div><div class="shopping-price">${item.price || ''}</div></div>
+                            <div class="shopping-info">
+                                <div class="shopping-title">${item.title || 'Artikel'}</div>
+                                <div class="shopping-price">${item.price || ''}</div>
+                            </div>
                         `;
                         pageBlock.appendChild(el);
                     }
                 });
             }
 
-            if (pageBlock.children.length > 0) content.insertBefore(pageBlock, trigger);
+            if (pageBlock.children.length > 0) {
+                content.insertBefore(pageBlock, trigger);
+            }
 
-            if (isInitial) requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
-            else if (isLoadMore) requestAnimationFrame(() => { const newScrollHeight = vp.scrollHeight; vp.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight); });
-        }
-
-        function checkApiKeys() {
-            const serperKey = localStorage.getItem('serper_api_key');
-            if (!serperKey) setupModal.classList.add('active');
-            else { 
-                document.getElementById('apiKeyInput').value = serperKey; 
-                const geminiKey = localStorage.getItem('gemini_api_key'); 
-                if(geminiKey) document.getElementById('geminiKeyInput').value = geminiKey; 
+            if (isInitial) {
+                requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
+            } else if (isLoadMore) {
+                requestAnimationFrame(() => {
+                    const newScrollHeight = vp.scrollHeight;
+                    vp.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
+                });
             }
         }
 
+        function checkApiKeys() {
+            const serperKey = getCookie('serper_api_key');
+            if (!serperKey) {
+                setupModal.classList.add('active');
+            } else {
+                document.getElementById('apiKeyInput').value = serperKey;
+                const geminiKey = getCookie('gemini_api_key');
+                if(geminiKey) document.getElementById('geminiKeyInput').value = geminiKey;
+            }
+        }
+
+        function getCookie(n) { const v=document.cookie.match('(^|;) ?'+n+'=([^;]*)(;|$)'); return v?v[2]:null; }
         function saveApiKeys() {
-            const serperKey = document.getElementById('apiKeyInput').value.trim(); 
+            const serperKey = document.getElementById('apiKeyInput').value.trim();
             const geminiKey = document.getElementById('geminiKeyInput').value.trim();
             if (serperKey) { 
-                localStorage.setItem('serper_api_key', serperKey);
+                document.cookie = `serper_api_key=${serperKey}; max-age=31536000; path=/`; 
                 if (geminiKey) {
-                    localStorage.setItem('gemini_api_key', geminiKey);
-                } else {
-                    localStorage.removeItem('gemini_api_key');
+                    document.cookie = `gemini_api_key=${geminiKey}; max-age=31536000; path=/`; 
                 }
                 setupModal.classList.remove('active'); 
                 if (currentQuery) triggerNewSearch(); 
