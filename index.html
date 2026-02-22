@@ -146,12 +146,17 @@
             border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; 
             color: white; border: 1px solid rgba(255,255,255,0.05); 
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
-        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column;}
+        .ai-bubble-model { 
+            align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 16px;
+            animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+        @keyframes slideInChat { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         
-        /* Das schöne Apple-Style KI Widget */
+        /* Das schöne Apple-Style KI Standard Widget */
         .ios-ai-widget {
-            background: linear-gradient(145deg, rgba(40,40,42,0.9), rgba(28,28,30,0.9));
+            background: linear-gradient(145deg, rgba(40,40,42,0.95), rgba(28,28,30,0.95));
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 24px; padding: 20px;
@@ -163,17 +168,34 @@
         }
         .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
         
-        /* Typografie im Widget */
+        /* Custom Currency Widget (Vollflächige Farbe) */
+        .ios-currency-card {
+            border-radius: 24px; padding: 24px; color: white;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+            position: relative; overflow: hidden;
+        }
+        .ios-currency-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 8px; }
+        .ios-currency-amount { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
+        .ios-currency-converted { font-size: 20px; font-weight: 500; opacity: 0.9; }
+
+        /* Custom Place Widget (Orte, Restaurants) */
+        .ios-place-card {
+            background: #1c1c1e; border-radius: 20px; padding: 18px; 
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .ios-place-name { font-size: 18px; font-weight: 600; color: white; margin-bottom: 14px; }
+        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
+        .ios-place-row:last-child { margin-bottom: 0; }
+        .ios-place-icon { 
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; color: white;
+        }
+
+        /* Typografie im Text Widget */
         .ai-h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 16px 0 8px 0; letter-spacing: -0.2px;}
         .ai-h2:first-child { margin-top: 0; }
         .ai-h3 { font-size: 16px; font-weight: 600; color: #e5e5ea; margin: 14px 0 6px 0; }
-        
-        /* Pillen für Highlights (Währungen, Namen etc.) */
-        .ai-highlight { 
-            font-weight: 600; color: #fff; 
-            background: rgba(255, 255, 255, 0.12); padding: 2px 8px; 
-            border-radius: 8px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
-        }
+        .ai-highlight { font-weight: 600; color: #fff; background: rgba(255, 255, 255, 0.12); padding: 2px 8px; border-radius: 8px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
         .ai-ul { padding-left: 0; margin: 12px 0; list-style: none; }
         .ai-li { margin-bottom: 8px; position: relative; padding-left: 18px; color: #d1d1d6;}
         .ai-li::before { content: "•"; color: #ffffff; position: absolute; left: 0; font-weight: bold; }
@@ -275,7 +297,7 @@
             <h2 class="modal-title">API Setup</h2>
             <div class="modal-subtitle">Serper Key (Web Search)</div>
             <input type="text" id="apiKeyInput" placeholder="Serper Key eingeben" autocomplete="off" spellcheck="false">
-            <div class="modal-subtitle" style="margin-top: 12px;">Gemini Key (AI Widgets - Optional)</div>
+            <div class="modal-subtitle" style="margin-top: 12px;">Gemini Key (AI Widgets)</div>
             <input type="text" id="geminiKeyInput" placeholder="Gemini API Key eingeben" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
         </div>
@@ -327,7 +349,7 @@
                 </div>
             <form class="ai-chat-input-area" onsubmit="handleAiChat(event)">
                 <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Folgefrage stellen..." autocomplete="off">
-                <button type="submit" class="ai-send-btn">
+                <button type="submit" class="ai-send-btn" id="ai-send-btn">
                     <svg viewBox="0 0 24 24"><path d="M3 20V4l19 8-19 8zm2-3l11.85-5L5 7v3.5l6 1.5-6 1.5V17z"/></svg>
                 </button>
             </form>
@@ -377,7 +399,7 @@
         let currentQuery = '';
         let isLoading = false;
         
-        // ZENTRALE LÖSUNG GEGEN RACE CONDITIONS
+        // Globale ID um Race Conditions auszuschalten
         let currentSearchId = 0;
         
         const state = {
@@ -400,6 +422,7 @@
         const aiSheetOverlay = document.getElementById('ai-sheet-overlay');
         const aiChatContent = document.getElementById('ai-chat-content');
         const aiChatInput = document.getElementById('ai-chat-input');
+        const aiSendBtn = document.getElementById('ai-send-btn');
 
         const colorCache = new Map();
 
@@ -548,13 +571,14 @@
         }
 
         function triggerNewSearch() {
-            // FIX: Erhöhen der Search ID invalidiert ALLE aktuell noch laufenden Background-Requests
+            // ID erhöhen um alle alten Requests zu verwerfen
             currentSearchId++;
             const myId = currentSearchId;
 
-            // FIX: Explizites Aufheben der Locks
+            // Globale Locks radikal freigeben
             isLoading = false; 
             isAiThinking = false;
+            aiSendBtn.style.opacity = '1';
 
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
@@ -568,7 +592,7 @@
             renderSkeletons(currentType);
             performSearch(currentType, false, true, myId);
             
-            // Background AI aktivieren - Historie resetten
+            // Background AI vorbereiten
             geminiHistory = [];
             aiChatContent.innerHTML = '';
             aiCompactWidget.classList.remove('active');
@@ -612,8 +636,8 @@
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
-                
                 if (searchId !== currentSearchId) return;
+                
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
@@ -635,7 +659,7 @@
                 if (searchId !== currentSearchId) return;
                 console.error("Fetch error");
             } finally {
-                // FIX: Nur entriegeln, wenn es auch noch unsere Suche ist
+                // Nur unlocken, wenn die ID noch stimmt
                 if (searchId === currentSearchId) {
                     isLoading = false; 
                 }
@@ -660,7 +684,6 @@
             let domainColors = [];
             if (type === 'search') domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
 
-            // Abbruch, falls zwischenzeitlich eine neue Suche gestartet wurde
             if (searchId !== currentSearchId) return;
 
             items.forEach((item, index) => {
@@ -715,22 +738,81 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (100% Robust & Apple Style)
+        // Gemini KI Integration (Custom Markup Parser & iOS Widgets)
         // ==========================================
         
-        function formatAiResponseToHtml(text) {
-            let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Schutz
+        function parseAiMarkupToHtml(text) {
+            // Erst Google-Search Links [1], [2] entfernen
+            text = text.replace(/\[\d+\]/g, '');
             
-            // Quellen-Links [1], [2] entfernen
-            html = html.replace(/\[\d+\]/g, '');
-            
-            // Markdown zu HTML
-            html = html.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
+            // XSS Schutz
+            text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            let html = '';
+            // Regex sucht nach unseren Blöcken [CURRENCY]...[/CURRENCY] etc.
+            const regex = /\[(CURRENCY|PLACE|TEXT)\]([\s\S]*?)\[\/\1\]/g;
+            let match;
+            let foundAny = false;
+
+            while ((match = regex.exec(text)) !== null) {
+                foundAny = true;
+                const type = match[1];
+                const content = match[2].trim();
+
+                if (type === 'CURRENCY') {
+                    const title = (content.match(/Title:\s*(.*)/) || [])[1] || 'Umrechnung';
+                    const amount = (content.match(/Amount:\s*(.*)/) || [])[1] || '';
+                    const converted = (content.match(/Converted:\s*(.*)/) || [])[1] || '';
+                    const color = (content.match(/Color:\s*(.*)/) || [])[1] || '#007AFF'; // Standard Blau
+                    
+                    html += `
+                        <div class="ios-currency-card" style="background-color: ${color};">
+                            <div class="ios-currency-title">${title}</div>
+                            <div class="ios-currency-amount">${amount}</div>
+                            <div class="ios-currency-converted">${converted}</div>
+                        </div>
+                    `;
+                } 
+                else if (type === 'PLACE') {
+                    const name = (content.match(/Name:\s*(.*)/) || [])[1] || '';
+                    const address = (content.match(/Address:\s*(.*)/) || [])[1] || '';
+                    const phone = (content.match(/Phone:\s*(.*)/) || [])[1] || '';
+                    const hours = (content.match(/Hours:\s*(.*)/) || [])[1] || '';
+                    const website = (content.match(/Website:\s*(.*)/) || [])[1] || '';
+                    
+                    let details = '';
+                    if(address) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span>${address}</span></div>`;
+                    if(hours) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
+                    if(phone) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span>${phone}</span></div>`;
+                    if(website) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span>${website}</span></div>`;
+
+                    html += `
+                        <div class="ios-place-card">
+                            <div class="ios-place-name">${name}</div>
+                            ${details}
+                        </div>
+                    `;
+                } 
+                else if (type === 'TEXT') {
+                    html += formatBasicTextToHtml(content);
+                }
+            }
+
+            // Fallback: Wenn Gemini vergisst, die Tags zu setzen
+            if (!foundAny) {
+                html = formatBasicTextToHtml(text);
+            }
+
+            return html;
+        }
+
+        // Helfer für regulären Text mit iOS-Styling
+        function formatBasicTextToHtml(content) {
+            let html = content.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
             html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
-            // Listen umwandeln
             let lines = html.split('\n');
             let out = [];
             let inList = false;
@@ -750,7 +832,6 @@
             
             let finalHtml = out.join('<br>').replace(/<br><ul/g, '<ul').replace(/<\/ul><br>/g, '</ul>');
             
-            // Das iOS Widget Layout
             return `
                 <div class="ios-ai-widget">
                     <div class="ios-ai-widget-header">
@@ -762,15 +843,22 @@
             `;
         }
 
+        function extractCompactText(text) {
+            // Bereinigt den Text für die kleine Vorschau unten
+            let clean = text.replace(/\[\/?(CURRENCY|PLACE|TEXT)\]/g, ' ');
+            clean = clean.replace(/(Title|Amount|Converted|Color|Name|Address|Phone|Hours|Website):/g, '');
+            clean = clean.replace(/[*#]/g, '').trim();
+            return clean.substring(0, 45) + "...";
+        }
+
         function triggerManualAi() {
             let q = currentQuery || document.getElementById('homeSearchInput').value;
             if (!q) { openAiSheet(); return; }
             
             openAiSheet();
-            
             const lastMsg = geminiHistory[geminiHistory.length - 2]; 
             
-            // FIX: Korrekter Check für leere Historien
+            // Wenn noch nicht exakt danach gesucht wurde, Suche auslösen!
             if (aiChatContent.innerHTML.trim() === '' || !lastMsg || lastMsg.parts[0].text !== q) {
                 geminiHistory = [];
                 aiChatContent.innerHTML = '';
@@ -778,16 +866,42 @@
                 userBubble.className = 'ai-bubble-user';
                 userBubble.innerText = q;
                 aiChatContent.appendChild(userBubble);
-                // Nutze die currentSearchId, um diesen Context zu sichern
                 triggerGemini(q, true, currentSearchId);
             }
         }
 
+        // Der 3-Stufen Rettungsschirm (auf Gemini 2.5 Flash)
         async function fetchFromGemini(historyItems) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
-            const systemPrompt = "Du bist ein hilfreicher KI-Assistent. Du hast Zugriff auf Live-Internetdaten. Antworte in gut strukturiertem Fließtext. WICHTIG: Nutze Überschriften (##), **Fettdruck** für Schlüsselinfos (Währungen, Orte) und Aufzählungszeichen. Fass dich präzise und elegant.";
+            // Der maßgeschneiderte Prompt für unser Markup!
+            const systemPrompt = `Du bist ein brillanter, hilfreicher KI-Assistent. Du hast Zugriff auf Live-Internetdaten. 
+WICHTIG: Antworte niemals in JSON! Verwende EXAKT und AUSSCHLIESSLICH diese Text-Blöcke zur Formatierung deiner Antworten:
+
+Für Währungen oder Rechnungen:
+[CURRENCY]
+Title: Umrechnung
+Amount: <Ursprungsbetrag>
+Converted: <Zielbetrag>
+Color: <HEX Farbe, z.B. #E54D2E für CHF, #2E8B57 für USD, #007AFF für EUR>
+[/CURRENCY]
+
+Für Orte, Restaurants, Sehenswürdigkeiten (kannst du beliebig oft untereinander setzen):
+[PLACE]
+Name: <Name>
+Address: <Adresse>
+Phone: <Telefon>
+Hours: <Öffnungszeiten>
+Website: <Website>
+[/PLACE]
+
+Für normalen Text, kurze Erklärungen oder Begrüssungen:
+[TEXT]
+<Dein Text. Nutze **Fettdruck** für Wichtiges und - für Listen>
+[/TEXT]
+
+Du kannst mehrere Blöcke kombinieren (z.B. einen [TEXT] und danach drei [PLACE]). Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
             let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
             if (historyItems.length > 1) {
@@ -811,7 +925,7 @@
                 if (res1.ok) return await res1.json();
             } catch(e) { console.warn("Versuch 1 (Grounding) fehlgeschlagen."); }
 
-            // 2. Absoluter Fallback: KI ohne Tools (Garantiert keine Payload-Errors)
+            // 2. Absoluter Fallback: KI ohne Tools
             const basePayload = {
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 contents: historyItems
@@ -828,16 +942,16 @@
         }
 
         async function triggerGemini(query, isManualTrigger = false, searchId) {
-            // Check Token
             if (searchId !== currentSearchId) return;
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) return;
+            
             if (isAiThinking) return;
+            isAiThinking = true;
+            aiSendBtn.style.opacity = '0.5';
 
             const userMsg = { role: "user", parts: [{ text: query }] };
             const tempHistory = [...geminiHistory, userMsg];
-            
-            isAiThinking = true;
 
             let loaderId = 'loader-' + Date.now();
             if (isManualTrigger) {
@@ -852,11 +966,9 @@
 
             try {
                 const data = await fetchFromGemini(tempHistory);
-                
-                // Abort, wenn während des API-Calls eine neue Suche gestartet wurde
                 if (searchId !== currentSearchId) return;
 
-                // FIX: Super robuster Extraktor, überspringt 'executableCode' & 'toolCall'
+                // Robuster Extraktor, umgeht "executableCode" oder "toolCall" Blöcke von Gemini
                 let textResp = "";
                 if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                     for (let part of data.candidates[0].content.parts) {
@@ -865,34 +977,35 @@
                 }
 
                 if (!textResp.trim()) {
-                    throw new Error("Kein lesbarer Text in der KI-Antwort gefunden.");
+                    throw new Error("Kein Text in der KI-Antwort gefunden.");
                 }
                 
+                // Erfolg: History speichern
                 geminiHistory.push(userMsg);
                 geminiHistory.push(data.candidates[0].content);
 
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
 
                 if (!isManualTrigger) {
-                    const snippet = textResp.split('\n')[0].replace(/[*#]/g, '').substring(0, 50) + "..."; 
-                    aiCompactText.innerText = snippet;
+                    aiCompactText.innerText = extractCompactText(textResp);
                     aiCompactWidget.classList.add('active');
                     appendAiCard(textResp);
                 } else {
                     appendAiCard(textResp);
                 }
             } catch (e) {
-                if (searchId !== currentSearchId) return; // Silent Abort
+                if (searchId !== currentSearchId) return;
+                console.error("Gemini Fehler:", e);
                 
-                console.error("Gemini Komplettausfall", e);
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
-                if (isManualTrigger) {
-                    appendAiCard("Es gab leider einen Fehler bei der Verbindung zur KI. Bitte versuche es noch einmal.");
+                if(isManualTrigger) {
+                    appendAiCard("[TEXT]Es gab leider einen Fehler bei der Verbindung zur KI. Bitte überprüfe deinen API Key oder versuche es noch einmal.[/TEXT]");
                 }
             } finally {
-                // FIX: Nur Lock aufheben, wenn es die aktuelle Suche ist
+                // Den Lock UNBEDINGT aufheben, damit Folgefragen möglich sind!
                 if (searchId === currentSearchId) {
                     isAiThinking = false;
+                    aiSendBtn.style.opacity = '1';
                 }
             }
         }
@@ -900,13 +1013,16 @@
         function appendAiCard(plainText) {
             const wrapper = document.createElement('div');
             wrapper.className = 'ai-bubble-model';
-            wrapper.innerHTML = formatAiResponseToHtml(plainText);
+            // Magie: Verwandelt den Code in hübsche UI Widgets
+            wrapper.innerHTML = parseAiMarkupToHtml(plainText); 
             aiChatContent.appendChild(wrapper);
             scrollToBottom(aiChatContent);
         }
 
         function handleAiChat(e) {
             e.preventDefault();
+            if (isAiThinking) return; // Verhindert Spamming
+            
             const q = aiChatInput.value.trim();
             if(!q) return;
             aiChatInput.value = '';
