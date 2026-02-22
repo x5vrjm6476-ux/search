@@ -721,14 +721,14 @@
             }
         }
 
-        // Der 3-Stufen Rettungsschirm für absolute Ausfallsicherheit
+        // Der 3-Stufen Rettungsschirm für absolute Ausfallsicherheit (jetzt auf Gemini 2.5 Flash)
         async function fetchFromGemini(historyItems) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
             const systemPrompt = "Du bist ein intelligenter KI-Assistent in einer Such-App. Du hast Zugriff auf aktuelle Internetdaten. Antworte in gut strukturiertem Fließtext. WICHTIG: Nutze Überschriften (##), **Fettdruck** für Schlüsselinfos (wie Währungen, Namen, Adressen) und Aufzählungszeichen. KEINE JSON-Ausgabe. Fass dich kurz und präzise.";
 
-            // FIX: Für Grounding komprimieren wir System-Prompt + History in eine einzige flache User-Nachricht
+            // Für Grounding komprimieren wir System-Prompt + History in eine einzige flache User-Nachricht
             let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
             if (historyItems.length > 1) {
                 combinedText += "Bisheriger Chat-Verlauf:\n";
@@ -742,36 +742,36 @@
 
             const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
 
-            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Google Search Syntax, flache History)
+            // 1. Versuch: Gemini 2.5 Flash (Neuestes Modell + korrekte Search-Syntax)
             try {
-                const payload20 = { 
+                const payload1 = { 
                     contents: flatContents, 
                     tools: [{ google_search: {} }] 
                 };
-                const res20 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload20)
+                const res1 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload1)
                 });
-                if (res20.ok) return await res20.json();
-            } catch(e) { console.warn("Gemini 2.0 fehlgeschlagen, wechsle auf 1.5 Fallback..."); }
+                if (res1.ok) return await res1.json();
+            } catch(e) { console.warn("Versuch 1 fehlgeschlagen, probiere Retry..."); }
 
-            // 2. Versuch: Fallback auf Gemini 1.5 Flash (Alte Grounding Syntax, flache History)
+            // 2. Versuch: Direkter Retry auf Gemini 2.5 Flash (falls es nur ein temporärer Netzwerk-Hänger war)
             try {
-                const payload15 = { 
+                const payload2 = { 
                     contents: flatContents, 
-                    tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }] 
+                    tools: [{ google_search: {} }] 
                 };
-                const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
+                const res2 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload2)
                 });
-                if (res15.ok) return await res15.json();
-            } catch(e) { console.warn("Gemini 1.5 Grounding fehlgeschlagen, wechsle auf reinen Text-Fallback..."); }
+                if (res2.ok) return await res2.json();
+            } catch(e) { console.warn("Grounding erneut fehlgeschlagen, wechsle auf reinen Text-Fallback..."); }
 
             // 3. Absoluter Fallback: KI ohne Tools (Unterstützt system_instruction & volle Multi-Turn History)
             const basePayload = {
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 contents: historyItems
             };
-            const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
             });
             
