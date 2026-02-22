@@ -42,10 +42,11 @@
         }
         .scroll-viewport.active { visibility: visible; opacity: 1; pointer-events: auto; z-index: 10; }
 
+        /* Angepasster Abstand unten, damit das KI-Widget nichts verdeckt! */
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
-            padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 100px); 
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 180px); 
             overflow-anchor: auto;
         }
 
@@ -68,7 +69,6 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
-        /* Suchfeld Overlay */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -88,7 +88,8 @@
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: var(--spring-fast); }
         .cancel-btn:active { opacity: 0.6; }
 
-        .page-block { display: flex; flex-direction: column; width: 100%; gap: 12px; }
+        /* Kompaktere Lücken zwischen den Ergebnissen */
+        .page-block { display: flex; flex-direction: column; width: 100%; gap: 12px; margin-bottom: 12px;}
         .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-bottom: 12px; align-content: start; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
@@ -96,7 +97,7 @@
         @keyframes slideIn { 0% { opacity: 0; transform: translateY(15px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
         .skeleton { animation: pulse 1.2s infinite ease-in-out; background: rgba(255,255,255,0.06); }
-        .skeleton-card { border-radius: var(--border-radius); padding: 20px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); }
+        .skeleton-card { border-radius: var(--border-radius); padding: 24px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 12px;}
         .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
         .s-title { height: 24px; width: 75%; border-radius: 8px; }
         .s-text { height: 16px; width: 100%; border-radius: 6px; }
@@ -107,7 +108,7 @@
         #ai-compact-widget {
             position: fixed; bottom: calc(var(--safe-bottom) + 75px); left: 50%; transform: translateX(-50%) scale(0.95);
             background: rgba(30, 30, 32, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 6px;
             display: flex; flex-direction: column; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
             transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); width: 92%; max-width: 420px;
@@ -118,21 +119,24 @@
         .compact-inner-wrap { flex: 1; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
         .compact-inner-wrap:active { transform: scale(0.97); }
 
-        /* Neuer Eleganter Ladebalken */
-        .compact-loading-state { padding: 4px; }
-        .ai-gradient-bar {
-            width: 100%; border-radius: 18px; padding: 12px 16px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            background-size: 200% 100%; animation: shimmer-bg 1.5s infinite linear;
-            text-align: center; border: 1px solid rgba(255,255,255,0.03);
+        /* NEUE: Elegante Gradient-Ladekarte */
+        .compact-loading-state { 
+            display: flex; align-items: center; justify-content: center; padding: 16px 24px; 
+            background: linear-gradient(-45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            background-size: 200% 200%; border-radius: 24px; width: 100%;
+            animation: shimmer-bg 3s ease infinite;
         }
-        @keyframes shimmer-bg { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes shimmer-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         
         .glow-text {
-            font-size: 14px; font-weight: 500;
-            background: linear-gradient(90deg, #fff, #8e8e93, #fff); background-size: 200% auto;
+            font-size: 15px; font-weight: 500; letter-spacing: 0.2px;
+            background: linear-gradient(90deg, #fff, #a1a1a6, #fff); background-size: 200% auto;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: text-shine 2s linear infinite; letter-spacing: 0.5px;
+            animation: text-shine 2s linear infinite;
         }
         @keyframes text-shine { to { background-position: 200% center; } }
         
@@ -145,14 +149,11 @@
 
         .compact-widget-container {
             pointer-events: none; max-height: 240px; overflow: hidden;
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            display: none; padding-top: 2px;
+            mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            display: none;
         }
-        .compact-widget-container .ios-ai-widget, 
-        .compact-widget-container .ios-currency-card,
-        .compact-widget-container .ios-place-card,
-        .compact-widget-container .ios-person-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; padding: 12px 14px;}
+        .compact-widget-container > div { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; padding: 12px;}
 
         /* AI BOTTOM SHEET */
         #ai-sheet-overlay {
@@ -187,64 +188,53 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
         .shake-anim { animation: shake 0.3s ease-in-out; border-color: rgba(255,59,48,0.6) !important; }
 
-        /* AI Chat Bubbles & Widgets */
+        /* AI Chat Bubbles */
         .ai-bubble-user { 
             align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; 
             color: white; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 12px; animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
         @keyframes slideInChat { 0% { opacity: 0; transform: translateY(12px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ELEGANTES WIDGET DESIGN */
-        .ios-ai-widget {
+        /* ELEGANTES WIDGET DESIGN (Modulare Cards) */
+        .ios-info-card, .ios-currency-card, .ios-place-card, .ios-person-card {
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 16px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            margin-bottom: 12px; color: #f2f2f7; font-size: 15px; line-height: 1.5;
         }
-        .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
+        .ios-info-card:last-child, .ios-currency-card:last-child, .ios-place-card:last-child, .ios-person-card:last-child { margin-bottom: 0; }
         
-        /* Währungs Card Neu */
-        .ios-currency-card {
-            background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px 20px; color: white;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative;
-        }
-        .ios-currency-amount { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-        .ios-currency-converted { font-size: 34px; font-weight: 700; letter-spacing: -1px; color: white; }
+        /* Currency Redesign */
+        .ios-currency-card { display: flex; flex-direction: column; gap: 4px; padding: 18px;}
+        .ios-currency-original { font-size: 15px; font-weight: 600; margin-bottom: 2px; letter-spacing: 0.3px;}
+        .ios-currency-target { font-size: 34px; font-weight: 700; color: #fff; letter-spacing: -0.5px; line-height: 1.1;}
 
-        /* Orte Karten */
-        .ios-place-card {
-            background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border-radius: 20px; padding: 18px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-        }
-        .ios-place-name { font-size: 18px; font-weight: 600; color: white; margin-bottom: 14px; letter-spacing: -0.2px;}
-        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
+        /* Place Redesign */
+        .ios-place-name { font-size: 17px; font-weight: 600; color: white; margin-bottom: 12px;}
+        .ios-place-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #d1d1d6; }
         .ios-place-row:last-child { margin-bottom: 0; }
-        .ios-place-row a { color: inherit; text-decoration: none; }
+        .ios-place-row a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2);}
         .ios-place-row a:active { opacity: 0.6; }
-        .ios-place-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; flex-shrink: 0; color: #a1a1a6; }
-        .ios-place-icon svg { width: 14px; height: 14px; stroke: currentColor; }
+        .ios-place-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; flex-shrink: 0; color: #a1a1a6; }
+        .ios-place-icon svg { width: 12px; height: 12px; stroke: currentColor; }
 
-        /* Personen Karten Neu */
-        .ios-person-card {
-            background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border-radius: 20px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .ios-person-img { width: 100%; height: 160px; object-fit: cover; border-radius: 12px; background: rgba(255,255,255,0.05); }
-        .ios-person-name-title { font-size: 20px; font-weight: 700; color: white; letter-spacing: -0.3px; }
-        .ios-person-facts { display: flex; flex-wrap: wrap; gap: 6px; }
-        .ios-person-fact { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 10px; font-size: 13px; color: #d1d1d6; font-weight: 500;}
-        .ios-person-bio-text { font-size: 15px; color: #a1a1a6; line-height: 1.45; }
+        /* Person Redesign */
+        .ios-person-card { cursor: pointer; transition: transform 0.2s, background 0.2s; padding: 18px;}
+        .ios-person-card:active { transform: scale(0.98); background: rgba(40,40,42,0.6); }
+        .ios-person-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+        .ios-person-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: rgba(255,255,255,0.1); flex-shrink: 0;}
+        .ios-person-info { flex: 1; display: flex; flex-direction: column; }
+        .ios-person-name { font-size: 17px; font-weight: 600; color: white; }
+        .ios-person-role { font-size: 14px; color: #8e8e93; }
+        .ios-person-traits { display: flex; flex-wrap: wrap; gap: 6px; }
+        .ios-trait-pill { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #d1d1d6; }
+        .ios-person-bio { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 14px; line-height: 1.5; color: #a1a1a6; animation: slideDown 0.3s ease; }
+        .ios-person-card.expanded .ios-person-bio { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .ai-h2 { font-size: 17px; font-weight: 700; color: #fff; margin: 12px 0 6px 0; letter-spacing: -0.2px;}
-        .ai-h2:first-child { margin-top: 0; }
-        .ai-h3 { font-size: 15px; font-weight: 600; color: #e5e5ea; margin: 10px 0 4px 0; }
         .ai-highlight { font-weight: 600; color: #fff; }
-        .ai-ul { padding-left: 0; margin: 8px 0; list-style: none; }
-        .ai-li { margin-bottom: 6px; position: relative; padding-left: 16px; color: #d1d1d6;}
-        .ai-li::before { content: "•"; color: #ffffff; position: absolute; left: 0; font-weight: bold; }
 
-        /* Kompakteres Bottom Bar */
+        /* Bottom Bar */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.55); 
@@ -270,10 +260,10 @@
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), width 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 20px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); }
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 20px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 0px;}
         .card:active { transform: scale(0.97); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 10px; }
-        .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 5px 12px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
+        .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
         .color-pill span { font-size: 12px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
         .card-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 14px; color: var(--text-muted); line-height: 1.5; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
@@ -285,9 +275,9 @@
         .shopping-card:active { transform: scale(0.96); transition: transform 0.15s; }
         .shopping-img-wrapper { width: 100%; height: 140px; padding: 12px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
         .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .shopping-info { padding: 12px; flex: 1; }
-        .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
-        .shopping-price { font-weight: 700; color: white; font-size: 15px; }
+        .shopping-info { padding: 14px; flex: 1; }
+        .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
+        .shopping-price { font-weight: 700; color: white; font-size: 16px; }
 
         #image-viewer { position: fixed; inset: 0; z-index: 999999; background: rgba(0,0,0,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #image-viewer.active { opacity: 1; pointer-events: auto; }
@@ -324,14 +314,14 @@
 
     <div id="home-view">
         <form class="home-search-wrapper" action="javascript:void(0);" onsubmit="handleHomeSubmit(event)">
-            <input type="search" id="homeSearchInput" class="home-search-input" placeholder="suchen..." autocomplete="off" spellcheck="false">
+            <input type="search" id="homeSearchInput" class="home-search-input" placeholder="Suchen..." autocomplete="off" spellcheck="false">
         </form>
     </div>
 
     <div id="search-overlay">
         <form class="overlay-bar-container" action="javascript:void(0);" onsubmit="handleOverlaySubmit(event)">
-            <input type="search" id="overlaySearchInput" class="overlay-input" placeholder="suchen..." autocomplete="off" spellcheck="false">
-            <button type="button" class="cancel-btn" onclick="closeSearch()">abbrechen</button>
+            <input type="search" id="overlaySearchInput" class="overlay-input" placeholder="Suchen..." autocomplete="off" spellcheck="false">
+            <button type="button" class="cancel-btn" onclick="closeSearch()">Abbrechen</button>
         </form>
     </div>
 
@@ -351,9 +341,7 @@
         </button>
         <div class="compact-inner-wrap" onclick="openAiSheet()">
             <div class="compact-loading-state" id="compact-loading-state">
-                <div class="ai-gradient-bar">
-                    <div class="glow-text">lade antwort...</div>
-                </div>
+                <div class="glow-text">antwort wird geladen...</div>
             </div>
             <div class="compact-widget-container" id="compact-widget-container"></div>
         </div>
@@ -371,8 +359,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="ai-chat-content" id="ai-chat-content">
-                </div>
+            <div class="ai-chat-content" id="ai-chat-content"></div>
             <form class="ai-chat-input-area" onsubmit="handleAiChat(event)">
                 <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="folgefrage stellen..." autocomplete="off">
                 <button type="submit" class="ai-send-btn" id="ai-send-btn">
@@ -434,6 +421,7 @@
         
         let globalImages = [];
         let viewerIndex = 0;
+        let latestKnowledgeGraphImage = ''; // Speichert Bilder von prominenten für die KI
         const track = document.getElementById('viewer-track');
         const viewerHeader = document.getElementById('viewer-header');
         const imageViewer = document.getElementById('image-viewer');
@@ -609,6 +597,7 @@
             isLoading = false; 
             isAiThinking = false;
             aiSendBtn.style.opacity = '1';
+            latestKnowledgeGraphImage = '';
 
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
@@ -680,6 +669,11 @@
                 
                 const data = await response.json();
                 
+                // Extrahiere wichtiges Bild für KI-Personen-Karte
+                if (data.knowledgeGraph && data.knowledgeGraph.imageUrl) {
+                    latestKnowledgeGraphImage = data.knowledgeGraph.imageUrl;
+                }
+                
                 if (searchId !== currentSearchId) return;
                 await renderResults(type, data, isLoadMore, isInitial, searchId);
                 
@@ -738,25 +732,21 @@
                 else if (type === 'images') {
                     globalImages.push({ 
                         link: item.link, 
-                        imageUrl: item.imageUrl, 
+                        imageUrl: item.imageUrl || item.thumbnailUrl || item.link, 
                         color: domainColors[index] 
                     });
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                    // Bilder Fix: Versucht HQ Bild, bei Fehler (oft 403 bei Google) wird direkt auf das sichere Thumbnail gewechselt!
-                    const hqImg = item.imageUrl || '';
-                    const thumbImg = item.thumbnailUrl || '';
-                    el.innerHTML = `<img src="${hqImg}" loading="lazy" onerror="if(this.src!=='${thumbImg}'){this.src='${thumbImg}';}else{this.closest('.image-card').remove();}">`;
+                    // Verwende fallback für fehlerhafte bilder
+                    el.innerHTML = `<img src="${item.thumbnailUrl || item.imageUrl || item.link}" loading="lazy" onerror="this.style.opacity=0">`;
                     el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                     pageBlock.appendChild(el);
                 } 
                 else if (type === 'shopping') {
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-                    const hqImg = item.imageUrl || '';
-                    const thumbImg = item.thumbnailUrl || '';
                     el.innerHTML = `
-                        <div class="shopping-img-wrapper"><img src="${hqImg}" loading="lazy" onerror="if(this.src!=='${thumbImg}'){this.src='${thumbImg}';}else{this.closest('.shopping-card').remove();}"></div>
+                        <div class="shopping-img-wrapper"><img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.style.opacity=0"></div>
                         <div class="shopping-info">
                             <div class="shopping-title">${item.title}</div>
                             <div class="shopping-price">${item.price || ''}</div>
@@ -796,6 +786,7 @@
             }, 400);
         }
 
+        // Mini Widget Swipe Down
         let compactStartY = 0;
         let compactCurrentY = 0;
         aiCompactWidget.addEventListener('touchstart', (e) => {
@@ -843,35 +834,31 @@
                 const content = match[2].trim();
 
                 if (type === 'currency') {
-                    const origin = (content.match(/ursprung:\s*(.*)/i) || [])[1] || '';
-                    const target = (content.match(/ziel:\s*(.*)/i) || [])[1] || '';
-                    const color = (content.match(/farbe:\s*(.*)/i) || [])[1] || '#8e8e93';
+                    const original = (content.match(/original:\s*(.*)/i) || [])[1] || '';
+                    const target = (content.match(/target:\s*(.*)/i) || [])[1] || '';
+                    const color = (content.match(/color:\s*(.*)/i) || [])[1] || '#8e8e93';
                     
                     html += `
                         <div class="ios-currency-card">
-                            <div class="ios-currency-amount" style="color: ${color};">${origin}</div>
-                            <div class="ios-currency-converted">${target}</div>
+                            <div class="ios-currency-original" style="color: ${color};">${original}</div>
+                            <div class="ios-currency-target">${target}</div>
                         </div>
                     `;
                 } 
                 else if (type === 'place') {
                     const name = (content.match(/name:\s*(.*)/i) || [])[1] || '';
-                    const address = (content.match(/adresse:\s*(.*)/i) || [])[1] || '';
-                    const phone = (content.match(/telefon:\s*(.*)/i) || [])[1] || '';
-                    const hours = (content.match(/zeiten:\s*(.*)/i) || [])[1] || '';
+                    const address = (content.match(/address:\s*(.*)/i) || [])[1] || '';
+                    const phone = (content.match(/phone:\s*(.*)/i) || [])[1] || '';
                     const website = (content.match(/website:\s*(.*)/i) || [])[1] || '';
                     
                     let details = '';
-                    if(address && address !== 'nicht verfügbar') {
+                    if(address && address.toLowerCase() !== 'leer') {
                         details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span><a href="https://maps.apple.com/?q=${encodeURIComponent(address)}" target="_blank">${address}</a></span></div>`;
                     }
-                    if(hours && hours !== 'nicht verfügbar') {
-                        details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
-                    }
-                    if(phone && phone !== 'nicht verfügbar') {
+                    if(phone && phone.toLowerCase() !== 'leer') {
                         details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span><a href="tel:${phone}">${phone}</a></span></div>`;
                     }
-                    if(website && website !== 'nicht verfügbar') {
+                    if(website && website.toLowerCase() !== 'leer') {
                         details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span><a href="${website}" target="_blank">website besuchen</a></span></div>`;
                     }
 
@@ -884,63 +871,78 @@
                 } 
                 else if (type === 'person') {
                     const name = (content.match(/name:\s*(.*)/i) || [])[1] || '';
-                    const image = (content.match(/bild:\s*(.*)/i) || [])[1] || '';
-                    const facts = (content.match(/fakten:\s*(.*)/i) || [])[1] || '';
+                    const role = (content.match(/role:\s*(.*)/i) || [])[1] || '';
+                    const traitsRaw = (content.match(/traits:\s*(.*)/i) || [])[1] || '';
                     const bio = (content.match(/bio:\s*([\s\S]*)/i) || [])[1] || '';
+                    
+                    const traits = traitsRaw.split(',').map(t => t.trim()).filter(t => t && t.toLowerCase() !== 'leer');
+                    let traitsHtml = '';
+                    if (traits.length > 0) {
+                        traitsHtml = `<div class="ios-person-traits">${traits.map(t => `<span class="ios-trait-pill">${t}</span>`).join('')}</div>`;
+                    }
 
-                    let factsHtml = facts.split('|').filter(f => f.trim() !== '').map(f => `<div class="ios-person-fact">${f.trim()}</div>`).join('');
-                    let imgHtml = image && image.startsWith('http') ? `<img src="${image}" class="ios-person-img" onerror="this.style.display='none'">` : '';
+                    // Nutze offizielles Bild aus Serper falls vorhanden
+                    let finalAvatar = latestKnowledgeGraphImage || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23fff" stroke-width="2"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
 
                     html += `
-                        <div class="ios-person-card">
-                            ${imgHtml}
-                            <div class="ios-person-name-title">${name}</div>
-                            <div class="ios-person-facts">${factsHtml}</div>
-                            <div class="ios-person-bio-text">${formatBasicTextToHtml(bio, true)}</div>
+                        <div class="ios-person-card" onclick="this.classList.toggle('expanded')">
+                            <div class="ios-person-header">
+                                <img src="${finalAvatar}" class="ios-person-avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%23fff\\' stroke-width=\\'2\\'%3E%3Cpath d=\\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\\'/%3E%3Ccircle cx=\\'12\\' cy=\\'7\\' r=\\'4\\'/%3E%3C/svg%3E'">
+                                <div class="ios-person-info">
+                                    <div class="ios-person-name">${name}</div>
+                                    <div class="ios-person-role">${role}</div>
+                                </div>
+                            </div>
+                            ${traitsHtml}
+                            <div class="ios-person-bio">${formatBasicTextToHtml(bio, true)}</div>
                         </div>
                     `;
                 }
                 else if (type === 'text') {
-                    html += formatBasicTextToHtml(content);
+                    // Split text chunks into elegant cards
+                    html += formatTextToCards(content);
                 }
             }
 
-            if (!foundAny) { html = formatBasicTextToHtml(text); }
+            if (!foundAny) { html = formatTextToCards(text); }
             return html;
         }
 
-        function formatBasicTextToHtml(content, isInner = false) {
-            let html = content.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
-            html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        // Zerstückelt Texte in modulare, schöne Cards
+        function formatTextToCards(content) {
+            let paragraphs = content.split('\n\n').map(p => p.trim()).filter(p => p);
+            let finalHtml = '';
             
-            let lines = html.split('\n');
-            let out = [];
-            let inList = false;
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (!line) continue; 
+            paragraphs.forEach(p => {
+                let formatted = p.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>')
+                                 .replace(/\*(.*?)\*/g, '<em>$1</em>');
                 
-                if (line.startsWith('- ') || line.startsWith('* ')) {
-                    line = `<li class="ai-li">${line.substring(2)}</li>`;
-                    if (!inList) { line = `<ul class="ai-ul">` + line; inList = true; }
+                // Listen formatieren
+                if (formatted.startsWith('- ') || formatted.startsWith('* ')) {
+                    let lines = formatted.split('\n');
+                    let listHtml = '<ul class="ai-ul">';
+                    lines.forEach(line => {
+                        if(line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+                            listHtml += `<li class="ai-li">${line.trim().substring(2)}</li>`;
+                        }
+                    });
+                    listHtml += '</ul>';
+                    formatted = listHtml;
                 } else {
-                    if (inList) { out[out.length-1] += `</ul>`; inList = false; }
+                    formatted = formatted.replace(/\n/g, '<br>');
                 }
-                out.push(line);
-            }
-            if (inList) out[out.length-1] += '</ul>';
-            
-            let finalHtml = out.join('<br>').replace(/<br><ul/g, '<ul').replace(/<\/ul><br>/g, '</ul>');
-            
-            if(isInner) return finalHtml;
 
-            return `
-                <div class="ios-ai-widget">
-                    <div class="ios-ai-widget-content">${finalHtml}</div>
-                </div>
-            `;
+                finalHtml += `<div class="ios-info-card">${formatted}</div>`;
+            });
+            return finalHtml;
+        }
+
+        // Für simple interne Texte (z.B. Bio bei Personen)
+        function formatBasicTextToHtml(content) {
+            let html = content.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>')
+                              .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                              .replace(/\n/g, '<br>');
+            return html;
         }
 
         function triggerManualAi() {
@@ -989,38 +991,16 @@
 
             const modelName = await getValidModel(apiKey);
 
-            // Strikter Prompt, komplett in Kleinbuchstaben, forciert Internetnutzung
-            const systemPrompt = `du bist ein brillanter, extrem kurzer assistent. durchsuche zwingend das internet für absolut aktuelle daten!
-antworte niemals in json. formatiere exakt so (alles kleingeschrieben bei den tags):
+            // Striktes minimalistisches Prompt
+            const systemPrompt = `du bist ein brillanter, minimalistischer ki-assistent. fasse dich extrem kurz. erwähne niemals wörter wie 'währungsrechner'. nutze zwingend diese tags (alles kleingeschrieben) für deine antworten. gib immer eine antwort, auch wenn du etwas nicht genau weisst:
 
-für währungen (kein titel):
-[currency]
-ursprung: <betrag mit symbol>
-ziel: <zielbetrag mit symbol>
-farbe: <#007aff für €, #34c759 für $, #ff3b30 für chf, #af52de für £, #ff9500 für ¥, sonst #8e8e93>
-[/currency]
+[currency] original: <ursprungswert inkl währung> | target: <zielwert inkl währung> | color: <#007aff für €, #34c759 für $, #ff3b30 für chf, #af52de für £, #ff9500 für ¥, sonst #8e8e93> [/currency]
 
-für orte/restaurants:
-[place]
-name: <name>
-adresse: <adresse>
-telefon: <telefon>
-zeiten: <öffnungszeiten heute>
-website: <website>
-[/place]
+[place] name: <name> | address: <adresse oder leer> | phone: <telefon oder leer> | website: <url oder leer> [/place]
 
-für personen:
-[person]
-name: <name>
-bild: <exakte bild-url aus dem netz>
-fakten: <fakt 1> | <fakt 2> | <fakt 3>
-bio: <sehr kurzer text>
-[/person]
+[person] name: <name> | role: <rolle> | traits: <merkmal1, merkmal2> | bio: <kurzbio> [/person]
 
-für normalen text:
-[text]
-<kurz und bündig. nutze **fettdruck** für wichtiges>
-[/text]`;
+[text] <kurze, elegante antwort> [/text]`;
 
             let combinedText = "anweisung: " + systemPrompt + "\n\n";
             if (geminiHistory.length > 0) {
@@ -1034,16 +1014,14 @@ für normalen text:
 
             const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
 
-            // Versuch 1: Mit expliziter Google Suche aktiviert!
             try {
                 const payload = { contents: flatContents, tools: [{ googleSearch: {} }] };
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
                 });
                 if (res.ok) return await res.json();
-            } catch(e) { console.warn("Google Search Grounding fehlgeschlagen, versuche Fallback."); }
+            } catch(e) { }
 
-            // Versuch 2: Standard Fallback
             const basePayload = { contents: [...geminiHistory, { role: "user", parts: [{ text: query }] }] };
             const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
@@ -1060,7 +1038,7 @@ für normalen text:
             if (isLoading) {
                 aiCompactWidget.style.display = 'flex';
                 aiCompactWidget.classList.add('active');
-                aiCompactLoadingState.style.display = 'block';
+                aiCompactLoadingState.style.display = 'flex';
                 aiCompactContainer.style.display = 'none';
                 aiCompactContainer.innerHTML = '';
             } else {
@@ -1083,10 +1061,8 @@ für normalen text:
                 const loader = document.createElement('div');
                 loader.id = loaderId;
                 loader.innerHTML = `
-                    <div style="padding: 4px;">
-                        <div class="ai-gradient-bar">
-                            <div class="glow-text">lade antwort...</div>
-                        </div>
+                    <div class="compact-loading-state" style="padding: 12px; border-radius: 16px; margin-bottom: 12px; width: max-content; align-self: flex-start;">
+                        <div class="glow-text">ich denke nach...</div>
                     </div>
                 `;
                 aiChatContent.appendChild(loader);
@@ -1229,7 +1205,7 @@ für normalen text:
             const allCards = Array.from(document.querySelectorAll('#view-images .image-card'));
             viewerIndex = allCards.indexOf(clickedCard);
             
-            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.display='none'"></div>`).join('');
+            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.opacity=0"></div>`).join('');
             imageViewer.classList.add('active');
             document.body.classList.add('no-scroll'); 
             
