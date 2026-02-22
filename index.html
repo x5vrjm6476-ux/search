@@ -102,7 +102,7 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* ================== AI MINIATUR WIDGET (Dynamic Island) ================== */
+        /* AI MINIATUR WIDGET (Dynamic Island Style) */
         #ai-compact-widget {
             position: fixed; bottom: calc(var(--safe-bottom) + 85px); left: 50%; transform: translateX(-50%) scale(0.95);
             background: rgba(30, 30, 32, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
@@ -121,6 +121,7 @@
         .compact-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); border-radius: 50%; color: white; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);}
         .compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px;}
         
+        /* Schließen-Button im Mini-Widget */
         .compact-close-btn {
             position: absolute; right: 12px; top: 12px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
             width: 26px; height: 26px; color: white; display: flex; align-items: center; justify-content: center;
@@ -134,12 +135,11 @@
             -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
             display: none; margin-top: -6px; 
         }
-        /* Widgets im Compact Mode anpassen */
         .compact-widget-container .ios-ai-widget, 
         .compact-widget-container .ios-currency-card,
         .compact-widget-container .ios-place-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; }
 
-        /* ================== AI BOTTOM SHEET & CHAT ================== */
+        /* AI BOTTOM SHEET */
         #ai-sheet-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 2000;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end;
@@ -157,7 +157,6 @@
         .ai-sheet-title { margin-top: 12px; font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;}
         .ai-sheet-close { position: absolute; right: 20px; top: 18px; width: 30px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.1); border: none; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; }
         .ai-sheet-close:active { transform: scale(0.9); }
-        
         .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;}
         .ai-chat-input-area { padding: 16px 20px calc(var(--safe-bottom) + 16px); background: #111112; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end;}
         .ai-chat-input { flex: 1; background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 16px; color: white; font-size: 16px; outline: none; resize: none; max-height: 100px; min-height: 44px;}
@@ -168,6 +167,7 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
         .shake-anim { animation: shake 0.3s ease-in-out; border-color: rgba(255,59,48,0.6) !important; }
 
+        /* AI Chat Bubbles & Apple-like Widgets */
         .ai-bubble-user { 
             align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; 
             color: white; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -175,7 +175,7 @@
         .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 12px; animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
         @keyframes slideInChat { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        /* ================== ELEGANTES WIDGET DESIGN ================== */
+        /* ELEGANTES WIDGET DESIGN (Frosted Glass & Accent Colors) */
         
         .ios-ai-widget {
             background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
@@ -184,7 +184,6 @@
         .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #a1a1a6; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
         
-        /* Neu: Elegante, dunkle Währungskarte mit leuchtendem Highlight */
         .ios-currency-card {
             background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; color: white;
@@ -194,7 +193,6 @@
         .ios-currency-amount { font-size: 16px; font-weight: 500; color: #8e8e93; text-decoration: line-through; }
         .ios-currency-converted { font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; }
 
-        /* Neu: Elegante Place-Cards */
         .ios-place-card {
             background: rgba(28,28,30,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
@@ -399,6 +397,7 @@
         let currentQuery = '';
         let isLoading = false;
         
+        // Globale ID um Race Conditions auszuschalten
         let currentSearchId = 0;
         
         const state = {
@@ -414,7 +413,8 @@
         const imageViewer = document.getElementById('image-viewer');
 
         // AI Globals
-        let geminiHistory = []; // Speichert NUR bereinigten Text, keine API ToolCalls
+        let geminiHistory = []; // Speichert NUR bereinigten Text
+        let activeGeminiModel = null; // Cacht das verfügbare Modell
         let isAiThinking = false;
         const aiCompactWidget = document.getElementById('ai-compact-widget');
         const aiCompactText = document.getElementById('ai-compact-text');
@@ -736,7 +736,7 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (100% Robust, Apple Design)
+        // Gemini KI Integration (DYNAMISCHES MODELL + APPLE DESIGN)
         // ==========================================
         
         function closeCompactWidget(e) {
@@ -853,6 +853,7 @@
             
             openAiSheet();
             
+            // Verhindert Error wenn Array leer ist
             const lastMsg = geminiHistory.length >= 2 ? geminiHistory[geminiHistory.length - 2] : null;
             
             if (aiChatContent.innerHTML.trim() === '' || !lastMsg || !lastMsg.parts || !lastMsg.parts[0] || lastMsg.parts[0].text !== q) {
@@ -866,12 +867,59 @@
             }
         }
 
-        // Dynamischer API-Kaskaden-Router (Löst alle 400er Fehler)
+        // ==========================================
+        // DYNAMISCHER MODELL-FINDER: Verhindert 400er Fehler
+        // ==========================================
+        async function getValidModel(apiKey) {
+            if (activeGeminiModel) return activeGeminiModel;
+            
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                if (!res.ok) throw new Error("ListModels failed");
+                const data = await res.json();
+                
+                if (data.models && Array.isArray(data.models)) {
+                    // Filter für generateContent
+                    const validModels = data.models
+                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+                        .map(m => m.name.split("/").pop()); 
+                    
+                    // Perfekte Reihenfolge der verfügbaren free-tier Modelle
+                    const priorities = [
+                        'gemini-2.5-flash', 
+                        'gemini-2.0-flash', 
+                        'gemini-2.0-flash-exp',
+                        'gemini-1.5-flash-latest',
+                        'gemini-1.5-flash'
+                    ];
+
+                    for (let p of priorities) {
+                        if (validModels.includes(p)) {
+                            activeGeminiModel = p;
+                            return p;
+                        }
+                    }
+                    
+                    const fallbackModel = validModels.find(m => m.includes("gemini"));
+                    if (fallbackModel) {
+                        activeGeminiModel = fallbackModel;
+                        return fallbackModel;
+                    }
+                }
+            } catch(e) {
+                console.warn("Modell-Liste konnte nicht geladen werden, verwende Standard.");
+            }
+            
+            return "gemini-1.5-flash-latest"; // Fallback of last resort
+        }
+
         async function fetchFromGemini(query) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
-            const systemPrompt = `Du bist ein brillanter KI-Assistent in einer Suche-App. Du hast Zugriff auf Live-Internetdaten. 
+            const modelName = await getValidModel(apiKey);
+
+            const systemPrompt = `Du bist ein brillanter KI-Assistent. Du hast Zugriff auf Live-Internetdaten. 
 WICHTIG: Antworte niemals in JSON! Verwende EXAKT und AUSSCHLIESSLICH diese Text-Blöcke zur Formatierung:
 
 Für Währungen:
@@ -898,55 +946,52 @@ Für Text/Antworten/Fakten:
 
 Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
-            // Wir verpacken die gesamte Historie in einen einzigen Prompt, damit Gemini nicht durch kaputte toolCalls verwirrt wird
-            let fullPrompt = "System-Anweisung: " + systemPrompt + "\n\n";
+            let combinedText = "System-Anweisung: " + systemPrompt + "\n\n";
             if (geminiHistory.length > 0) {
-                fullPrompt += "Bisheriger Chatverlauf:\n";
+                combinedText += "Bisheriger Verlauf:\n";
                 for (let msg of geminiHistory) {
                     const role = msg.role === 'user' ? 'User' : 'KI';
-                    fullPrompt += `${role}: ${msg.parts[0].text}\n\n`;
+                    combinedText += `${role}: ${msg.parts[0].text}\n`;
                 }
+                combinedText += "\nAktuelle Frage:\n";
             }
-            fullPrompt += "Aktuelle Frage: " + query;
+            combinedText += query;
 
-            const payloadGrounding = {
-                contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
-                tools: [{ googleSearch: {} }] 
+            const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
+
+            // Versuch 1: Grounding mit googleSearch
+            try {
+                const payload1 = { contents: flatContents, tools: [{ googleSearch: {} }] };
+                const res1 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload1)
+                });
+                if (res1.ok) return await res1.json();
+            } catch(e) { }
+
+            // Versuch 2: Grounding mit google_search (für ältere Modelle)
+            try {
+                const payload2 = { contents: flatContents, tools: [{ google_search: {} }] };
+                const res2 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload2)
+                });
+                if (res2.ok) return await res2.json();
+            } catch(e) { }
+
+            // Versuch 3: Absoluter Fallback OHNE Tools (Garantierte Antwort)
+            const basePayload = {
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: [...geminiHistory, { role: "user", parts: [{ text: query }] }]
             };
-
-            const payloadFallback = {
-                contents: [{ role: "user", parts: [{ text: fullPrompt }] }]
-            };
-
-            const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-            let lastError = null;
-
-            // Phase 1: Versuche Grounding auf allen Modellen
-            for (let model of models) {
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payloadGrounding)
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.candidates) return data;
-                    if (data.error) lastError = data.error.message;
-                } catch(e) { lastError = e.message; }
+            const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
+            });
+            
+            if (!resFallback.ok) {
+                activeGeminiModel = null; // Cache leeren falls das Modell gecrasht ist
+                const errorData = await resFallback.json().catch(() => ({}));
+                throw new Error(errorData?.error?.message || `HTTP Error ${resFallback.status}`);
             }
-
-            // Phase 2: Wenn Grounding überall fehlschlägt, absoluter Text-Fallback
-            for (let model of models) {
-                try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                        method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payloadFallback)
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.candidates) return data;
-                } catch(e) {}
-            }
-
-            throw new Error("Alle API-Versuche fehlgeschlagen. Letzter Fehler: " + lastError);
+            return await resFallback.json();
         }
 
         function setCompactLoadingState(isLoading) {
@@ -995,12 +1040,9 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                     }
                 }
 
-                if (!textResp.trim()) { 
-                    const finishReason = data.candidates && data.candidates[0] ? data.candidates[0].finishReason : "Unbekannt";
-                    textResp = `[TEXT]Die Antwort wurde blockiert oder abgebrochen (Grund: ${finishReason}).[/TEXT]`; 
-                }
+                if (!textResp.trim()) { throw new Error("Kein Text in der KI-Antwort gefunden."); }
                 
-                // HISTORY FIX: Speichert AUSSCHLIESSLICH REINEN TEXT ab!
+                // HISTORY FIX: Speichert ausschließlich reinen Text ab! Keine Tool-Aufrufe!
                 geminiHistory.push({ role: "user", parts: [{ text: query }] });
                 geminiHistory.push({ role: "model", parts: [{ text: textResp }] });
 
@@ -1029,7 +1071,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                     }, 300);
                 }
             } finally {
-                // FIX: IMMER den Lock aufheben (unabhängig von der searchId), damit der Chat nie einfriert
+                // IMMER den Lock aufheben, damit der Chat nie einfriert
                 isAiThinking = false;
                 aiSendBtn.style.opacity = '1';
             }
