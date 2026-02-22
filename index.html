@@ -146,14 +146,14 @@
         .sitelink-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
 
         /* Special Cards */
-        .answer-box-card { background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); position: relative; cursor: default; }
+        .answer-box-card { background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); position: relative; cursor: default; margin-bottom: 0; pointer-events: auto; }
         .answer-box-card:active { transform: none; background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); }
         .answer-box-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
         .answer-box-label { font-size: 12px; font-weight: 700; color: #0a84ff; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         .answer-box-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #ffffff; line-height: 1.25; word-break: break-word; overflow-wrap: break-word; }
         .answer-box-snippet { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; word-break: break-word; overflow-wrap: break-word; }
 
-        .kg-card { padding: 28px; cursor: default; }
+        .kg-card { padding: 28px; cursor: default; margin-bottom: 0; pointer-events: auto;}
         .kg-card:active { transform: none; background-color: var(--card-bg); }
         .kg-header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
         .kg-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -167,7 +167,7 @@
         .kg-attr-k { color: var(--text-muted); white-space: nowrap; }
         .kg-attr-v { color: #fff; font-weight: 500; text-align: right; }
 
-        .local-card { padding: 24px 28px; cursor: default; }
+        .local-card { padding: 24px 28px; cursor: default; margin-bottom: 0; pointer-events: auto;}
         .local-card:active { transform: none; background-color: var(--card-bg); }
         .local-header { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #fff; display: flex; align-items: center; gap: 8px; }
         .local-list { display: flex; flex-direction: column; gap: 20px; }
@@ -263,33 +263,28 @@
 
     <div id="results-wrapper">
         <div id="view-search" data-type="search" class="scroll-viewport active">
-            <div class="results-content">
-                <div class="local-anchor" style="width: 100%; display: flex; flex-direction: column;"></div>
-                <div class="load-more-trigger"></div>
-                <div class="top-anchor" style="width: 100%; display: flex; flex-direction: column;"></div>
-            </div>
+            <div class="results-content"><div class="load-more-trigger"></div></div>
         </div>
         <div id="view-images" data-type="images" class="scroll-viewport">
-            <div class="results-content">
-                <div class="load-more-trigger"></div>
-            </div>
+            <div class="results-content"><div class="load-more-trigger"></div></div>
         </div>
         <div id="view-shopping" data-type="shopping" class="scroll-viewport">
-            <div class="results-content">
-                <div class="load-more-trigger"></div>
-            </div>
+            <div class="results-content"><div class="load-more-trigger"></div></div>
         </div>
+    </div>
 
-        <div id="bottom-bar">
-            <button class="search-circle-btn" onclick="openSearch()">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </button>
-            <div class="tabs-container">
-                <div class="tab-slider" id="tabSlider"></div>
-                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
-                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
-                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
-            </div>
+    <div id="special-cards" style="display:none; position:fixed; bottom: 90px; left:50%; transform:translateX(-50%); width:100%; max-width:760px; padding: 0 20px; z-index: 50; flex-direction: column; gap: 16px; max-height: 65vh; overflow-y: auto; scrollbar-width: none; pointer-events: none;">
+    </div>
+
+    <div id="bottom-bar">
+        <button class="search-circle-btn" onclick="openSearch()">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <div class="tabs-container">
+            <div class="tab-slider" id="tabSlider"></div>
+            <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
+            <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
+            <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
     </div>
 
@@ -424,6 +419,12 @@
             document.getElementById(`view-${type}`).classList.add('active');
             currentType = type;
             
+            if (type !== 'search') {
+                document.getElementById('special-cards').style.display = 'none';
+            } else if (state['search'].loaded && document.getElementById('special-cards').innerHTML.trim() !== '') {
+                document.getElementById('special-cards').style.display = 'flex';
+            }
+
             if (currentQuery && !state[currentType].loaded) {
                 renderSkeletons(currentType); 
                 performSearch(currentType, false, true);
@@ -458,6 +459,13 @@
         }
 
         function triggerNewSearch() {
+            // Hide and clear special cards
+            const specialCards = document.getElementById('special-cards');
+            if(specialCards) {
+                specialCards.style.display = 'none';
+                specialCards.innerHTML = '';
+            }
+
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
@@ -465,15 +473,7 @@
                 const vp = document.getElementById(`view-${k}`);
                 const content = vp.querySelector('.results-content');
                 
-                // Wir räumen nur noch dynamische Blöcke weg, der Trigger und die Anker bleiben!
                 content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
-                
-                if (k === 'search') {
-                    vp.querySelector('.local-anchor').innerHTML = '';
-                    vp.querySelector('.top-anchor').innerHTML = '';
-                }
-                
-                // SetupObserver muss nicht mehr neu aufgerufen werden, da der Trigger erhalten bleibt!
             });
             
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
@@ -504,8 +504,6 @@
                 }
             }
             frag.appendChild(pageBlock);
-            
-            // Seite VOR dem Trigger einfügen
             content.insertBefore(frag, trigger);
             
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
@@ -529,7 +527,7 @@
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
-                console.log(`Serper API Data (${type}):`, data); // Debugging im Browser
+                console.log(`Serper API Data (${type}):`, data);
                 
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
@@ -567,15 +565,9 @@
             else if (type === 'shopping') rawItems = data.shopping || [];
             
             if (isInitial) {
-                // Nur dynamisch geladene Blöcke entfernen
                 content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(child => child.remove());
-                if (type === 'search') {
-                    vp.querySelector('.local-anchor').innerHTML = '';
-                    vp.querySelector('.top-anchor').innerHTML = '';
-                }
             }
 
-            // Empty State (Keine Ergebnisse gefunden)
             if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.localResults && data.localResults.length)) {
                 if (isInitial) {
                     let emptyMsg = "Keine Ergebnisse gefunden.";
@@ -598,48 +590,6 @@
                 const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
                 const colors = await Promise.all(colorPromises);
 
-                const topAnchor = vp.querySelector('.top-anchor');
-                const localAnchor = vp.querySelector('.local-anchor');
-
-                // 1. Answer Box -> Kommt exklusiv in den Top Anchor!
-                if (isInitial && data.answerBox) {
-                    const ansData = data.answerBox;
-                    const ans = document.createElement('div');
-                    ans.className = `card answer-box-card ${isInitial ? 'animate-in' : ''}`;
-                    ans.innerHTML = `
-                        <div class="answer-box-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 
-                            Direkte Antwort
-                        </div>
-                        <h2 class="answer-box-title">${ansData.answer || ansData.title || 'Ergebnis'}</h2>
-                        ${ansData.snippet ? `<p class="answer-box-snippet">${ansData.snippet}</p>` : ''}
-                    `;
-                    topAnchor.appendChild(ans);
-                }
-
-                // 2. Knowledge Graph -> Kommt exklusiv in den Top Anchor!
-                if (isInitial && data.knowledgeGraph) {
-                    const kgData = data.knowledgeGraph;
-                    const kg = document.createElement('div');
-                    kg.className = `card kg-card ${isInitial ? 'animate-in' : ''}`;
-                    kg.innerHTML = `
-                        <div class="kg-header">
-                            <div class="kg-info">
-                                <h2 class="kg-title">${kgData.title || ''}</h2>
-                                ${kgData.type ? `<div class="kg-type">${kgData.type}</div>` : ''}
-                            </div>
-                            ${kgData.imageUrl ? `<img src="${kgData.imageUrl}" class="kg-img">` : ''}
-                        </div>
-                        ${kgData.description ? `<div class="kg-desc">${kgData.description}</div>` : ''}
-                        ${kgData.attributes ? `
-                        <div class="kg-attributes">
-                            ${Object.entries(kgData.attributes).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
-                        </div>` : ''}
-                    `;
-                    topAnchor.appendChild(kg);
-                }
-
-                // 3. Organische Suchergebnisse
                 items.forEach((item, index) => {
                     if(!item.link) return;
                     const domain = getHostname(item.link);
@@ -686,30 +636,72 @@
                     pageBlock.appendChild(el);
                 });
 
-                // 4. Local Results -> Kommt exklusiv in den Local Anchor!
-                if (isInitial && data.localResults && data.localResults.length > 0) {
-                    const local = document.createElement('div');
-                    local.className = `card local-card ${isInitial ? 'animate-in' : ''}`;
-                    local.innerHTML = `
-                        <h3 class="local-header">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            Orte
-                        </h3>
-                        <div class="local-list">
-                            ${data.localResults.slice(0, 4).map(p => `
-                                <div class="local-item" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
-                                    <div class="local-item-title">${p.title || ''}</div>
-                                    ${p.rating ? `
-                                    <div class="local-item-rating">
-                                        <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${(p.ratingCount || p.reviews) ? `<span style="opacity:0.6;">(${p.ratingCount || p.reviews})</span>` : ''} 
-                                    </div>` : ''}
-                                    ${p.address ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
-                                    ${p.category ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> ${p.category}</div>` : ''}
+                // SPECIAL CARDS LOGIK - Rendert direkt ins fixierte Container DIV
+                if (isInitial) {
+                    const special = document.getElementById('special-cards');
+                    special.innerHTML = '';
+                    let hasSpecial = false;
+
+                    if (data.answerBox) {
+                        hasSpecial = true;
+                        const ansData = data.answerBox;
+                        special.innerHTML += `
+                            <div class="card answer-box-card animate-in">
+                                <div class="answer-box-label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 
+                                    Direkte Antwort
                                 </div>
-                            `).join('')}
-                        </div>
-                    `;
-                    localAnchor.appendChild(local);
+                                <h2 class="answer-box-title">${ansData.answer || ansData.title || 'Ergebnis'}</h2>
+                                ${ansData.snippet ? `<p class="answer-box-snippet">${ansData.snippet}</p>` : ''}
+                            </div>
+                        `;
+                    }
+                    if (data.knowledgeGraph) {
+                        hasSpecial = true;
+                        const kgData = data.knowledgeGraph;
+                        special.innerHTML += `
+                            <div class="card kg-card animate-in">
+                                <div class="kg-header">
+                                    <div class="kg-info">
+                                        <h2 class="kg-title">${kgData.title || ''}</h2>
+                                        ${kgData.type ? `<div class="kg-type">${kgData.type}</div>` : ''}
+                                    </div>
+                                    ${kgData.imageUrl ? `<img src="${kgData.imageUrl}" class="kg-img">` : ''}
+                                </div>
+                                ${kgData.description ? `<div class="kg-desc">${kgData.description}</div>` : ''}
+                                ${kgData.attributes ? `
+                                <div class="kg-attributes">
+                                    ${Object.entries(kgData.attributes).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
+                                </div>` : ''}
+                            </div>
+                        `;
+                    }
+                    if (data.localResults && data.localResults.length > 0) {
+                        hasSpecial = true;
+                        special.innerHTML += `
+                            <div class="card local-card animate-in">
+                                <h3 class="local-header">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Orte
+                                </h3>
+                                <div class="local-list">
+                                    ${data.localResults.slice(0, 4).map(p => `
+                                        <div class="local-item" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
+                                            <div class="local-item-title">${p.title || ''}</div>
+                                            ${p.rating ? `
+                                            <div class="local-item-rating">
+                                                <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${(p.ratingCount || p.reviews) ? `<span style="opacity:0.6;">(${p.ratingCount || p.reviews})</span>` : ''} 
+                                            </div>` : ''}
+                                            ${p.address ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
+                                            ${p.category ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> ${p.category}</div>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    special.style.display = hasSpecial ? 'flex' : 'none';
                 }
 
             } 
@@ -743,7 +735,6 @@
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
 
-            // Die neuen Seite IMMER direkt VOR dem Load-More Trigger einfügen!
             if (pageBlock.children.length > 0) {
                 content.insertBefore(pageBlock, trigger);
             }
