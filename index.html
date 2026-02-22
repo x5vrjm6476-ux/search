@@ -524,6 +524,9 @@
         }
 
         function triggerNewSearch() {
+            // FIX: isAiThinking explizit zurücksetzen, um Blockaden zu vermeiden
+            isAiThinking = false;
+
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
@@ -708,9 +711,10 @@
             
             openAiSheet();
             
-            // Prüfen, ob die exakt selbe Frage schon die letzte Nachricht war
             const lastMsg = geminiHistory[geminiHistory.length - 2]; 
-            if (aiChatContent.innerHTML.trim() === '' || (lastMsg && lastMsg.parts[0].text !== q)) {
+            
+            // FIX: Logik-Bedingung überarbeitet (!lastMsg hinzugefügt)
+            if (aiChatContent.innerHTML.trim() === '' || !lastMsg || lastMsg.parts[0].text !== q) {
                 geminiHistory = [];
                 aiChatContent.innerHTML = '';
                 const userBubble = document.createElement('div');
@@ -721,7 +725,7 @@
             }
         }
 
-        // Der 3-Stufen Rettungsschirm für absolute Ausfallsicherheit (jetzt auf Gemini 2.5 Flash)
+        // Der 3-Stufen Rettungsschirm für absolute Ausfallsicherheit (auf Gemini 2.5 Flash)
         async function fetchFromGemini(historyItems) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
