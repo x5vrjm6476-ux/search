@@ -17,7 +17,7 @@
             --card-hover: #1c1c1e;
             --text-main: #ffffff;
             --text-muted: #8e8e93;
-            --border-radius: 24px;
+            --border-radius: 22px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
             --spring-fast: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
@@ -45,7 +45,8 @@
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
+            /* Extra Padding unten, damit das erste (unterste) Resultat nie vom KI Widget verdeckt wird */
+            padding: calc(var(--safe-top) + 20px) 16px calc(var(--safe-bottom) + 160px); 
             overflow-anchor: auto;
         }
 
@@ -68,7 +69,6 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
-        /* Suchfeld Overlay */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -88,15 +88,16 @@
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: var(--spring-fast); }
         .cancel-btn:active { opacity: 0.6; }
 
-        .page-block { display: flex; flex-direction: column; width: 100%; gap: 20px; }
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 16px; align-content: start; }
+        /* Kompaktere Abstände für Ergebnisse */
+        .page-block { display: flex; flex-direction: column; width: 100%; gap: 12px; }
+        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; align-content: start; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         .animate-in { animation: slideIn 0.4s cubic-bezier(0.32, 0.72, 0, 1) both; }
         @keyframes slideIn { 0% { opacity: 0; transform: translateY(15px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
         .skeleton { animation: pulse 1.2s infinite ease-in-out; background: rgba(255,255,255,0.06); }
-        .skeleton-card { border-radius: var(--border-radius); padding: 28px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px;}
+        .skeleton-card { border-radius: var(--border-radius); padding: 22px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 12px;}
         .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
         .s-title { height: 24px; width: 75%; border-radius: 8px; }
         .s-text { height: 16px; width: 100%; border-radius: 6px; }
@@ -107,7 +108,7 @@
         #ai-compact-widget {
             position: fixed; bottom: calc(var(--safe-bottom) + 75px); left: 50%; transform: translateX(-50%) scale(0.95);
             background: rgba(30, 30, 32, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 32px; padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 6px;
             display: flex; flex-direction: column; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
             transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); width: 92%; max-width: 420px;
@@ -118,25 +119,21 @@
         .compact-inner-wrap { flex: 1; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
         .compact-inner-wrap:active { transform: scale(0.97); }
 
-        /* Siri Glow Loader */
-        .ai-glow-loader {
-            display: flex; align-items: center; gap: 14px; padding: 8px 16px 8px 8px;
+        /* Edles Gradient-Lade-Widget */
+        #compact-loading-state {
+            padding: 14px 18px; 
+            background: linear-gradient(270deg, rgba(30,30,32,0.6), rgba(55,55,60,0.6), rgba(30,30,32,0.6));
+            background-size: 200% 200%; border-radius: 22px;
+            animation: softGradient 2.5s ease infinite;
+            display: flex; align-items: center; justify-content: center; width: 100%;
         }
-        .glow-orb {
-            width: 28px; height: 28px; border-radius: 50%; position: relative;
-            background: conic-gradient(from 0deg, #FF2A5F, #00C6FF, #C200FF, #FF2A5F);
-            animation: spin-orb 2s linear infinite; box-shadow: 0 0 12px rgba(0, 198, 255, 0.4);
-        }
-        .glow-orb::after {
-            content: ''; position: absolute; inset: 3px; background: rgba(30, 30, 32, 0.9); border-radius: 50%;
-        }
-        @keyframes spin-orb { 100% { transform: rotate(360deg); } }
+        @keyframes softGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
         .glow-text {
             font-size: 15px; font-weight: 500;
-            background: linear-gradient(90deg, #fff, #8e8e93, #fff); background-size: 200% auto;
+            background: linear-gradient(90deg, #8e8e93, #ffffff, #8e8e93); background-size: 200% auto;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: text-shine 2s linear infinite;
+            animation: text-shine 2s linear infinite; letter-spacing: 0.2px;
         }
         @keyframes text-shine { to { background-position: 200% center; } }
         
@@ -202,21 +199,18 @@
         /* ELEGANTES WIDGET DESIGN */
         .ios-ai-widget {
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-        .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #a1a1a6; margin-bottom: 14px; letter-spacing: 0.5px; }
-        .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.55; }
+        .ios-ai-widget-content { color: #f2f2f7; font-size: 15px; line-height: 1.5; }
         
+        /* Währung Widget Minimalist */
         .ios-currency-card {
-            background: linear-gradient(135deg, rgba(36,36,38,0.8), rgba(28,28,30,0.6)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; color: white;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; position: relative;
+            background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px;
         }
-        .ios-currency-title { font-size: 13px; font-weight: 500; color: #8e8e93; margin-bottom: 6px; }
-        .ios-currency-row { display: flex; align-items: baseline; gap: 10px; margin-top: 2px;}
-        .ios-currency-amount { font-size: 20px; font-weight: 500; color: #8e8e93; }
-        .ios-currency-converted { font-size: 38px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
-        .ios-currency-icon { color: #8e8e93; display: flex; align-items: center;}
+        .ios-currency-top { font-size: 15px; font-weight: 600; }
+        .ios-currency-bottom { font-size: 32px; font-weight: 700; color: #d1d1d6; letter-spacing: -1px; line-height: 1.1; margin-top: 2px;}
 
         /* Orte & Personen Karten (Interaktiv & Clean) */
         .ios-place-card, .ios-person-card {
@@ -226,7 +220,7 @@
         .ios-place-card:last-child, .ios-person-card:last-child { margin-bottom: 0; }
         
         .ios-place-name { font-size: 18px; font-weight: 600; color: white; margin-bottom: 14px; letter-spacing: -0.2px;}
-        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
+        .ios-place-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 14px; color: #d1d1d6; line-height: 1.4;}
         .ios-place-row:last-child { margin-bottom: 0; }
         .ios-place-row a { color: inherit; text-decoration: none; }
         .ios-place-row a:active { opacity: 0.6; }
@@ -236,25 +230,26 @@
         .ios-person-card { cursor: pointer; transition: transform 0.2s, background 0.2s; }
         .ios-person-card:active { transform: scale(0.98); background: rgba(40,40,42,0.6); }
         .ios-person-header { display: flex; align-items: center; gap: 14px; }
-        .ios-person-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); display: flex; justify-content: center; align-items: center; color: white; flex-shrink: 0;}
-        .ios-person-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .ios-person-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);}
+        .ios-person-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .ios-person-name { font-size: 17px; font-weight: 600; color: white; }
         .ios-person-role { font-size: 14px; color: #8e8e93; }
         .ios-person-chevron { color: #8e8e93; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
-        .ios-person-bio { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 15px; line-height: 1.5; color: #d1d1d6; animation: slideDown 0.3s ease; }
+        .ios-person-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+        .ios-person-chip { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #e5e5ea; }
+        .ios-person-bio { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 14px; line-height: 1.5; color: #d1d1d6; animation: slideDown 0.3s ease; }
         .ios-person-card.expanded .ios-person-chevron { transform: rotate(180deg); }
         .ios-person-card.expanded .ios-person-bio { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .ai-h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 16px 0 8px 0; letter-spacing: -0.2px;}
+        .ai-h2 { font-size: 16px; font-weight: 700; color: #fff; margin: 12px 0 6px 0; letter-spacing: -0.2px;}
         .ai-h2:first-child { margin-top: 0; }
-        .ai-h3 { font-size: 16px; font-weight: 600; color: #e5e5ea; margin: 14px 0 6px 0; }
-        .ai-highlight { font-weight: 600; color: #fff; background: rgba(255, 255, 255, 0.12); padding: 2px 8px; border-radius: 8px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
-        .ai-ul { padding-left: 0; margin: 12px 0; list-style: none; }
-        .ai-li { margin-bottom: 8px; position: relative; padding-left: 18px; color: #d1d1d6;}
+        .ai-highlight { font-weight: 600; color: #fff; background: rgba(255, 255, 255, 0.12); padding: 2px 6px; border-radius: 6px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
+        .ai-ul { padding-left: 0; margin: 8px 0; list-style: none; display: flex; flex-direction: column; gap: 6px;}
+        .ai-li { position: relative; padding-left: 18px; color: #d1d1d6; font-size: 15px;}
         .ai-li::before { content: "•"; color: #ffffff; position: absolute; left: 0; font-weight: bold; }
 
-        /* Kompakteres Bottom Bar */
+        /* Kompaktes Bottom Bar */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.55); 
@@ -280,12 +275,12 @@
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), width 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 24px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px;}
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 20px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 12px;}
         .card:active { transform: scale(0.97); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 12px; }
         .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
-        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); line-height: 1.3; }
+        .card-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); line-height: 1.3; }
         .card-snippet { font-size: 14px; color: var(--text-muted); line-height: 1.5; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
@@ -360,11 +355,8 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
         </button>
         <div class="compact-inner-wrap" onclick="openAiSheet()">
-            <div class="compact-loading-state" id="compact-loading-state">
-                <div class="ai-glow-loader">
-                    <div class="glow-orb"></div>
-                    <div class="glow-text">intelligente antwort laden...</div>
-                </div>
+            <div id="compact-loading-state">
+                <div class="glow-text">lade antwort...</div>
             </div>
             <div class="compact-widget-container" id="compact-widget-container"></div>
         </div>
@@ -374,10 +366,6 @@
         <div class="ai-sheet">
             <div class="ai-sheet-header" id="ai-sheet-header">
                 <div class="ai-sheet-handle"></div>
-                <div class="ai-sheet-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                    intelligente antwort
-                </div>
                 <button class="ai-sheet-close" onclick="closeAiSheet()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                 </button>
@@ -461,6 +449,9 @@
         const aiChatContent = document.getElementById('ai-chat-content');
         const aiChatInput = document.getElementById('ai-chat-input');
         const aiSendBtn = document.getElementById('ai-send-btn');
+
+        // KI Image Bridge
+        let extractedKgImageUrl = null;
 
         const colorCache = new Map();
 
@@ -619,6 +610,7 @@
 
             isLoading = false; 
             isAiThinking = false;
+            extractedKgImageUrl = null;
             aiSendBtn.style.opacity = '1';
 
             Object.keys(state).forEach(k => {
@@ -691,6 +683,11 @@
                 
                 const data = await response.json();
                 
+                // Extrahiere Bild für Personen-Widget
+                if (type === 'search' && data.knowledgeGraph && data.knowledgeGraph.imageUrl) {
+                    extractedKgImageUrl = data.knowledgeGraph.imageUrl;
+                }
+
                 if (searchId !== currentSearchId) return;
                 await renderResults(type, data, isLoadMore, isInitial, searchId);
                 
@@ -721,7 +718,6 @@
             
             if (rawItems.length === 0) return;
 
-            // Originale Array-Reihenfolge und Page-Block Logik, damit bestes Resultat bei column-reverse unten ist
             let items = rawItems.reverse();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
@@ -755,16 +751,17 @@
                     });
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                    // Bessere Qualität reinladen
-                    el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
+                    // FIX: Nutze Thumbnail, falls imageUrl 403 wirft im Grid (besserer Hotlink Schutz)
+                    el.innerHTML = `<img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                     el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                     pageBlock.appendChild(el);
                 } 
                 else if (type === 'shopping') {
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+                    // FIX: Thumbnail hier auch sicherer
                     el.innerHTML = `
-                        <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
+                        <div class="shopping-img-wrapper"><img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
                         <div class="shopping-info">
                             <div class="shopping-title">${item.title}</div>
                             <div class="shopping-price">${item.price || ''}</div>
@@ -838,7 +835,6 @@
             text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
             let html = '';
-            // Regex matcht jetzt klein und groß geschrieben sicherheitshalber (gi)
             const regex = /\[(currency|place|person|text)\]([\s\S]*?)\[\/\1\]/gi;
             let match;
             let foundAny = false;
@@ -853,21 +849,14 @@
                 const content = match[2].trim();
 
                 if (type === 'currency') {
-                    const title = (content.match(/titel:\s*(.*)/i) || [])[1] || 'Währungsumrechnung';
-                    const amount = (content.match(/betrag:\s*(.*)/i) || [])[1] || '';
+                    const amount = (content.match(/ursprung:\s*(.*)/i) || [])[1] || '';
                     const converted = (content.match(/ziel:\s*(.*)/i) || [])[1] || '';
-                    const color = (content.match(/farbe:\s*(.*)/i) || [])[1] || '#0A84FF';
+                    const color = (content.match(/farbe:\s*(.*)/i) || [])[1] || '#8e8e93';
                     
                     html += `
                         <div class="ios-currency-card">
-                            <div class="ios-currency-title">${title}</div>
-                            <div class="ios-currency-row">
-                                <div class="ios-currency-amount">${amount}</div>
-                                <div class="ios-currency-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                </div>
-                                <div class="ios-currency-converted" style="color: ${color};">${converted}</div>
-                            </div>
+                            <div class="ios-currency-top" style="color: ${color};">${amount}</div>
+                            <div class="ios-currency-bottom">${converted}</div>
                         </div>
                     `;
                 } 
@@ -902,23 +891,34 @@
                 else if (type === 'person') {
                     const name = (content.match(/name:\s*(.*)/i) || [])[1] || '';
                     const role = (content.match(/rolle:\s*(.*)/i) || [])[1] || '';
-                    const info = (content.match(/info:\s*(.*)/i) || [])[1] || '';
+                    const factsRaw = (content.match(/fakten:\s*(.*)/i) || [])[1] || '';
                     const bio = (content.match(/bio:\s*([\s\S]*)/i) || [])[1] || '';
+
+                    // Generiere Chips aus den Fakten
+                    let chipsHtml = '';
+                    if (factsRaw) {
+                        const facts = factsRaw.split(',').map(f => f.trim()).filter(f => f);
+                        chipsHtml = `<div class="ios-person-chips">` + facts.map(f => `<div class="ios-person-chip">${f.toLowerCase()}</div>`).join('') + `</div>`;
+                    }
+
+                    // Dynamisches Bild laden
+                    const imgTag = extractedKgImageUrl 
+                        ? `<img src="${extractedKgImageUrl}" class="ios-person-img" onerror="this.style.display='none';">`
+                        : `<div class="ios-person-img" style="display:flex; justify-content:center; align-items:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`;
 
                     html += `
                         <div class="ios-person-card" onclick="this.classList.toggle('expanded')">
                             <div class="ios-person-header">
-                                <div class="ios-person-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                </div>
+                                ${imgTag}
                                 <div class="ios-person-info">
                                     <div class="ios-person-name">${name}</div>
-                                    <div class="ios-person-role">${role} • ${info}</div>
+                                    <div class="ios-person-role">${role}</div>
                                 </div>
                                 <div class="ios-person-chevron">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
                                 </div>
                             </div>
+                            ${chipsHtml}
                             <div class="ios-person-bio">${formatBasicTextToHtml(bio, true)}</div>
                         </div>
                     `;
@@ -933,7 +933,8 @@
         }
 
         function formatBasicTextToHtml(content, isInner = false) {
-            let html = content.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
+            let html = content.toLowerCase(); // Alles zwingend kleingeschrieben
+            html = html.replace(/^###\s*(.*)$/gm, '<div class="ai-h3">$1</div>');
             html = html.replace(/^##\s*(.*)$/gm, '<div class="ai-h2">$1</div>');
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="ai-highlight">$1</strong>');
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -961,10 +962,6 @@
 
             return `
                 <div class="ios-ai-widget">
-                    <div class="ios-ai-widget-header">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                        <span>intelligente antwort</span>
-                    </div>
                     <div class="ios-ai-widget-content">${finalHtml}</div>
                 </div>
             `;
@@ -1016,14 +1013,13 @@
 
             const modelName = await getValidModel(apiKey);
 
-            const systemPrompt = `du bist ein brillanter ki-assistent. antworte niemals in json! verwende exakt und ausschließlich diese text-blöcke zur formatierung (alles kleingeschrieben bei den tags, niemals durchgehend capslock im text):
+            const systemPrompt = `du bist ein brillanter ki-assistent. antworte extrem kurz, präzise und niemals in json! verwende exakt diese blöcke (alles zwingend kleingeschrieben, absolut kein capslock):
 
 für währungen:
 [currency]
-titel: währungsumrechnung
-betrag: <ursprung>
+ursprung: <betrag>
 ziel: <zielbetrag>
-farbe: <#007aff für €, #34c759 für $, #ff3b30 für chf, #af52de für £, #ff9500 für ¥, sonst #5e5ce6>
+farbe: <#007aff für €, #34c759 für $, #ff3b30 für chf, #af52de für £, #ff9500 für ¥, sonst #8e8e93>
 [/currency]
 
 für orte/restaurants:
@@ -1039,13 +1035,13 @@ für bekannte personen:
 [person]
 name: <name>
 rolle: <beruf/rolle>
-info: <kurze info/alter>
-bio: <ausführlicher text>
+fakten: <3 extrem kurze stichpunkte (mit komma getrennt)>
+bio: <sehr kurzer text>
 [/person]
 
 für normalen text/fakten:
 [text]
-<dein text. nutze **fettdruck** für wichtiges>
+<antworte in extrem kurzen, informativen stichpunkten. nutze **fettdruck** für wichtiges>
 [/text]`;
 
             let combinedText = "anweisung: " + systemPrompt + "\n\n";
@@ -1107,9 +1103,8 @@ für normalen text/fakten:
                 const loader = document.createElement('div');
                 loader.id = loaderId;
                 loader.innerHTML = `
-                    <div class="ai-glow-loader" style="padding-left: 0;">
-                        <div class="glow-orb" style="width:20px; height:20px;"></div>
-                        <div class="glow-text">ich denke nach...</div>
+                    <div id="compact-loading-state" style="margin-top:10px; padding: 10px; border-radius:18px;">
+                        <div class="glow-text">lade antwort...</div>
                     </div>
                 `;
                 aiChatContent.appendChild(loader);
@@ -1186,12 +1181,10 @@ für normalen text/fakten:
         }
 
         function openAiSheet() {
-            // Widget ausblenden und Overlay öffnen
             aiCompactWidget.classList.remove('active');
             aiSheetOverlay.classList.add('active');
             
             setTimeout(() => {
-                // Ganz nach oben scrollen wie gewünscht
                 aiChatContent.scrollTo({ top: 0, behavior: 'instant' });
                 aiChatInput.focus();
             }, 300);
@@ -1200,7 +1193,6 @@ für normalen text/fakten:
         function closeAiSheet() {
             aiSheetOverlay.classList.remove('active');
             aiChatInput.blur();
-            // Widget NICHT wieder einblenden wie gewünscht
             closeCompactWidget();
         }
 
