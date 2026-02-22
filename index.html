@@ -68,7 +68,7 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
-        /* Robustes Overlay blockiert alle Hintergrundklicks */
+        /* Perfektes Overlay: Blockiert alle Klicks darunter */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -76,7 +76,7 @@
             padding: calc(var(--safe-top) + 20px) 16px 20px;
             opacity: 0; pointer-events: none; transition: opacity 0.15s ease;
         }
-        #search-overlay.active { opacity: 1; pointer-events: auto; }
+        #search-overlay.active { opacity: 1; pointer-events: all; }
         
         .overlay-bar-container { display: flex; width: 100%; max-width: 600px; gap: 12px; align-items: center; }
         .overlay-input {
@@ -140,26 +140,25 @@
         .ai-send-btn:active { transform: scale(0.9); }
         .ai-send-btn svg { fill: black; width: 20px; height: 20px; }
 
-        /* AI Chat Bubbles & Text Styling */
+        /* AI Chat Bubbles & Text Styling (Robust, iOS Design) */
         .ai-bubble-user { align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; color: white; border: 1px solid rgba(255,255,255,0.05); }
         .ai-bubble-model { align-self: flex-start; max-width: 95%; display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
-        /* Das ist die Magic! iOS Style direkt aus normalem Text */
         .widget-fact { 
-            background: #1c1c1e; padding: 20px; border-radius: 24px 24px 24px 8px; 
-            font-size: 16px; line-height: 1.5; color: #d1d1d6; border: 1px solid rgba(255,255,255,0.08);
+            background: #1c1c1e; padding: 20px; border-radius: 20px; 
+            font-size: 16px; line-height: 1.55; color: #d1d1d6; border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .ai-h2 { font-size: 19px; font-weight: 700; color: #fff; margin: 20px 0 10px 0; letter-spacing: -0.3px;}
         .ai-h2:first-child { margin-top: 0; }
         .ai-h3 { font-size: 17px; font-weight: 600; color: #fff; margin: 16px 0 8px 0; }
-        .ai-highlight { color: #fff; font-weight: 700; background: rgba(255, 255, 255, 0.12); padding: 2px 6px; border-radius: 6px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
+        .ai-highlight { color: #fff; font-weight: 600; background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 6px; }
         .ai-ul { padding-left: 10px; margin: 12px 0; list-style: none; }
         .ai-li { margin-bottom: 8px; position: relative; padding-left: 16px; }
         .ai-li::before { content: "•"; color: #8e8e93; position: absolute; left: 0; font-weight: bold; }
 
         .ai-loader { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; padding-left: 8px; }
-        @keyframes pulse-opacity { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes pulse-opacity { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
         /* Bottom Bar */
         #bottom-bar {
@@ -668,7 +667,7 @@
         }
 
         // ==========================================
-        // Gemini KI Integration (Super-Robust, ohne JSON)
+        // Gemini KI Integration (100% Robust)
         // ==========================================
         
         // Helfer-Funktion: Macht aus einfachem Markdown wunderschöne iOS-Widgets
@@ -709,7 +708,7 @@
             
             openAiSheet();
             
-            // Prüfen, ob die KI schon die exakt selbe Frage geladen hat
+            // Prüfen, ob die exakt selbe Frage schon die letzte Nachricht war
             const lastMsg = geminiHistory[geminiHistory.length - 2]; 
             if (aiChatContent.innerHTML.trim() === '' || (lastMsg && lastMsg.parts[0].text !== q)) {
                 geminiHistory = [];
@@ -722,41 +721,46 @@
             }
         }
 
+        // Der 3-Stufen Rettungsschirm für absolute Ausfallsicherheit
         async function fetchFromGemini(historyItems) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
             const systemPrompt = "Du bist ein intelligenter KI-Assistent in einer Such-App. Du hast Zugriff auf aktuelle Internetdaten. Antworte in gut strukturiertem Fließtext. WICHTIG: Nutze Überschriften (##), **Fettdruck** für Schlüsselinfos (wie Währungen, Namen, Adressen) und Aufzählungszeichen. KEINE JSON-Ausgabe. Fass dich kurz und präzise.";
 
-            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Grounding Syntax)
+            const basePayload = {
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: historyItems
+            };
+
+            // 1. Versuch: Das brandneue Gemini 2.0 Flash (Neue Google Search Syntax)
             try {
-                const payload20 = {
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    contents: historyItems,
-                    tools: [{ googleSearch: {} }]
-                };
+                const payload20 = { ...basePayload, tools: [{ google_search: {} }] };
                 const res20 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload20)
                 });
                 if (res20.ok) return await res20.json();
-            } catch(e) { console.warn("Gemini 2.0 fehlgeschlagen, wechsle auf 1.5 Fallback...", e); }
+            } catch(e) { console.warn("Gemini 2.0 fehlgeschlagen, wechsle auf 1.5 Fallback..."); }
 
             // 2. Versuch: Fallback auf Gemini 1.5 Flash (Alte Grounding Syntax)
-            const payload15 = {
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                contents: historyItems,
-                tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }]
-            };
-            const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
+            try {
+                const payload15 = { ...basePayload, tools: [{ googleSearchRetrieval: { dynamicRetrievalConfig: { mode: "MODE_DYNAMIC", dynamicThreshold: 0.1 } } }] };
+                const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
+                });
+                if (res15.ok) return await res15.json();
+            } catch(e) { console.warn("Gemini 1.5 Grounding fehlgeschlagen, wechsle auf reinen Text-Fallback..."); }
+
+            // 3. Absoluter Fallback: KI ohne Tools (Garantiert keine Payload-Errors)
+            const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
             });
             
-            if (!res15.ok) {
-                const errorData = await res15.json().catch(() => ({}));
-                console.error("Gemini 1.5 Error:", errorData);
-                throw new Error(errorData?.error?.message || `HTTP Error ${res15.status}`);
+            if (!resFallback.ok) {
+                const errorData = await resFallback.json().catch(() => ({}));
+                throw new Error(errorData?.error?.message || `HTTP Error ${resFallback.status}`);
             }
-            return await res15.json();
+            return await resFallback.json();
         }
 
         async function triggerGemini(query, isManualTrigger = false) {
@@ -765,7 +769,7 @@
             if (isAiThinking) return;
 
             const userMsg = { role: "user", parts: [{ text: query }] };
-            // Temporäre History nutzen, damit bei einem Fehler der Verlauf nicht kaputtgeht
+            // Temporäre History nutzen, damit bei einem API-Fehler der Verlauf nicht kaputtgeht
             const tempHistory = [...geminiHistory, userMsg];
             
             isAiThinking = true;
@@ -803,7 +807,7 @@
                 console.error("Gemini Komplettausfall", e);
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
                 if(isManualTrigger) {
-                    appendAiCard("Es gab leider einen Fehler bei der Verbindung zur KI. Bitte überprüfe deinen API-Key.");
+                    appendAiCard("Es gab leider einen Fehler bei der Verbindung zur KI. Bitte überprüfe deinen API-Key oder deine Netzwerkverbindung.");
                 }
             } finally {
                 isAiThinking = false;
