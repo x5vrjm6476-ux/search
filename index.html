@@ -21,8 +21,7 @@
             --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --spring-fast: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-            --spring-smooth: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            --spring-fast: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; overflow-anchor: none; }
@@ -46,7 +45,7 @@
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 100px); 
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
             overflow-anchor: auto;
         }
 
@@ -101,102 +100,33 @@
         .s-text.short { width: 60%; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
 
-        /* KI BOTTOM SHEET (Apple 2026 Detent Style) */
-        #ai-sheet {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
-            background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border-top-left-radius: 36px; border-top-right-radius: 36px;
-            padding: 12px 20px calc(var(--safe-bottom) + 16px) 20px; 
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
-            border-top: 1px solid rgba(255,255,255,0.15);
-            transition: var(--spring-smooth);
-            display: flex; flex-direction: column;
-        }
-        
-        /* Sheet States */
-        #ai-sheet.state-hidden { transform: translateY(100%); height: 35vh; opacity: 0;}
-        #ai-sheet.state-compact { transform: translateY(0); height: 35vh; opacity: 1; cursor: pointer; }
-        #ai-sheet.state-expanded { transform: translateY(0); height: 85vh; opacity: 1;}
-
-        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; transition: var(--spring-fast); }
-        #ai-sheet.state-compact:hover .drag-pill { background: rgba(255,255,255,0.5); transform: scaleX(1.2); }
-
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
-        .ai-sheet-title { font-size: 16px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
-        
-        /* Spark Icon */
-        .spark-icon { filter: drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
-        
-        .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
-        .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
-        
-        .ai-sheet-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 8px 4px 20px; scroll-behavior: smooth; pointer-events: none; }
-        #ai-sheet.state-expanded .ai-sheet-content { pointer-events: auto; } /* Only clickable when expanded */
-
-        /* AI WIDGETS (Structured Responses) */
-        .ai-widget { animation: slideIn 0.3s cubic-bezier(0.2,0.9,0.3,1) both; }
-        
-        /* Currency Widget */
-        .widget-currency { background: linear-gradient(135deg, rgba(50, 150, 255, 0.15), rgba(108, 71, 255, 0.15)); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 24px; text-align: center; }
-        .widget-currency-from { font-size: 15px; color: rgba(255,255,255,0.6); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
-        .widget-currency-to { font-size: 38px; font-weight: 700; color: #fff; letter-spacing: -0.5px; margin-bottom: 8px; }
-        .widget-currency-rate { font-size: 13px; color: rgba(255,255,255,0.5); }
-
-        /* Fact Widget */
-        .widget-fact { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; padding: 22px; }
-        .widget-fact-answer { font-size: 22px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 8px; }
-        .widget-fact-details { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.5; }
-
-        /* Places Widget */
-        .widget-places-container { display: flex; flex-direction: column; gap: 10px; }
-        .widget-place { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
-        .widget-place-name { font-size: 17px; font-weight: 600; color: #fff; }
-        .widget-place-meta { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.6); }
-        .widget-place-meta svg { opacity: 0.7; }
-
-        /* Chat Bubbles (For follow ups) */
-        .chat-bubble { font-size: 16px; line-height: 1.5; padding: 14px 18px; position: relative; animation: slideIn 0.3s cubic-bezier(0.2,0.9,0.3,1) both; }
-        .ai-message { background: rgba(255,255,255,0.06); color: white; border-radius: 22px; border-bottom-left-radius: 4px; align-self: flex-start; max-width: 95%; border: 1px solid rgba(255,255,255,0.03); }
-        .user-message { background: #2c63ff; color: white; border-radius: 22px; border-bottom-right-radius: 4px; align-self: flex-end; max-width: 85%; }
-        
-        /* Follow-up Input */
-        .ai-followup-form { display: none; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
-        #ai-sheet.state-expanded .ai-followup-form { display: flex; }
-        
-        .ai-followup-form input { flex: 1; background: transparent; border: none; color: white; font-size: 16px; padding: 0 16px; outline: none; -webkit-appearance: none; }
-        .ai-followup-form input::placeholder { color: rgba(255,255,255,0.4); }
-        .ai-followup-form button { width: 36px; height: 36px; border-radius: 18px; background: white; border: none; color: black; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; }
-        .ai-followup-form button:active { transform: scale(0.9); }
-
-        /* Bottom Bar (Slimmer) */
         #bottom-bar {
-            position: fixed; bottom: calc(var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%);
-            background: rgba(30, 30, 32, 0.55); 
+            position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
+            background: rgba(30, 30, 32, 0.45); 
             backdrop-filter: blur(50px) saturate(250%) brightness(1.15); -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.15);
-            padding: 6px; border-radius: 100px; 
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 -1px 1px rgba(0, 0, 0, 0.3), 0 16px 32px rgba(0, 0, 0, 0.6);
-            display: flex; align-items: center; gap: 4px; z-index: 100; transition: var(--spring-fast);
+            padding: 8px; border-radius: 100px; 
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.6);
+            display: flex; align-items: center; gap: 8px; z-index: 100; transition: var(--spring-fast);
         }
         .search-circle-btn {
-            width: 38px; height: 38px; border-radius: 19px; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15); color: white;
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
-        .search-circle-btn svg { width: 16px; height: 16px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
-        /* KI Button in der Bottom Bar (Grounded Glass, not purple) */
         .ai-reopen-btn {
-            width: 38px; height: 38px; border-radius: 19px; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); display: none; color: white; margin-left: 2px;
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; display: none; backdrop-filter: blur(10px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
         }
         .ai-reopen-btn.active { display: flex; }
-        .ai-reopen-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.25); }
+        .ai-reopen-btn:active { transform: scale(0.9); }
 
-        .tabs-container { position: relative; display: flex; padding: 2px; }
-        .tab { padding: 8px 14px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.65); cursor: pointer; position: relative; z-index: 2; transition: color 0.2s ease; text-align: center; letter-spacing: -0.2px;}
+        .tabs-container { position: relative; display: flex; padding: 4px; }
+        .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.65); cursor: pointer; position: relative; z-index: 2; transition: color 0.2s ease; text-align: center; }
         .tab.active { color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
         .tab-slider { 
-            position: absolute; top: 2px; bottom: 2px; left: 0; 
+            position: absolute; top: 4px; bottom: 4px; left: 0; 
             background: rgba(255, 255, 255, 0.2); border-radius: 100px; z-index: 1; 
             border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); 
@@ -215,22 +145,92 @@
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
         .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.6; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
 
+        .sitelink-toggle { background: rgba(255,255,255,0.05); border: none; color: white; border-radius: 16px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; }
+        .sitelink-toggle:active { transform: scale(0.85); background: rgba(255,255,255,0.1); }
+        .sitelink-btn { background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 14px; font-size: 13px; color: white; text-decoration: none; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: var(--spring-fast); cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .sitelink-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
+
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
         .image-card:active { transform: scale(0.96); transition: transform 0.15s; }
         .image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .shopping-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+        .shopping-card:active { transform: scale(0.98); transition: transform 0.15s; }
+        .shopping-img-wrapper { width: 100%; height: 160px; padding: 16px; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+        .shopping-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .shopping-info { padding: 16px; flex: 1; }
+        .shopping-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .shopping-price { font-weight: 700; color: white; font-size: 16px; }
         
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 16px; width: 100%; font-weight: 500; }
+
+        /* KI WIDGETS & SHEET */
+        #ai-sheet {
+            position: fixed; z-index: 2000;
+            background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column;
+            transition: var(--spring-fast);
+            transform: translateY(150%);
+            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        /* Compact Kapsel über der Suchleiste */
+        #ai-sheet.compact-mode {
+            bottom: calc(var(--safe-bottom) + 80px);
+            left: 16px; right: 16px; max-width: 728px; margin: 0 auto;
+            border-radius: 28px;
+            max-height: 300px;
+            transform: translateY(0);
+            cursor: pointer;
+        }
+        #ai-sheet.compact-mode:active { transform: scale(0.98); }
+
+        /* Expanded Vollbild Sheet */
+        #ai-sheet.expanded-mode {
+            bottom: 0; left: 0; right: 0;
+            border-radius: 32px 32px 0 0;
+            height: 85vh;
+            transform: translateY(0);
+            cursor: default;
+        }
+
+        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 12px; }
+        .ai-sheet-title { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
+        
+        .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
+        #ai-sheet.expanded-mode .ai-sheet-close { display: flex; }
+        .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+        
+        .ai-sheet-content { padding: 0 24px 24px; overflow-y: auto; flex: 1; scrollbar-width: none; font-size: 16px; line-height: 1.6; color: #fff; }
+        
+        .ai-sheet-input-container { padding: 16px 24px calc(var(--safe-bottom) + 16px); border-top: 1px solid rgba(255,255,255,0.05); display: none; background: rgba(25, 25, 28, 0.95); }
+        #ai-sheet.expanded-mode .ai-sheet-input-container { display: block; }
+        
+        .ai-sheet-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 16px 20px; color: white; font-size: 16px; outline: none; transition: var(--spring-fast); }
+        .ai-sheet-input:focus { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.15); }
+
+        /* WIDGET STYLES (No Gradients, Apple Modern) */
+        .widget-currency { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .widget-currency-box { flex: 1; padding: 16px; border-radius: 20px; color: #fff; }
+        .widget-currency-code { font-size: 13px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
+        .widget-currency-amount { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; word-break: break-word;}
+        
+        .widget-places-grid { display: flex; flex-direction: column; gap: 12px; }
+        .widget-place-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 20px; }
+        .widget-place-name { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .widget-place-meta { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; }
+        .widget-place-actions { display: flex; gap: 8px; flex-wrap: wrap;}
+        .widget-place-btn { background: rgba(255,255,255,0.1); color: #fff; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+
+        .ai-full-text { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 20px; display: none; }
+        #ai-sheet.expanded-mode .ai-full-text { display: block; }
 
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
         .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
-        .modal-content input.gemini-input { margin-top: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; }
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
         .modal-content button:active { transform: scale(0.95); }
-        
-        .typing-indicator { display: inline-block; width: 12px; animation: ellipsis 1.2s infinite; }
-        @keyframes ellipsis { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } }
     </style>
 </head>
 <body>
@@ -238,10 +238,10 @@
     <div id="setup-modal">
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
-            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suche)" autocomplete="off" spellcheck="false">
-            <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
+            <input type="text" id="apiKeyInput" placeholder="Serper Key (Suche)" autocomplete="off" spellcheck="false">
+            <input type="text" id="geminiKeyInput" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false" style="background: rgba(255,255,255,0.05);">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert schnelle, formatierte Direktantworten.</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini API liefert interaktive Widgets & Antworten.</p>
         </div>
     </div>
 
@@ -258,6 +258,16 @@
         </form>
     </div>
 
+    <div id="image-viewer">
+        <div class="viewer-header" id="viewer-header">
+            <div id="viewer-pill-container"></div>
+            <button class="viewer-close" onclick="closeImageViewer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="viewer-track" id="viewer-track"></div>
+    </div>
+
     <div id="results-wrapper">
         <div id="view-search" data-type="search" class="scroll-viewport active">
             <div class="results-content"><div class="load-more-trigger"></div></div>
@@ -270,26 +280,20 @@
         </div>
     </div>
 
-    <div id="ai-sheet" class="state-hidden">
-        <div class="drag-pill" onclick="toggleAiSheetExpand()"></div>
-        <div class="ai-sheet-header" onclick="toggleAiSheetExpand()" style="cursor: pointer;">
+    <div id="ai-sheet" onclick="expandAiSheet(event)">
+        <div class="ai-sheet-header">
             <div class="ai-sheet-title">
-                <svg class="spark-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                Intelligence
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Antwort
             </div>
             <button class="ai-sheet-close" onclick="closeAiSheet(event)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        
-        <div class="ai-sheet-content" id="ai-sheet-content" onclick="if(sheetState==='compact') expandAiSheet()">
+        <div class="ai-sheet-content" id="ai-sheet-content">
             </div>
-        
-        <form class="ai-followup-form" onsubmit="handleAiFollowup(event)">
-            <input type="text" id="aiFollowupInput" placeholder="Folgefrage stellen..." autocomplete="off">
-            <button type="submit">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-            </button>
+        <form class="ai-sheet-input-container" onsubmit="handleAiFollowUp(event)">
+            <input type="text" id="aiFollowUpInput" class="ai-sheet-input" placeholder="Nachfragen..." autocomplete="off">
         </form>
     </div>
 
@@ -303,8 +307,8 @@
             <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
             <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
-        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheetCompact()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheetCompact(true)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
         </button>
     </div>
 
@@ -321,16 +325,18 @@
         const aiSheet = document.getElementById('ai-sheet');
         const aiContent = document.getElementById('ai-sheet-content');
         const aiReopenBtn = document.getElementById('aiReopenBtn');
-        const bottomBar = document.getElementById('bottom-bar');
-        const followupInput = document.getElementById('aiFollowupInput');
+        const aiFollowUpInput = document.getElementById('aiFollowUpInput');
         
         let currentType = 'search';
         let currentQuery = '';
         let isLoading = false;
+        let aiHistory = []; // Speichert Chat-Verlauf
         
-        // AI State
-        let aiChatHistory = [];
-        let sheetState = 'hidden'; // hidden, compact, expanded
+        const state = {
+            search: { page: 1, loaded: false },
+            images: { page: 1, loaded: false },
+            shopping: { page: 1, loaded: false }
+        };
 
         const colorCache = new Map();
 
@@ -439,10 +445,10 @@
             currentType = type;
             
             if (type !== 'search') {
-                closeAiSheet(null, true); // force hide without fab if not search
+                forceCloseAiSheet();
                 aiReopenBtn.classList.remove('active');
-            } else if (state['search'].loaded && aiContent.innerHTML.trim() !== '') {
-                aiReopenBtn.classList.add('active'); // Show re-open fab
+            } else if (state['search'].loaded && getCookie('gemini_api_key')) {
+                aiReopenBtn.classList.add('active');
             }
 
             if (currentQuery && !state[currentType].loaded) {
@@ -479,7 +485,8 @@
         }
 
         function triggerNewSearch() {
-            closeAiSheet(null, true); // Force hard close
+            forceCloseAiSheet();
+            aiReopenBtn.classList.remove('active');
 
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
@@ -494,160 +501,197 @@
             
             performSearch(currentType, false, true);
             
-            if (getCookie('gemini_api_key')) {
-                fetchGeminiAI(currentQuery, false);
+            if (currentType === 'search' && getCookie('gemini_api_key')) {
+                aiHistory = []; // Reset Chat History
+                fetchGeminiAI(currentQuery, true);
             }
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
-        // --- GEMINI KI LOGIK (STRUCTURED WIDGETS) ---
-        function setSheetState(newState) {
-            sheetState = newState;
-            aiSheet.className = `state-${newState}`;
+        // --- GEMINI KI WIDGET LOGIK ---
+        
+        function shouldAutoOpenAI(query) {
+            const q = query.toLowerCase();
+            const questionWords = /^(wie|was|wer|wo|wann|warum|welche|wieviel|wetter)/.test(q);
+            const conversion = /\b(in|zu|to)\b/.test(q) && /\d/.test(q); 
+            const local = /\b(restaurant|hotel|kino|öffnungszeiten|nähe|arzt|apotheke|vegan|pizza|bar)\b/.test(q);
+            const isMath = /^[0-9\+\-\*\/\(\)\.\,\s]+$/.test(q) && /\d/.test(q);
+            return questionWords || conversion || local || isMath || q.includes('?');
+        }
+
+        function openAiSheetCompact(manual = false) {
+            aiSheet.classList.add('compact-mode');
+            aiSheet.classList.remove('expanded-mode');
+            aiReopenBtn.classList.remove('active');
+            if (manual && aiHistory.length === 0) {
+                fetchGeminiAI(currentQuery, false);
+            }
+        }
+
+        function expandAiSheet(e) {
+            if (aiSheet.classList.contains('compact-mode')) {
+                if (e && e.target.closest('.ai-sheet-close')) return;
+                if (e && e.target.closest('a')) return; // Links nicht blockieren
+                
+                aiSheet.classList.remove('compact-mode');
+                aiSheet.classList.add('expanded-mode');
+                
+                // Input fokussieren mit leichter Verzögerung für Animation
+                setTimeout(() => aiFollowUpInput.focus(), 300);
+            }
+        }
+
+        function closeAiSheet(e) {
+            if (e) e.stopPropagation();
+            forceCloseAiSheet();
+            if (currentType === 'search' && getCookie('gemini_api_key')) {
+                aiReopenBtn.classList.add('active'); 
+            }
+        }
+
+        function forceCloseAiSheet() {
+            aiSheet.classList.remove('compact-mode');
+            aiSheet.classList.remove('expanded-mode');
+            aiFollowUpInput.blur();
+        }
+
+        function getCurrencyColor(code) {
+            const colors = {
+                'EUR': '#1565C0', 'USD': '#2E7D32', 'CHF': '#C62828', 
+                'GBP': '#4527A0', 'JPY': '#0277BD', 'AUD': '#00695C', 
+                'CAD': '#E65100'
+            };
+            return colors[code.toUpperCase()] || '#424242';
+        }
+
+        function renderJsonWidget(data) {
+            let html = '';
             
-            if (newState === 'hidden') {
-                bottomBar.style.transform = 'translate(-50%, 0)'; 
-                if (aiContent.innerHTML.trim() !== '') aiReopenBtn.classList.add('active');
-                followupInput.blur();
-            } else if (newState === 'compact') {
-                bottomBar.style.transform = 'translate(-50%, 150%)'; 
-                aiReopenBtn.classList.remove('active');
-                followupInput.blur();
-            } else if (newState === 'expanded') {
-                bottomBar.style.transform = 'translate(-50%, 150%)'; 
-                aiReopenBtn.classList.remove('active');
-            }
-        }
-
-        function openAiSheetCompact() { setSheetState('compact'); }
-        function expandAiSheet() { setSheetState('expanded'); }
-        function toggleAiSheetExpand() {
-            if(sheetState === 'compact') expandAiSheet();
-            else if(sheetState === 'expanded') setSheetState('compact');
-        }
-        function closeAiSheet(e, force = false) {
-            if(e) e.stopPropagation();
-            setSheetState('hidden');
-        }
-
-        function handleAiFollowup(e) {
-            e.preventDefault();
-            const q = followupInput.value.trim();
-            if(q) {
-                followupInput.value = '';
-                followupInput.blur();
-                fetchGeminiAI(q, true);
-            }
-        }
-
-        function renderWidget(jsonData) {
-            try {
-                const data = JSON.parse(jsonData);
-                if (data.type === 'currency' && data.currency) {
-                    return `
-                        <div class="ai-widget widget-currency">
-                            <div class="widget-currency-from">${data.currency.from} =</div>
-                            <div class="widget-currency-to">${data.currency.to}</div>
-                            <div class="widget-currency-rate">${data.currency.rate}</div>
+            // 1. Währungs-Widget
+            if (data.type === 'currency' && data.currency) {
+                const c = data.currency;
+                html += `
+                    <div class="widget-currency">
+                        <div class="widget-currency-box" style="background:${getCurrencyColor(c.from)};">
+                            <div class="widget-currency-code">${c.from}</div>
+                            <div class="widget-currency-amount">${c.amount_from}</div>
+                        </div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        <div class="widget-currency-box" style="background:${getCurrencyColor(c.to)};">
+                            <div class="widget-currency-code">${c.to}</div>
+                            <div class="widget-currency-amount">${c.amount_to}</div>
+                        </div>
+                    </div>
+                `;
+            } 
+            // 2. Local Places Widget
+            else if (data.type === 'places' && data.places && data.places.length > 0) {
+                html += `<div class="widget-places-grid">`;
+                data.places.forEach(p => {
+                    html += `
+                        <div class="widget-place-card">
+                            <div class="widget-place-name">${p.name}</div>
+                            <div class="widget-place-meta">
+                                ${p.address ? `${p.address}<br>` : ''}
+                                ${p.hours ? `<span style="color:#fff; font-weight:500;">${p.hours}</span>` : ''}
+                            </div>
+                            <div class="widget-place-actions">
+                                ${p.phone ? `<a href="tel:${p.phone.replace(/\s+/g,'')}" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Anrufen</a>` : ''}
+                                ${p.website ? `<a href="${p.website}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Website</a>` : ''}
+                            </div>
                         </div>
                     `;
-                } else if (data.type === 'places' && data.places && data.places.length > 0) {
-                    return `
-                        <div class="ai-widget widget-places-container">
-                            ${data.places.map(p => `
-                                <div class="widget-place">
-                                    <div class="widget-place-name">${p.name}</div>
-                                    ${p.address ? `<div class="widget-place-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
-                                    ${p.hours ? `<div class="widget-place-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${p.hours}</div>` : ''}
-                                    ${p.phone ? `<div class="widget-place-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> ${p.phone}</div>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                } else if (data.fact) {
-                    return `
-                        <div class="ai-widget widget-fact">
-                            <div class="widget-fact-answer">${data.fact.answer}</div>
-                            ${data.fact.details ? `<div class="widget-fact-details">${data.fact.details}</div>` : ''}
-                        </div>
-                    `;
-                } else {
-                    return `<div class="chat-bubble ai-message">${jsonData}</div>`; // Fallback
-                }
-            } catch(e) {
-                // If it's not JSON, render as normal message
-                return `<div class="chat-bubble ai-message">${jsonData}</div>`;
+                });
+                html += `</div>`;
+            } 
+            // 3. Normaler Text (Kurzform)
+            else {
+                html += `<div style="font-size: 18px; font-weight: 500;">${data.short_answer || 'Antwort geladen.'}</div>`;
             }
+
+            // Ausführlicher Text (Nur sichtbar wenn Expanded!)
+            if (data.full_text) {
+                let formattedFull = data.full_text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                html += `<div class="ai-full-text">${formattedFull}</div>`;
+            }
+
+            return html;
         }
 
-        async function fetchGeminiAI(query, isFollowUp = false) {
+        async function fetchGeminiAI(query, isInitialSearch) {
             const geminiKey = getCookie('gemini_api_key');
             if (!geminiKey) return;
 
-            if (!isFollowUp) {
-                aiChatHistory = [];
-                aiContent.innerHTML = '';
+            if (isInitialSearch) {
+                const autoOpen = shouldAutoOpenAI(query);
+                if (autoOpen) {
+                    openAiSheetCompact(false);
+                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 15px;">Suche aktuelle Daten...</span>';
+                } else {
+                    aiReopenBtn.classList.add('active'); 
+                    return; // Stilles Laden überspringen wir hier um API Kosten zu sparen, bis der User den Button drückt
+                }
             } else {
-                aiContent.innerHTML += `<div class="chat-bubble user-message">${query}</div>`;
+                // Bei Nachfrage oder manuellem Öffnen
+                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 15px;">Sucht Antwort...</span>';
             }
 
-            const loadingId = `loading-${Date.now()}`;
-            aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><span class="typing-indicator"></span></div>`;
-            
-            requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
-            
-            // Open Compact on initial search, keep expanded if follow up
-            if (!isFollowUp) openAiSheetCompact();
+            aiHistory.push({ role: "user", parts: [{ text: query }] });
 
-            const prompt = `Du bist ein brillianter Assistent. Antworte IMMER und AUSSCHLIESSLICH in validem JSON Format (ohne Markdown Block).
-            Wähle den passenden Typ: "currency", "places" oder "fact".
-            Schema:
+            const systemInstruction = `Du bist ein hilfreicher KI-Suchassistent. Nutze zwingend "Google Search" um Echtzeitdaten abzufragen.
+            Antworte IMMER und AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Markdown-Codeblöcke um das JSON herum.
+            
             {
-              "type": "currency" | "places" | "fact",
-              "currency": { "from": "100 CHF", "to": "105.50 EUR", "rate": "1 CHF = 1.055 EUR" },
-              "places": [ { "name": "Name", "address": "Adresse", "phone": "Tel", "website": "URL", "hours": "Offen bis 22:00" } ],
-              "fact": { "answer": "Kurze präzise Antwort (max 1 Satz)", "details": "Optionaler kurzer Zusatzsatz" }
-            }
-            Anfrage: "${query}"`;
-
-            const historyPrompt = isFollowUp ? `Neuer Input des Nutzers: "${query}". Behalte das JSON Schema exakt bei.` : prompt;
-            aiChatHistory.push({ role: "user", parts: [{ text: historyPrompt }] });
+              "type": "currency" | "places" | "text",
+              "short_answer": "Sehr kurze prägnante Antwort (1 Satz)",
+              "full_text": "Ausführlichere Erklärung und Details",
+              "currency": { "from": "CHF", "to": "EUR", "amount_from": "100", "amount_to": "105.20" }, // Nur bei Währungen/Rechnungen ausfüllen
+              "places": [ { "name": "Ort 1", "address": "Mustergasse 1", "phone": "+41...", "website": "https...", "hours": "Heute: 09:00 - 18:00" } ] // Nur bei Orten ausfüllen (max 3)
+            }`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: aiChatHistory,
-                        generationConfig: { 
-                            temperature: 0.1, 
-                            maxOutputTokens: 600,
-                            responseMimeType: "application/json"
-                        }
+                        contents: aiHistory,
+                        systemInstruction: { parts: [{ text: systemInstruction }] },
+                        tools: [{ googleSearch: {} }], 
+                        generationConfig: { temperature: 0.2, responseMimeType: "application/json" }
                     })
                 });
 
-                if (!response.ok) throw new Error();
+                if (!response.ok) throw new Error('API Error');
                 const data = await response.json();
                 
-                let answerText = data.candidates[0].content.parts[0].text;
-                
-                // Store in history
-                aiChatHistory.push({ role: "model", parts: [{ text: answerText }] });
+                const answerRaw = data.candidates[0].content.parts[0].text;
+                aiHistory.push({ role: "model", parts: [{ text: answerRaw }] });
 
-                // Render beautiful widget
-                const htmlOutput = renderWidget(answerText);
-                document.getElementById(loadingId).outerHTML = htmlOutput;
+                try {
+                    const parsedJson = JSON.parse(answerRaw);
+                    aiContent.innerHTML = renderJsonWidget(parsedJson);
+                } catch (parseError) {
+                    // Fallback falls JSON kaputt
+                    aiContent.innerHTML = `<div style="font-size:16px;">${answerRaw.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}</div>`;
+                }
 
             } catch (error) {
-                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">KI konnte nicht laden.</span>';
-                aiChatHistory.pop(); // Remove failed prompt
+                aiContent.innerHTML = '<span style="color:#ff6b6b; font-size: 15px;">KI Error. API Key prüfen.</span>';
+                aiHistory.pop(); // Fehlerhafte Frage entfernen
             }
-            requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
         }
 
+        function handleAiFollowUp(e) {
+            e.preventDefault();
+            const q = aiFollowUpInput.value.trim();
+            if(q) {
+                aiFollowUpInput.value = '';
+                aiFollowUpInput.blur();
+                fetchGeminiAI(q, false);
+            }
+        }
         // --- ENDE KI LOGIK ---
 
         function renderSkeletons(type) {
@@ -809,6 +853,7 @@
                         const el = document.createElement('a');
                         el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
                         el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
+                        el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                         pageBlock.appendChild(el);
                     } 
                     else if (type === 'shopping') {
@@ -826,6 +871,9 @@
                 });
             }
 
+            const oldScrollHeight = vp.scrollHeight;
+            const oldScrollTop = vp.scrollTop;
+
             if (pageBlock.children.length > 0) {
                 content.insertBefore(pageBlock, trigger);
             }
@@ -838,6 +886,108 @@
                     vp.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
                 });
             }
+        }
+
+        let startX = 0, startY = 0;
+        let isSwipingY = false, isSwipingX = false;
+
+        function openImageViewer(clickedCard) {
+            const allCards = Array.from(document.querySelectorAll('#view-images .image-card'));
+            globalImages = allCards.map(card => ({ link: card.href, imageUrl: card.querySelector('img').src }));
+            viewerIndex = allCards.indexOf(clickedCard);
+            
+            track.innerHTML = globalImages.map(img => `<div class="viewer-slide"><img src="${img.imageUrl}" onerror="this.style.display='none'"></div>`).join('');
+            imageViewer.classList.add('active');
+            document.body.classList.add('no-scroll'); 
+            
+            requestAnimationFrame(() => {
+                track.scrollTo({ left: viewerIndex * window.innerWidth, behavior: 'instant' });
+                updateViewerPill();
+            });
+        }
+
+        function closeImageViewer() {
+            imageViewer.style.opacity = '0';
+            document.body.classList.remove('no-scroll'); 
+            setTimeout(() => { 
+                imageViewer.classList.remove('active');
+                imageViewer.style.cssText = ''; 
+                track.innerHTML = ''; 
+                track.style.transform = '';
+            }, 250); 
+        }
+
+        track.addEventListener('scroll', () => {
+            if(isSwipingY) return; 
+            const index = Math.round(track.scrollLeft / window.innerWidth);
+            if(index !== viewerIndex) {
+                viewerIndex = index;
+                updateViewerPill();
+            }
+        }, {passive: true});
+
+        track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isSwipingY = false;
+            isSwipingX = false;
+        }, {passive: false});
+
+        track.addEventListener('touchmove', (e) => {
+            if (!isSwipingX && !isSwipingY) {
+                const diffX = Math.abs(e.touches[0].clientX - startX);
+                const diffY = Math.abs(e.touches[0].clientY - startY);
+                if (diffY > diffX && diffY > 5) isSwipingY = true;
+                if (diffX > diffY && diffX > 5) isSwipingX = true;
+            }
+            if (isSwipingY) {
+                e.preventDefault(); 
+                const diffY = e.touches[0].clientY - startY;
+                if (diffY > 0) {
+                    const scale = Math.max(0.75, 1 - (diffY / 800));
+                    track.style.transform = `translateY(${diffY}px) scale(${scale})`;
+                    imageViewer.style.backgroundColor = `rgba(0,0,0, ${Math.max(0, 0.95 - (diffY / 400))})`;
+                    viewerHeader.style.opacity = Math.max(0, 1 - (diffY / 200));
+                }
+            }
+        }, {passive: false});
+
+        track.addEventListener('touchend', (e) => {
+            if (isSwipingY) {
+                const diffY = e.changedTouches[0].clientY - startY;
+                if (diffY > 120) {
+                    closeImageViewer();
+                } else {
+                    track.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    track.style.transform = 'translateY(0) scale(1)';
+                    imageViewer.style.backgroundColor = 'rgba(0,0,0,0.95)';
+                    viewerHeader.style.opacity = '1';
+                    setTimeout(() => track.style.transition = 'none', 300);
+                }
+            }
+        });
+
+        function updateViewerPill() {
+            if(!globalImages[viewerIndex]) return;
+            const item = globalImages[viewerIndex];
+            const domain = getHostname(item.link);
+            const pillContainer = document.getElementById('viewer-pill-container');
+            const pillId = `viewer-pill-${Date.now()}`;
+
+            pillContainer.innerHTML = `
+                <a href="${item.link}" target="_blank" class="color-pill" id="${pillId}" style="text-decoration: none; background: rgba(255,255,255,0.15); border: none; color: white;">
+                    <span>${domain}</span>
+                </a>
+            `;
+
+            getDominantColor(domain).then(color => {
+                const pill = document.getElementById(pillId);
+                if (color && pill) {
+                    pill.style.background = color.bg;
+                    pill.style.color = color.text;
+                    pill.style.border = color.border;
+                }
+            });
         }
 
         function checkApiKeys() {
