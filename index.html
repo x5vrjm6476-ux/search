@@ -68,6 +68,7 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
+        /* Perfektes Overlay: Blockiert alle Klicks darunter */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -110,6 +111,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
             transition: all 0.5s cubic-bezier(0.25, 1, 0.2, 1); width: 92%; max-width: 420px;
             overflow: hidden;
+            display: none; /* Initial hidden */
         }
         #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
         
@@ -187,7 +189,7 @@
             animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
         .ai-bubble-model { 
-            align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 12px;
+            align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 16px;
             animation: slideInChat 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
         @keyframes slideInChat { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -231,7 +233,6 @@
             width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; 
             background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; color: white;
         }
-        /* FIX: stroke="currentColor" erzwingt sichtbare Icons */
         .ios-place-icon svg { width: 14px; height: 14px; stroke: currentColor; }
 
         /* Typografie */
@@ -794,7 +795,11 @@
         function closeCompactWidget(e) {
             e.stopPropagation(); // Verhindert, dass sich das Sheet öffnet
             aiCompactWidget.classList.remove('active');
-            setTimeout(() => { aiCompactWidget.style.display = 'none'; }, 300);
+            setTimeout(() => { 
+                if(!aiCompactWidget.classList.contains('active')) {
+                    aiCompactWidget.style.display = 'none'; 
+                }
+            }, 300);
         }
 
         function parseAiMarkupToHtml(text, isCompactMode = false) {
@@ -900,9 +905,12 @@
             if (!q) { openAiSheet(); return; }
             
             openAiSheet();
-            const lastMsg = geminiHistory[geminiHistory.length - 2]; 
             
-            if (aiChatContent.innerHTML.trim() === '' || !lastMsg || lastMsg.parts[0].text !== q) {
+            // Sicherer Zugriff auf das letzte Element in der History
+            const lastMsg = geminiHistory.length >= 2 ? geminiHistory[geminiHistory.length - 2] : null;
+            
+            // Wenn die History leer ist, oder das letzte Element nicht dem Suchbegriff entspricht, starte Suche
+            if (aiChatContent.innerHTML.trim() === '' || !lastMsg || !lastMsg.parts || !lastMsg.parts[0] || lastMsg.parts[0].text !== q) {
                 geminiHistory = [];
                 aiChatContent.innerHTML = '';
                 const userBubble = document.createElement('div');
@@ -1014,8 +1022,6 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
             }
 
             try {
-                // Wir übergeben nur die Query an fetchFromGemini. 
-                // Die Funktion kümmert sich um die sichere Abflachung der globalen History.
                 const data = await fetchFromGemini(query);
                 if (searchId !== currentSearchId) return;
 
@@ -1036,6 +1042,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
                 if (!isManualTrigger) {
                     setCompactLoadingState(false);
+                    // Magie: Das Widget direkt im Compact-Container rendern!
                     aiCompactContainer.innerHTML = parseAiMarkupToHtml(textResp, true);
                     appendAiCard(textResp);
                 } else {
@@ -1050,10 +1057,14 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
                     appendAiCard("[TEXT]Es gab leider einen Fehler bei der Verbindung zur KI. Bitte versuche es nochmal.[/TEXT]");
                 } else {
                     aiCompactWidget.classList.remove('active');
-                    setTimeout(() => { aiCompactWidget.style.display = 'none'; }, 300);
+                    setTimeout(() => { 
+                        if(!aiCompactWidget.classList.contains('active')) {
+                            aiCompactWidget.style.display = 'none'; 
+                        }
+                    }, 300);
                 }
             } finally {
-                // IMMER den Lock aufheben, damit weitere Fragen möglich sind!
+                // FIX: IMMER den Lock aufheben, damit weitere Fragen möglich sind!
                 isAiThinking = false;
                 aiSendBtn.style.opacity = '1';
             }
@@ -1069,7 +1080,6 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
         function handleAiChat(e) {
             e.preventDefault();
-            // ANIMATIONS FIX: Kurzes visuelles Feedback (Shake), wenn KI noch arbeitet
             if (isAiThinking) {
                 aiChatInput.classList.add('shake-anim');
                 setTimeout(() => aiChatInput.classList.remove('shake-anim'), 300);
