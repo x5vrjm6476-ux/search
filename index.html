@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ä<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -145,7 +145,7 @@
         .sitelink-btn { background: rgba(255,255,255,0.04); padding: 12px 14px; border-radius: 14px; font-size: 13px; color: white; text-decoration: none; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: var(--spring-fast); cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
         .sitelink-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
 
-        /* Special Cards (AnswerBox, KnowledgeGraph, LocalResults) */
+        /* Special Cards */
         .answer-box-card { background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); position: relative; cursor: default; }
         .answer-box-card:active { transform: none; background: linear-gradient(150deg, rgba(35,35,40,0.9) 0%, rgba(20,20,25,0.9) 100%); }
         .answer-box-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); }
@@ -508,7 +508,6 @@
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
-                // Warten auf das vollständige Rendering (inkl. Farben) bevor State geupdatet wird
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
 
@@ -539,24 +538,30 @@
             const content = vp.querySelector('.results-content');
             let trigger = content.querySelector('.load-more-trigger');
 
-            let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
+            // Sehr robuster Fallback, um TypeErrors zu verhindern!
+            let rawItems = [];
+            if (type === 'search') rawItems = data.organic || [];
+            else if (type === 'images') rawItems = data.images || [];
+            else if (type === 'shopping') rawItems = data.shopping || [];
             
             if (isInitial) {
                 Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             }
-            if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !data.places) return;
+            if (rawItems.length === 0 && !data.knowledgeGraph && !data.answerBox && !(data.places && data.places.length)) return;
 
-            let items = rawItems.reverse();
+            let items = [...rawItems].reverse(); 
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
             if (type === 'search') {
-                // Dominante Farben laden, BEVOR die Elemente DOM hinzugefügt werden (Verhindert FOUC/Flackern)
-                const colorPromises = items.map(item => getDominantColor(getHostname(item.link)));
+                const colorPromises = items.map(item => getDominantColor(getHostname(item.link || '')));
                 const colors = await Promise.all(colorPromises);
 
-                // 1. Answer Box (Ganz Oben)
+                // Aufbau-Logik (Top-To-Bottom im DOM) = Visuell richtig sortiert durch Flex-Column!
+
+                // 1. Answer Box (Erscheint visuell ganz oben im Feed)
                 if (isInitial && data.answerBox) {
+                    const ansData = data.answerBox;
                     const ans = document.createElement('div');
                     ans.className = `card answer-box-card ${isInitial ? 'animate-in' : ''}`;
                     ans.innerHTML = `
@@ -564,34 +569,37 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> 
                             Direkte Antwort
                         </div>
-                        <h2 class="answer-box-title">${data.answerBox.answer || data.answerBox.title}</h2>
-                        ${data.answerBox.snippet ? `<p class="answer-box-snippet">${data.answerBox.snippet}</p>` : ''}
+                        <h2 class="answer-box-title">${ansData.answer || ansData.title || 'Ergebnis'}</h2>
+                        ${ansData.snippet ? `<p class="answer-box-snippet">${ansData.snippet}</p>` : ''}
                     `;
                     pageBlock.appendChild(ans);
                 }
 
                 // 2. Knowledge Graph (Unter Answer Box)
                 if (isInitial && data.knowledgeGraph) {
+                    const kgData = data.knowledgeGraph;
                     const kg = document.createElement('div');
                     kg.className = `card kg-card ${isInitial ? 'animate-in' : ''}`;
                     kg.innerHTML = `
                         <div class="kg-header">
                             <div class="kg-info">
-                                <h2 class="kg-title">${data.knowledgeGraph.title}</h2>
-                                <div class="kg-type">${data.knowledgeGraph.type || ''}</div>
+                                <h2 class="kg-title">${kgData.title || ''}</h2>
+                                ${kgData.type ? `<div class="kg-type">${kgData.type}</div>` : ''}
                             </div>
-                            ${data.knowledgeGraph.imageUrl ? `<img src="${data.knowledgeGraph.imageUrl}" class="kg-img">` : ''}
+                            ${kgData.imageUrl ? `<img src="${kgData.imageUrl}" class="kg-img">` : ''}
                         </div>
-                        ${data.knowledgeGraph.description ? `<div class="kg-desc">${data.knowledgeGraph.description}</div>` : ''}
+                        ${kgData.description ? `<div class="kg-desc">${kgData.description}</div>` : ''}
+                        ${kgData.attributes ? `
                         <div class="kg-attributes">
-                            ${Object.entries(data.knowledgeGraph.attributes || {}).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
-                        </div>
+                            ${Object.entries(kgData.attributes).map(([k,v]) => `<div class="kg-attr"><span class="kg-attr-k">${k}</span><span class="kg-attr-v">${v}</span></div>`).join('')}
+                        </div>` : ''}
                     `;
                     pageBlock.appendChild(kg);
                 }
 
-                // 3. Organische Suchergebnisse (Bestes=Unten Mechanik bleibt intakt)
+                // 3. Organische Suchergebnisse (Bestes landet am tiefsten, in Daumennähe)
                 items.forEach((item, index) => {
+                    if(!item.link) return;
                     const domain = getHostname(item.link);
                     const color = colors[index] || { bg: 'rgba(255,255,255,0.08)', text: '#fff', border: '1px solid rgba(255,255,255,0.05)' };
                     const hasSitelinks = item.sitelinks && item.sitelinks.length > 0;
@@ -600,7 +608,6 @@
                     el.className = `card ${isInitial ? 'animate-in' : ''}`; 
                     el.style.cursor = 'pointer';
                     el.onclick = (e) => {
-                        // Klick auf Sitelink-Toggle oder Button soll nicht zur Hauptseite navigieren
                         if(!e.target.closest('.sitelink-toggle') && !e.target.closest('.sitelink-btn')) {
                             window.open(item.link, '_blank');
                         }
@@ -619,13 +626,14 @@
                             </button>
                             ` : ''}
                         </div>
-                        <div class="card-title">${item.title}</div>
-                        <div class="card-snippet">${item.snippet || ''}</div>
+                        <div class="card-title">${item.title || 'Ohne Titel'}</div>
+                        ${item.snippet ? `<div class="card-snippet">${item.snippet}</div>` : ''}
+                        
                         ${hasSitelinks ? `
                         <div class="sitelinks-container" style="display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);">
                             <div style="overflow: hidden;">
                                 <div class="sitelinks-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    ${item.sitelinks.map(sl => `
+                                    ${item.sitelinks.slice(0, 6).map(sl => `
                                         <div onclick="window.open('${sl.link}', '_blank')" class="sitelink-btn">${sl.title}</div>
                                     `).join('')}
                                 </div>
@@ -636,22 +644,25 @@
                     pageBlock.appendChild(el);
                 });
 
-                // 4. Local Results (Immer Ganz Unten)
+                // 4. Local Results (Ganz Unten, direkt über dem Suchschlitz!)
                 if (isInitial && data.places && data.places.length > 0) {
                     const local = document.createElement('div');
                     local.className = `card local-card ${isInitial ? 'animate-in' : ''}`;
                     local.innerHTML = `
-                        <h3 class="local-header">Lokale Ergebnisse</h3>
+                        <h3 class="local-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Orte
+                        </h3>
                         <div class="local-list">
                             ${data.places.slice(0, 4).map(p => `
-                                <div class="local-item">
-                                    <div class="local-item-title">${p.title}</div>
+                                <div class="local-item" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.title||'') + ' ' + (p.address||''))}', '_blank')" style="cursor: pointer;">
+                                    <div class="local-item-title">${p.title || ''}</div>
+                                    ${p.rating ? `
                                     <div class="local-item-rating">
-                                        <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating || ''}</span> ${p.ratingCount ? `<span style="opacity:0.6;">(${p.ratingCount})</span>` : ''} 
-                                    </div>
+                                        <span class="star">★</span> <span style="color:#fff; font-weight:600; margin-right:4px;">${p.rating}</span> ${p.ratingCount ? `<span style="opacity:0.6;">(${p.ratingCount})</span>` : ''} 
+                                    </div>` : ''}
                                     ${p.address ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
-                                    ${p.hours ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${p.hours}</div>` : ''}
-                                    ${p.phone ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> ${p.phone}</div>` : ''}
+                                    ${p.category ? `<div class="local-item-meta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> ${p.category}</div>` : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -660,25 +671,25 @@
                 }
 
             } 
-            // ----- Bilder und Shopping Rendern (unverändert & synchron) -----
             else {
                 items.forEach((item) => {
                     if (type === 'images') {
+                        if(!item.imageUrl) return;
                         const myIndex = globalImages.length;
                         globalImages.push(item);
                         const el = document.createElement('a');
-                        el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
+                        el.href = item.link || '#'; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
                         el.innerHTML = `<img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                         el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                         pageBlock.appendChild(el);
                     } 
                     else if (type === 'shopping') {
                         const el = document.createElement('a');
-                        el.href = item.link; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
+                        el.href = item.link || '#'; el.className = `shopping-card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
                         el.innerHTML = `
                             <div class="shopping-img-wrapper"><img src="${item.imageUrl}" loading="lazy" onerror="this.closest('.shopping-card').remove();"></div>
                             <div class="shopping-info">
-                                <div class="shopping-title">${item.title}</div>
+                                <div class="shopping-title">${item.title || 'Artikel'}</div>
                                 <div class="shopping-price">${item.price || ''}</div>
                             </div>
                         `;
