@@ -109,47 +109,15 @@
             padding: 12px 20px calc(var(--safe-bottom) + 16px) 20px; 
             box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
             border-top: 1px solid rgba(255,255,255,0.15);
-            transform: translateY(100%); transition: var(--spring-smooth), height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            transform: translateY(100%); transition: var(--spring-smooth);
             height: 85vh; display: flex; flex-direction: column;
         }
         #ai-sheet.active { transform: translateY(0); }
+        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; }
         
-        /* KOMPAKTER MODUS */
-        #ai-sheet.compact {
-            height: auto;
-            min-height: 100px;
-            max-height: 30vh;
-            cursor: pointer;
-        }
-        #ai-sheet.compact .ai-followup-form {
-            display: none;
-        }
-        #ai-sheet.compact .ai-sheet-content {
-            overflow: hidden;
-            pointer-events: none;
-            padding-bottom: 30px; /* Space for the hint text */
-        }
-        #ai-sheet.compact::after {
-            content: "Für Chat & mehr tippen";
-            position: absolute;
-            bottom: calc(var(--safe-bottom) + 12px);
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.4);
-            pointer-events: none;
-            animation: fadeIn 1s ease forwards;
-            animation-delay: 1s;
-            opacity: 0;
-        }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; pointer-events: none; }
-        
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; pointer-events: none; }
+        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
         .ai-sheet-title { font-size: 16px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
-        .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); pointer-events: all; }
+        .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
         .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
         
         .ai-sheet-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 8px 4px 20px; scroll-behavior: smooth; }
@@ -159,35 +127,13 @@
         .ai-message { background: rgba(255,255,255,0.06); color: white; border-radius: 22px; border-bottom-left-radius: 4px; align-self: flex-start; max-width: 95%; border: 1px solid rgba(255,255,255,0.03); }
         .user-message { background: rgba(255,255,255,0.15); color: white; border-radius: 22px; border-bottom-right-radius: 4px; align-self: flex-end; max-width: 85%; }
         
-        /* AI WIDGETS (Währung & Orte) */
-        .ai-widget-currency {
-            border-radius: 18px; padding: 16px 20px; margin: 12px 0; color: white; display: flex; align-items: center; justify-content: space-between;
-            font-weight: 600; font-size: 20px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 8px 20px rgba(0,0,0,0.2); 
-            border: 1px solid rgba(255,255,255,0.1); letter-spacing: -0.5px;
-        }
-        .ai-widget-currency .currency-part { display: flex; flex-direction: column; }
-        .ai-widget-currency .currency-label { font-size: 12px; font-weight: 600; opacity: 0.75; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px; }
-        .ai-widget-currency .currency-equals { opacity: 0.3; font-size: 24px; font-weight: 400; }
-        .ai-widget-currency .currency-part.right { text-align: right; }
-
-        .ai-widget-place {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 18px; margin: 12px 0; 
-            display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .ai-widget-place-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 2px; letter-spacing: -0.3px; }
-        .ai-widget-place-row { font-size: 15px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px; line-height: 1.4; }
-        .ai-widget-place-row svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.6; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        .ai-widget-place-row a { color: #fff; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity 0.2s; }
-        .ai-widget-place-row a:active { opacity: 0.5; }
-        .ai-widget-place-row a.web-link { color: #0a84ff; font-weight: 500; }
-
         .ai-message b { font-weight: 600; color: #fff; }
         .ai-message p { margin-bottom: 8px; }
         .ai-message p:last-child { margin-bottom: 0; }
         .ai-message ul { padding-left: 20px; margin-bottom: 8px; }
         
         /* Follow-up Input */
-        .ai-followup-form { display: flex; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); animation: slideIn 0.3s 0.2s both; }
+        .ai-followup-form { display: flex; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
         .ai-followup-form input { flex: 1; background: transparent; border: none; color: white; font-size: 16px; padding: 0 16px; outline: none; -webkit-appearance: none; }
         .ai-followup-form input::placeholder { color: rgba(255,255,255,0.4); }
         .ai-followup-form button { width: 36px; height: 36px; border-radius: 18px; background: white; border: none; color: black; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; }
@@ -208,6 +154,7 @@
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 18px; height: 18px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
+        /* KI Button in der Bottom Bar (Not purple, sleek glass design) */
         .ai-reopen-btn {
             width: 40px; height: 40px; border-radius: 20px; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); display: none; color: white;
@@ -264,6 +211,7 @@
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
         .modal-content button:active { transform: scale(0.95); }
         
+        /* Loading skeleton for AI */
         .typing-indicator { display: inline-block; width: 12px; animation: ellipsis 1.2s infinite; }
         @keyframes ellipsis { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } }
     </style>
@@ -273,10 +221,10 @@
     <div id="setup-modal">
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
-            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suche)" autocomplete="off" spellcheck="false">
+            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suce)" autocomplete="off" spellcheck="false">
             <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert intelligente Kurz-Widgets. Serper liefert das Web.</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert schnelle Direktantworten. Serper liefert das Web.</p>
         </div>
     </div>
 
@@ -309,14 +257,15 @@
         <div class="drag-pill"></div>
         <div class="ai-sheet-header">
             <div class="ai-sheet-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
                 Intelligence
             </div>
-            <button class="ai-sheet-close" onclick="closeAiSheet(event)">
+            <button class="ai-sheet-close" onclick="closeAiSheet()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="ai-sheet-content" id="ai-sheet-content"></div>
+        <div class="ai-sheet-content" id="ai-sheet-content">
+            </div>
         <form class="ai-followup-form" onsubmit="handleAiFollowup(event)">
             <input type="text" id="aiFollowupInput" placeholder="Fragen..." autocomplete="off">
             <button type="submit">
@@ -335,7 +284,7 @@
             <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
             <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
-        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheet(false)">
+        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheet()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
         </button>
     </div>
@@ -521,93 +470,29 @@
             performSearch(currentType, false, true);
             
             if (getCookie('gemini_api_key')) {
-                fetchGeminiAI(currentQuery, false, true);
+                fetchGeminiAI(currentQuery, false);
             }
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
-        // --- GEMINI KI LOGIK ---
-        
-        function openAiSheet(compact = false) {
-            if (compact) {
-                aiSheet.classList.add('compact');
-            } else {
-                aiSheet.classList.remove('compact');
-            }
+        // --- GEMINI KI LOGIK (Mit Folgefragen) ---
+        function openAiSheet() {
             aiSheet.classList.add('active');
             aiReopenBtn.classList.remove('active');
             bottomBar.style.transform = 'translate(-50%, 150%)'; 
         }
 
-        function closeAiSheet(e) {
-            if (e) e.stopPropagation(); // Verhindern, dass click event auf aiSheet feuert
+        function closeAiSheet() {
             aiSheet.classList.remove('active');
             aiReopenBtn.classList.add('active'); 
             bottomBar.style.transform = 'translate(-50%, 0)'; 
             followupInput.blur();
         }
 
-        // Klick auf kompaktes Fenster klappt es auf
-        aiSheet.addEventListener('click', function(e) {
-            if (this.classList.contains('compact')) {
-                // Schließen-Button ausnehmen
-                if (!e.target.closest('.ai-sheet-close')) {
-                    this.classList.remove('compact');
-                    setTimeout(() => {
-                        aiContent.scrollTop = aiContent.scrollHeight;
-                        followupInput.focus();
-                    }, 300);
-                }
-            }
-        });
-
-        // Farbe pro Währung
-        function getCurrencyColor(c1, c2) {
-            const colors = {
-                'USD': '#248a3d', 'EUR': '#0052cc', 'CHF': '#d9281c',
-                'GBP': '#5e5ce6', 'JPY': '#ff2d55', 'BTC': '#f59e0b',
-                'ETH': '#627eea', 'AUD': '#0084ff', 'CAD': '#e02826'
-            };
-            return colors[c1] || colors[c2] || '#48484a';
-        }
-
-        function parseWidgets(text) {
-            // Währungs Widget Parse
-            let parsed = text.replace(/\$\$CURRENCY:\s*(.*?)\s*\|\s*(.*?)\$\$/gi, (match, p1, p2) => {
-                const w1 = p1.trim().split(/\s+/).pop().toUpperCase();
-                const w2 = p2.trim().split(/\s+/).pop().toUpperCase();
-                const color = getCurrencyColor(w1, w2);
-                return `
-                <div class="ai-widget-currency" style="background-color: ${color};">
-                    <div class="currency-part"><span class="currency-label">${w1}</span><span>${p1.replace(new RegExp(w1, "i"), '').trim()}</span></div>
-                    <div class="currency-equals">=</div>
-                    <div class="currency-part right"><span class="currency-label">${w2}</span><span>${p2.replace(new RegExp(w2, "i"), '').trim()}</span></div>
-                </div>`;
-            });
-
-            // Orts Widget Parse
-            parsed = parsed.replace(/\$\$PLACE:\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\$\$/gi, (match, name, addr, phone, email, web) => {
-                let html = `<div class="ai-widget-place">`;
-                if (name && name.trim() !== '-') html += `<div class="ai-widget-place-name">${name.trim()}</div>`;
-                if (addr && addr.trim() !== '-') html += `<div class="ai-widget-place-row"><svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> <span>${addr.trim()}</span></div>`;
-                if (phone && phone.trim() !== '-') html += `<div class="ai-widget-place-row"><svg><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <a href="tel:${phone.trim()}">${phone.trim()}</a></div>`;
-                if (email && email.trim() !== '-') html += `<div class="ai-widget-place-row"><svg><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <a href="mailto:${email.trim()}">${email.trim()}</a></div>`;
-                if (web && web.trim() !== '-') {
-                    let niceUrl = web.trim();
-                    let hrefUrl = niceUrl.startsWith('http') ? niceUrl : 'https://' + niceUrl;
-                    html += `<div class="ai-widget-place-row"><svg><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> <a href="${hrefUrl}" target="_blank" class="web-link">${niceUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a></div>`;
-                }
-                html += `</div>`;
-                return html;
-            });
-            return parsed;
-        }
-
         function formatMarkdown(text) {
-            let htmlText = parseWidgets(text);
-            return htmlText
+            return text
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
                 .replace(/\n\n/g, '</p><p>')
@@ -622,11 +507,11 @@
             if(q) {
                 followupInput.value = '';
                 followupInput.blur();
-                fetchGeminiAI(q, true, false);
+                fetchGeminiAI(q, true);
             }
         }
 
-        async function fetchGeminiAI(query, isFollowUp = false, isInitialSearch = false) {
+        async function fetchGeminiAI(query, isFollowUp = false) {
             const geminiKey = getCookie('gemini_api_key');
             if (!geminiKey) return;
 
@@ -641,26 +526,16 @@
             aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><span style="opacity:0.6;">Denke nach...</span></div>`;
             
             requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
-            
-            if (isInitialSearch) {
-                openAiSheet(true); 
-            } else if (!isFollowUp) {
-                openAiSheet(false);
-            }
-
-            const rules = `REGELN ZWINGEND EINHALTEN:
-- Antworte extrem kurz, max. 1-2 Sätze. Direkt auf den Punkt.
-- WÄHRUNGEN & UMRECHNUNGEN AUSSCHLIESSLICH so: $$CURRENCY: [Betrag] [Währung1] | [Betrag] [Währung2]$$ (Bsp: $$CURRENCY: 10 USD | 9.20 EUR$$)
-- ORTE & RESTAURANTS AUSSCHLIESSLICH so (max 2): $$PLACE: Name | Adresse | Telefon | Email | Website$$ (Fülle fehlendes mit - aus)`;
+            if (!isFollowUp) openAiSheet();
 
             const prompt = isFollowUp 
-                ? `Nutzer fragt: "${query}".\n\n${rules}`
-                : `Nutzer sucht nach: "${query}".\n\n${rules}`;
+                ? `Neue Frage des Nutzers: "${query}". Antworte basierend auf dem bisherigen Kontext. Antworte extrem kurz, präzise und direkt auf den Punkt.`
+                : `Der Nutzer sucht nach: "${query}". Antworte extrem kurz, präzise und brandaktuell. Wenn es eine Rechenaufgabe/Währung ist, gib nur das Resultat. Wenn es eine Faktenfrage ist, antworte direkt im 1. Satz. Wenn es um lokale Orte geht, nenne 2 konkrete Beispiele. Keine langen Einleitungen. Nutze Fett-Druck (**) für wichtige Daten.`;
 
+            // Append to context array
             aiChatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
             try {
-                // Kann generisch genutzt werden, aber Endpunkt erfordert hier ein Modell im URL Pfad
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -678,8 +553,8 @@
 
                 document.getElementById(loadingId).innerHTML = `<p>${formatMarkdown(answerText)}</p>`;
             } catch (error) {
-                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">KI Antwort fehlgeschlagen.</span>';
-                aiChatHistory.pop();
+                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">KI konnte nicht laden. Bitte überprüfe den API Key.</span>';
+                aiChatHistory.pop(); // Remove failed prompt
             }
             requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
         }
@@ -718,6 +593,7 @@
 
             try {
                 const endpoint = type === 'search' ? 'search' : type;
+                
                 const response = await fetch(`https://google.serper.dev/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
