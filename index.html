@@ -21,7 +21,7 @@
             --border-radius: 24px;
             --safe-top: env(safe-area-inset-top, 44px);
             --safe-bottom: env(safe-area-inset-bottom, 34px);
-            --spring-fast: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            --spring-fast: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; overflow-anchor: none; }
@@ -106,7 +106,7 @@
             backdrop-filter: blur(50px) saturate(250%) brightness(1.15); -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.15);
             padding: 8px; border-radius: 100px; 
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.6);
-            display: flex; align-items: center; gap: 8px; z-index: 100; transition: var(--spring-fast);
+            display: flex; align-items: center; gap: 8px; z-index: 100; transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
         }
         .search-circle-btn {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
@@ -117,7 +117,7 @@
 
         .ai-reopen-btn {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; display: none; backdrop-filter: blur(10px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; display: none; backdrop-filter: blur(10px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.3); color: white;
         }
         .ai-reopen-btn.active { display: flex; }
         .ai-reopen-btn:active { transform: scale(0.9); }
@@ -169,7 +169,7 @@
             background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
             border: 1px solid rgba(255,255,255,0.1);
             display: flex; flex-direction: column;
-            transition: var(--spring-fast);
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), border-radius 0.4s ease, height 0.4s ease, bottom 0.4s ease, left 0.4s ease, right 0.4s ease;
             transform: translateY(150%);
             overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
@@ -179,7 +179,7 @@
             bottom: calc(var(--safe-bottom) + 80px);
             left: 16px; right: 16px; max-width: 728px; margin: 0 auto;
             border-radius: 28px;
-            max-height: 300px;
+            height: auto; max-height: 320px;
             transform: translateY(0);
             cursor: pointer;
         }
@@ -187,48 +187,52 @@
 
         /* Expanded Vollbild Sheet */
         #ai-sheet.expanded-mode {
-            bottom: 0; left: 0; right: 0;
+            bottom: 0; left: 0; right: 0; max-width: 100%; margin: 0;
             border-radius: 32px 32px 0 0;
-            height: 85vh;
+            height: 85vh; max-height: 85vh;
             transform: translateY(0);
             cursor: default;
         }
 
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 12px; }
-        .ai-sheet-title { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
+        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 12px; flex-shrink: 0; }
+        .ai-sheet-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; }
         
         .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
         #ai-sheet.expanded-mode .ai-sheet-close { display: flex; }
         .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
         
-        .ai-sheet-content { padding: 0 24px 24px; overflow-y: auto; flex: 1; scrollbar-width: none; font-size: 16px; line-height: 1.6; color: #fff; }
-        
-        .ai-sheet-input-container { padding: 16px 24px calc(var(--safe-bottom) + 16px); border-top: 1px solid rgba(255,255,255,0.05); display: none; background: rgba(25, 25, 28, 0.95); }
+        .ai-sheet-content { padding: 0 24px 24px; overflow-y: auto; flex: 1; scrollbar-width: none; font-size: 16px; line-height: 1.6; color: #fff; pointer-events: none; }
+        #ai-sheet.expanded-mode .ai-sheet-content { pointer-events: auto; } /* Erst im Vollbild scrollbar/klickbar */
+
+        .ai-sheet-input-container { padding: 16px 24px calc(var(--safe-bottom) + 16px); border-top: 1px solid rgba(255,255,255,0.05); display: none; background: rgba(25, 25, 28, 0.95); flex-shrink: 0; }
         #ai-sheet.expanded-mode .ai-sheet-input-container { display: block; }
         
         .ai-sheet-input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 16px 20px; color: white; font-size: 16px; outline: none; transition: var(--spring-fast); }
         .ai-sheet-input:focus { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.15); }
 
-        /* WIDGET STYLES (No Gradients, Apple Modern) */
-        .widget-currency { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .widget-currency-box { flex: 1; padding: 16px; border-radius: 20px; color: #fff; }
-        .widget-currency-code { font-size: 13px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; }
-        .widget-currency-amount { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; word-break: break-word;}
+        /* WIDGET STYLES (Apple Modern, Solid Colors) */
+        .widget-currency { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .widget-currency-box { flex: 1; padding: 20px; border-radius: 24px; color: #fff; text-align: center; }
+        .widget-currency-code { font-size: 14px; font-weight: 600; opacity: 0.8; margin-bottom: 4px; text-transform: uppercase; }
+        .widget-currency-amount { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; word-break: break-word; line-height: 1.2;}
         
-        .widget-places-grid { display: flex; flex-direction: column; gap: 12px; }
-        .widget-place-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 20px; }
-        .widget-place-name { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .widget-place-meta { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; }
+        .widget-places-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px;}
+        .widget-place-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); padding: 20px; border-radius: 24px; }
+        .widget-place-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+        .widget-place-meta { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px; line-height: 1.5; }
         .widget-place-actions { display: flex; gap: 8px; flex-wrap: wrap;}
-        .widget-place-btn { background: rgba(255,255,255,0.1); color: #fff; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-
-        .ai-full-text { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 20px; display: none; }
+        .widget-place-btn { background: rgba(255,255,255,0.12); color: #fff; padding: 10px 16px; border-radius: 16px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        
+        .ai-short-text { font-size: 20px; font-weight: 500; line-height: 1.4; color: #fff; margin-bottom: 8px; }
+        .ai-full-text { font-size: 16px; color: rgba(255,255,255,0.85); margin-top: 24px; display: none; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;}
         #ai-sheet.expanded-mode .ai-full-text { display: block; }
+        .ai-full-text b { color: #fff; font-weight: 600; }
 
         #setup-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999; opacity: 0; pointer-events: none; transition: var(--spring-fast); }
         #setup-modal.active { opacity: 1; pointer-events: all; }
         .modal-content { background: rgba(28,28,30,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 32px; border-radius: 32px; width: 90%; max-width: 340px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-content input { width: 100%; padding: 16px; margin: 16px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 16px; text-align: center; outline: none; }
+        .modal-content input.gemini-input { margin-top: 0; background: rgba(255,255,255,0.08); }
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
         .modal-content button:active { transform: scale(0.95); }
     </style>
@@ -239,9 +243,9 @@
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
             <input type="text" id="apiKeyInput" placeholder="Serper Key (Suche)" autocomplete="off" spellcheck="false">
-            <input type="text" id="geminiKeyInput" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false" style="background: rgba(255,255,255,0.05);">
+            <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini API liefert interaktive Widgets & Antworten.</p>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 16px; line-height: 1.4;">Gemini liefert interaktive Widgets & intelligente Antworten.</p>
         </div>
     </div>
 
@@ -262,7 +266,7 @@
         <div class="viewer-header" id="viewer-header">
             <div id="viewer-pill-container"></div>
             <button class="viewer-close" onclick="closeImageViewer()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="viewer-track" id="viewer-track"></div>
@@ -283,8 +287,8 @@
     <div id="ai-sheet" onclick="expandAiSheet(event)">
         <div class="ai-sheet-header">
             <div class="ai-sheet-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Antwort
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                KI Antwort
             </div>
             <button class="ai-sheet-close" onclick="closeAiSheet(event)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -308,7 +312,7 @@
             <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
         <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheetCompact(true)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
         </button>
     </div>
 
@@ -326,11 +330,12 @@
         const aiContent = document.getElementById('ai-sheet-content');
         const aiReopenBtn = document.getElementById('aiReopenBtn');
         const aiFollowUpInput = document.getElementById('aiFollowUpInput');
+        const bottomBar = document.getElementById('bottom-bar');
         
         let currentType = 'search';
         let currentQuery = '';
         let isLoading = false;
-        let aiHistory = []; // Speichert Chat-Verlauf
+        let aiHistory = []; 
         
         const state = {
             search: { page: 1, loaded: false },
@@ -502,7 +507,7 @@
             performSearch(currentType, false, true);
             
             if (currentType === 'search' && getCookie('gemini_api_key')) {
-                aiHistory = []; // Reset Chat History
+                aiHistory = []; 
                 fetchGeminiAI(currentQuery, true);
             }
         }
@@ -525,6 +530,8 @@
             aiSheet.classList.add('compact-mode');
             aiSheet.classList.remove('expanded-mode');
             aiReopenBtn.classList.remove('active');
+            bottomBar.style.transform = 'translate(-50%, 150%)'; 
+            
             if (manual && aiHistory.length === 0) {
                 fetchGeminiAI(currentQuery, false);
             }
@@ -533,13 +540,12 @@
         function expandAiSheet(e) {
             if (aiSheet.classList.contains('compact-mode')) {
                 if (e && e.target.closest('.ai-sheet-close')) return;
-                if (e && e.target.closest('a')) return; // Links nicht blockieren
+                if (e && e.target.closest('a')) return; 
                 
                 aiSheet.classList.remove('compact-mode');
                 aiSheet.classList.add('expanded-mode');
                 
-                // Input fokussieren mit leichter Verzögerung für Animation
-                setTimeout(() => aiFollowUpInput.focus(), 300);
+                setTimeout(() => aiFollowUpInput.focus(), 350);
             }
         }
 
@@ -555,21 +561,26 @@
             aiSheet.classList.remove('compact-mode');
             aiSheet.classList.remove('expanded-mode');
             aiFollowUpInput.blur();
+            bottomBar.style.transform = 'translate(-50%, 0)'; 
         }
 
+        // Apple-style Solid Colors für Währungen
         function getCurrencyColor(code) {
             const colors = {
-                'EUR': '#1565C0', 'USD': '#2E7D32', 'CHF': '#C62828', 
-                'GBP': '#4527A0', 'JPY': '#0277BD', 'AUD': '#00695C', 
-                'CAD': '#E65100'
+                'EUR': '#007AFF', // Apple Blue
+                'USD': '#34C759', // Apple Green
+                'CHF': '#FF3B30', // Apple Red
+                'GBP': '#5856D6', // Apple Purple
+                'JPY': '#FF9500', // Apple Orange
+                'AUD': '#32ADE6', // Apple Indigo
+                'CAD': '#FFCC00'  // Apple Yellow
             };
-            return colors[code.toUpperCase()] || '#424242';
+            return colors[code.toUpperCase()] || '#8E8E93'; // Apple Gray Fallback
         }
 
         function renderJsonWidget(data) {
             let html = '';
             
-            // 1. Währungs-Widget
             if (data.type === 'currency' && data.currency) {
                 const c = data.currency;
                 html += `
@@ -578,7 +589,7 @@
                             <div class="widget-currency-code">${c.from}</div>
                             <div class="widget-currency-amount">${c.amount_from}</div>
                         </div>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         <div class="widget-currency-box" style="background:${getCurrencyColor(c.to)};">
                             <div class="widget-currency-code">${c.to}</div>
                             <div class="widget-currency-amount">${c.amount_to}</div>
@@ -586,10 +597,10 @@
                     </div>
                 `;
             } 
-            // 2. Local Places Widget
             else if (data.type === 'places' && data.places && data.places.length > 0) {
                 html += `<div class="widget-places-grid">`;
                 data.places.forEach(p => {
+                    const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.name||'') + ' ' + (p.address||''))}`;
                     html += `
                         <div class="widget-place-card">
                             <div class="widget-place-name">${p.name}</div>
@@ -598,6 +609,7 @@
                                 ${p.hours ? `<span style="color:#fff; font-weight:500;">${p.hours}</span>` : ''}
                             </div>
                             <div class="widget-place-actions">
+                                <a href="${searchUrl}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Karte</a>
                                 ${p.phone ? `<a href="tel:${p.phone.replace(/\s+/g,'')}" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Anrufen</a>` : ''}
                                 ${p.website ? `<a href="${p.website}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Website</a>` : ''}
                             </div>
@@ -606,14 +618,13 @@
                 });
                 html += `</div>`;
             } 
-            // 3. Normaler Text (Kurzform)
             else {
-                html += `<div style="font-size: 18px; font-weight: 500;">${data.short_answer || 'Antwort geladen.'}</div>`;
+                html += `<div class="ai-short-text">${data.short_answer || 'Antwort geladen.'}</div>`;
             }
 
-            // Ausführlicher Text (Nur sichtbar wenn Expanded!)
+            // Vollständiger Text (wird erst beim Ausklappen eingeblendet)
             if (data.full_text) {
-                let formattedFull = data.full_text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                let formattedFull = data.full_text.replace(/\n/g, '<br>');
                 html += `<div class="ai-full-text">${formattedFull}</div>`;
             }
 
@@ -628,38 +639,38 @@
                 const autoOpen = shouldAutoOpenAI(query);
                 if (autoOpen) {
                     openAiSheetCompact(false);
-                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 15px;">Suche aktuelle Daten...</span>';
+                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Suche aktuelle Daten...</span>';
                 } else {
                     aiReopenBtn.classList.add('active'); 
-                    return; // Stilles Laden überspringen wir hier um API Kosten zu sparen, bis der User den Button drückt
+                    return; 
                 }
             } else {
-                // Bei Nachfrage oder manuellem Öffnen
-                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 15px;">Sucht Antwort...</span>';
+                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Sucht Antwort...</span>';
             }
 
             aiHistory.push({ role: "user", parts: [{ text: query }] });
 
-            const systemInstruction = `Du bist ein hilfreicher KI-Suchassistent. Nutze zwingend "Google Search" um Echtzeitdaten abzufragen.
-            Antworte IMMER und AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Markdown-Codeblöcke um das JSON herum.
+            const systemInstruction = `Du bist ein hilfreicher Suchassistent. Nutze zwingend "Google Search" um Echtzeitdaten abzufragen.
+            Antworte IMMER und AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Markdown-Codeblöcke um das JSON herum, gib reines JSON zurück!
             
             {
               "type": "currency" | "places" | "text",
-              "short_answer": "Sehr kurze prägnante Antwort (1 Satz)",
-              "full_text": "Ausführlichere Erklärung und Details",
-              "currency": { "from": "CHF", "to": "EUR", "amount_from": "100", "amount_to": "105.20" }, // Nur bei Währungen/Rechnungen ausfüllen
-              "places": [ { "name": "Ort 1", "address": "Mustergasse 1", "phone": "+41...", "website": "https...", "hours": "Heute: 09:00 - 18:00" } ] // Nur bei Orten ausfüllen (max 3)
+              "short_answer": "Sehr kurze, direkte Antwort in 1 Satz ohne Einleitung.",
+              "full_text": "Ausführlichere Erklärung, Details und Kontext. Verfasse keine unnötigen Einleitungen.",
+              "currency": { "from": "CHF", "to": "EUR", "amount_from": "100", "amount_to": "105.20" },
+              "places": [ { "name": "Ort 1", "address": "Mustergasse 1", "phone": "+41...", "website": "https...", "hours": "Geöffnet bis 18:00" } ]
             }`;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+                // gemini-1.5-flash ist extrem schnell, verlässlich und unterstützt native JSON-Formate
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: aiHistory,
                         systemInstruction: { parts: [{ text: systemInstruction }] },
                         tools: [{ googleSearch: {} }], 
-                        generationConfig: { temperature: 0.2, responseMimeType: "application/json" }
+                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
                     })
                 });
 
@@ -670,16 +681,17 @@
                 aiHistory.push({ role: "model", parts: [{ text: answerRaw }] });
 
                 try {
-                    const parsedJson = JSON.parse(answerRaw);
+                    // Falls das Modell doch Markdown-Tags mitsendet, bereinigen wir diese zur Sicherheit
+                    const cleanJson = answerRaw.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const parsedJson = JSON.parse(cleanJson);
                     aiContent.innerHTML = renderJsonWidget(parsedJson);
                 } catch (parseError) {
-                    // Fallback falls JSON kaputt
-                    aiContent.innerHTML = `<div style="font-size:16px;">${answerRaw.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}</div>`;
+                    aiContent.innerHTML = `<div class="ai-short-text">Formatierungsfehler der KI.</div><div class="ai-full-text">${answerRaw}</div>`;
                 }
 
             } catch (error) {
-                aiContent.innerHTML = '<span style="color:#ff6b6b; font-size: 15px;">KI Error. API Key prüfen.</span>';
-                aiHistory.pop(); // Fehlerhafte Frage entfernen
+                aiContent.innerHTML = '<span style="color:#ff3b30; font-size: 16px; font-weight:500;">Verbindungsfehler zur KI. Bitte prüfe den API Key.</span>';
+                aiHistory.pop(); 
             }
         }
 
