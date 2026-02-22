@@ -68,7 +68,7 @@
         }
         .home-search-input:focus { background-color: var(--card-hover); border-color: rgba(255,255,255,0.1); transform: scale(1.02); }
 
-        /* Perfektes Overlay: Blockiert alle Klicks darunter */
+        /* Suchfeld Overlay */
         #search-overlay {
             position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -217,7 +217,7 @@
         }
         .ios-currency-title { font-size: 13px; font-weight: 600; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .ios-currency-amount { font-size: 16px; font-weight: 500; color: #a1a1a6; text-decoration: line-through; }
-        .ios-currency-converted { font-size: 42px; font-weight: 700; letter-spacing: -1.2px; line-height: 1.1; }
+        .ios-currency-converted { font-size: 42px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
 
         /* ORTE WIDGET (Apple Maps Style) */
         .ios-place-card {
@@ -648,8 +648,11 @@
             // AI Vorbereiten - Compact Widget anzeigen
             geminiHistory = [];
             aiChatContent.innerHTML = '';
+            
+            // Display sicherstellen für neue Suche
             aiCompactWidget.style.display = 'flex';
             aiCompactWidget.classList.remove('active');
+            
             triggerGemini(currentQuery, false, myId);
         }
 
@@ -793,7 +796,7 @@
         // ==========================================
         
         function closeCompactWidget(e) {
-            e.stopPropagation(); // Verhindert, dass sich das Sheet öffnet
+            e.stopPropagation(); // Verhindert Klick aufs Widget
             aiCompactWidget.classList.remove('active');
             setTimeout(() => { 
                 if(!aiCompactWidget.classList.contains('active')) {
@@ -825,7 +828,7 @@
                     const title = (content.match(/Title:\s*(.*)/) || [])[1] || 'Umrechnung';
                     const amount = (content.match(/Amount:\s*(.*)/) || [])[1] || '';
                     const converted = (content.match(/Converted:\s*(.*)/) || [])[1] || '';
-                    const color = (content.match(/Color:\s*(.*)/) || [])[1] || '#007AFF';
+                    const color = (content.match(/Color:\s*(.*)/) || [])[1] || '#0A84FF';
                     
                     html += `
                         <div class="ios-currency-card">
@@ -843,10 +846,10 @@
                     const website = (content.match(/Website:\s*(.*)/) || [])[1] || '';
                     
                     let details = '';
-                    if(address) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span>${address}</span></div>`;
-                    if(hours) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
-                    if(phone) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span>${phone}</span></div>`;
-                    if(website) details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span>${website}</span></div>`;
+                    if(address && address !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div><span>${address}</span></div>`;
+                    if(hours && hours !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span>${hours}</span></div>`;
+                    if(phone && phone !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span>${phone}</span></div>`;
+                    if(website && website !== 'Nicht verfügbar') details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span>${website}</span></div>`;
 
                     html += `
                         <div class="ios-place-card">
@@ -906,10 +909,9 @@
             
             openAiSheet();
             
-            // Sicherer Zugriff auf das letzte Element in der History
+            // Verhindert Error wenn Array leer ist
             const lastMsg = geminiHistory.length >= 2 ? geminiHistory[geminiHistory.length - 2] : null;
             
-            // Wenn die History leer ist, oder das letzte Element nicht dem Suchbegriff entspricht, starte Suche
             if (aiChatContent.innerHTML.trim() === '' || !lastMsg || !lastMsg.parts || !lastMsg.parts[0] || lastMsg.parts[0].text !== q) {
                 geminiHistory = [];
                 aiChatContent.innerHTML = '';
@@ -925,7 +927,7 @@
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) throw new Error("No API Key");
 
-            const systemPrompt = `Du bist ein brillanter, hilfreicher KI-Assistent. Du hast Zugriff auf Live-Internetdaten. 
+            const systemPrompt = `Du bist ein brillanter KI-Assistent. Du hast Zugriff auf Live-Internetdaten. 
 WICHTIG: Antworte niemals in JSON! Verwende EXAKT und AUSSCHLIESSLICH diese Text-Blöcke zur Formatierung:
 
 Für Währungen:
@@ -936,7 +938,7 @@ Converted: <Zielbetrag inkl. Währungszeichen>
 Color: <Nutze zwingend: #0A84FF für €, #30D158 für $, #FF453A für CHF, #BF5AF2 für £, #FF9F0A für ¥, sonst #5E5CE6>
 [/CURRENCY]
 
-Für Orte/Restaurants (mehrere erlaubt, Liste sie einzeln auf):
+Für Orte/Restaurants (mehrere erlaubt):
 [PLACE]
 Name: <Name>
 Address: <Adresse>
@@ -965,18 +967,32 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
             const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
 
+            // 1. Versuch: Gemini 2.5 Flash + Grounding google_search
             try {
                 const payload1 = { contents: flatContents, tools: [{ google_search: {} }] };
                 const res1 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload1)
                 });
                 if (res1.ok) return await res1.json();
-            } catch(e) { console.warn("Versuch 1 (Grounding) fehlgeschlagen."); }
+            } catch(e) {}
 
-            // Fallback ohne Tools (garantiert robuster Aufruf)
-            const payloadFallback = { contents: flatContents };
+            // 1.5 Versuch: Gemini 2.5 Flash + Grounding googleSearch (CamelCase)
+            try {
+                const payload15 = { contents: flatContents, tools: [{ googleSearch: {} }] };
+                const res15 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload15)
+                });
+                if (res15.ok) return await res15.json();
+            } catch(e) {}
+
+            // 2. Absoluter Fallback: KI ohne Tools (sicher und fehlerfrei)
+            const multiTurnContents = [...geminiHistory, { role: "user", parts: [{ text: query }] }];
+            const basePayload = {
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: multiTurnContents
+            };
             const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadFallback)
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
             });
             
             if (!resFallback.ok) {
@@ -1042,7 +1058,6 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
                 if (!isManualTrigger) {
                     setCompactLoadingState(false);
-                    // Magie: Das Widget direkt im Compact-Container rendern!
                     aiCompactContainer.innerHTML = parseAiMarkupToHtml(textResp, true);
                     appendAiCard(textResp);
                 } else {
@@ -1080,6 +1095,7 @@ Lass keine Felder leer, schreibe sonst "Nicht verfügbar".`;
 
         function handleAiChat(e) {
             e.preventDefault();
+            // ANIMATIONS FIX: Shake Animation wenn AI noch denkt
             if (isAiThinking) {
                 aiChatInput.classList.add('shake-anim');
                 setTimeout(() => aiChatInput.classList.remove('shake-anim'), 300);
