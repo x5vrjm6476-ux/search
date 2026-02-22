@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://encrypted-tbn0.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,6 +23,7 @@
             --safe-bottom: env(safe-area-inset-bottom, 34px);
             --spring-fast: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
             --spring-smooth: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            --ai-accent: #a285ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; scrollbar-width: none; overflow-anchor: none; }
@@ -46,7 +47,7 @@
         .results-content { 
             display: flex; flex-direction: column-reverse; 
             max-width: 760px; margin: 0 auto; width: 100%; 
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 120px); 
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 160px); /* Mehr Platz für AI Pill */
             overflow-anchor: auto;
         }
 
@@ -86,54 +87,83 @@
         }
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; }
 
-        .page-block { display: flex; flex-direction: column; width: 100%; }
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 16px; }
-        @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
-
-        .animate-in { animation: slideIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
-        @keyframes slideIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
-
-        .skeleton { animation: pulse 1.2s infinite ease-in-out; background: rgba(255,255,255,0.06); }
-        .skeleton-card { border-radius: var(--border-radius); padding: 28px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px; border: 1px solid rgba(255,255,255,0.02); }
-        .s-pill { height: 26px; width: 100px; border-radius: 9999px; }
-        .s-title { height: 24px; width: 75%; border-radius: 8px; }
-        .s-text { height: 16px; width: 100%; border-radius: 6px; }
-        .s-text.short { width: 60%; }
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }
-
-        /* KI BOTTOM SHEET (Interactive Apple Style) */
-        #ai-sheet {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
-            background: rgba(25, 25, 28, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border-top-left-radius: 36px; border-top-right-radius: 36px;
-            padding: 12px 20px calc(var(--safe-bottom) + 16px) 20px; 
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
-            border-top: 1px solid rgba(255,255,255,0.15);
-            transform: translateY(100%); transition: var(--spring-smooth);
-            height: 85vh; display: flex; flex-direction: column;
+        /* --- KI UI (Pill -> Sheet Morphing) --- */
+        #ai-container {
+            position: fixed; z-index: 2000;
+            background: rgba(30, 30, 35, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+            transition: var(--spring-smooth);
+            display: flex; flex-direction: column; overflow: hidden;
         }
-        #ai-sheet.active { transform: translateY(0); }
-        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; }
+
+        /* State 0: Hidden */
+        #ai-container.state-hidden {
+            opacity: 0; pointer-events: none;
+            bottom: 0px; left: 50%; width: 90%; max-width: 500px; transform: translateX(-50%) translateY(100px) scale(0.9);
+            border-radius: 30px; height: 64px; box-shadow: none; border: none;
+        }
+
+        /* State 1: Collapsed Pill (Kompaktvorschau) */
+        #ai-container.state-collapsed {
+            opacity: 1; pointer-events: auto; cursor: pointer;
+            bottom: calc(var(--safe-bottom) + 80px); left: 50%; width: 92%; max-width: 500px; transform: translateX(-50%) translateY(0) scale(1);
+            border-radius: 32px; height: 64px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        #ai-container.state-collapsed:active { transform: translateX(-50%) scale(0.97); }
+
+        /* State 2: Expanded Sheet (Ausgeklappt) */
+        #ai-container.state-expanded {
+            opacity: 1; pointer-events: auto; cursor: default;
+            bottom: 0; left: 50%; width: 100%; max-width: 760px; transform: translateX(-50%) translateY(0) scale(1);
+            border-radius: 36px 36px 0 0; height: 85vh; 
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.08); border-bottom: none;
+        }
+
+        /* Inhalte Steuerung */
+        .ai-collapsed-view { display: flex; align-items: center; justify-content: space-between; height: 100%; padding: 0 20px; transition: opacity 0.2s; }
+        .state-expanded .ai-collapsed-view { opacity: 0; pointer-events: none; position: absolute; }
         
-        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
+        .ai-collapsed-icon { display: flex; align-items: center; justify-content: center; color: var(--ai-accent); flex-shrink: 0; margin-right: 12px; }
+        .ai-collapsed-text { flex: 1; font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ai-collapsed-arrow { color: rgba(255,255,255,0.4); flex-shrink: 0; margin-left: 12px; }
+
+        .ai-expanded-view { display: flex; flex-direction: column; height: 100%; padding: 12px 20px calc(var(--safe-bottom) + 16px); opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s; }
+        .state-expanded .ai-expanded-view { opacity: 1; pointer-events: auto; }
+
+        .drag-pill { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25); margin: 0 auto 16px; flex-shrink: 0;}
+        .ai-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; flex-shrink: 0;}
         .ai-sheet-title { font-size: 16px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px; }
         .ai-sheet-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--spring-fast); }
         .ai-sheet-close:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
-        
+
         .ai-sheet-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 8px 4px 20px; scroll-behavior: smooth; }
         
-        /* Chat Bubbles */
-        .chat-bubble { font-size: 16px; line-height: 1.5; padding: 14px 18px; position: relative; animation: slideIn 0.3s cubic-bezier(0.2,0.9,0.3,1) both; }
-        .ai-message { background: rgba(255,255,255,0.06); color: white; border-radius: 22px; border-bottom-left-radius: 4px; align-self: flex-start; max-width: 95%; border: 1px solid rgba(255,255,255,0.03); }
-        .user-message { background: rgba(255,255,255,0.15); color: white; border-radius: 22px; border-bottom-right-radius: 4px; align-self: flex-end; max-width: 85%; }
+        /* Chat UI */
+        .chat-bubble { font-size: 16px; line-height: 1.5; padding: 0; position: relative; animation: slideIn 0.3s cubic-bezier(0.2,0.9,0.3,1) both; max-width: 100%; display: flex; flex-direction: column; gap: 8px; }
+        .ai-message { align-self: flex-start; width: 100%; }
+        .user-message { background: rgba(255,255,255,0.12); color: white; border-radius: 22px; border-bottom-right-radius: 4px; align-self: flex-end; max-width: 85%; padding: 12px 18px; font-weight: 500; }
         
-        .ai-message b { font-weight: 600; color: #fff; }
-        .ai-message p { margin-bottom: 8px; }
-        .ai-message p:last-child { margin-bottom: 0; }
-        .ai-message ul { padding-left: 20px; margin-bottom: 8px; }
+        /* --- RICH WIDGETS --- */
+        /* Fact Widget */
+        .ai-widget-text { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.03); border-radius: 22px; border-bottom-left-radius: 4px; padding: 16px 20px; color: #fff; }
+        .ai-widget-text b { font-weight: 600; color: #fff; }
         
+        /* Currency / Calculation Widget */
+        .ai-widget-currency { background: linear-gradient(135deg, #a285ff, #6c47ff); border-radius: 24px; padding: 24px; color: #fff; display: flex; flex-direction: column; box-shadow: 0 8px 24px rgba(108, 71, 255, 0.4); }
+        .currency-label { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 8px; }
+        .currency-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+        
+        /* Places Scroll Widget */
+        .ai-widget-places-scroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin: 0 -4px; padding: 0 4px 8px; scrollbar-width: none; }
+        .ai-place-card { flex: 0 0 80%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 20px; scroll-snap-align: center; display: flex; flex-direction: column; gap: 10px; }
+        .place-title { font-size: 18px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .place-info { font-size: 14px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .place-icon { color: var(--ai-accent); flex-shrink: 0; }
+
         /* Follow-up Input */
-        .ai-followup-form { display: flex; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+        .ai-followup-form { display: flex; gap: 10px; margin-top: auto; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); flex-shrink: 0;}
         .ai-followup-form input { flex: 1; background: transparent; border: none; color: white; font-size: 16px; padding: 0 16px; outline: none; -webkit-appearance: none; }
         .ai-followup-form input::placeholder { color: rgba(255,255,255,0.4); }
         .ai-followup-form button { width: 36px; height: 36px; border-radius: 18px; background: white; border: none; color: black; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0; }
@@ -145,7 +175,7 @@
             backdrop-filter: blur(50px) saturate(250%) brightness(1.15); -webkit-backdrop-filter: blur(50px) saturate(250%) brightness(1.15);
             padding: 6px; border-radius: 100px; 
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), inset 0 -1px 1px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.6);
-            display: flex; align-items: center; gap: 6px; z-index: 100; transition: var(--spring-fast);
+            display: flex; align-items: center; gap: 6px; z-index: 100; transition: var(--spring-smooth);
         }
         .search-circle-btn {
             width: 40px; height: 40px; border-radius: 20px; background: rgba(255,255,255,0.1); border: none; display: flex; justify-content: center; align-items: center;
@@ -154,7 +184,6 @@
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
         .search-circle-btn svg { width: 18px; height: 18px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
-        /* KI Button in der Bottom Bar (Not purple, sleek glass design) */
         .ai-reopen-btn {
             width: 40px; height: 40px; border-radius: 20px; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); display: none; color: white;
@@ -176,10 +205,7 @@
         .card:active { transform: scale(0.98); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         
-        .color-pill {
-            display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; 
-        }
+        .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 
         .card-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; word-break: break-word; overflow-wrap: break-word; }
@@ -210,10 +236,6 @@
         .modal-content input.gemini-input { margin-top: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; }
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast);}
         .modal-content button:active { transform: scale(0.95); }
-        
-        /* Loading skeleton for AI */
-        .typing-indicator { display: inline-block; width: 12px; animation: ellipsis 1.2s infinite; }
-        @keyframes ellipsis { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } }
     </style>
 </head>
 <body>
@@ -221,10 +243,10 @@
     <div id="setup-modal">
         <div class="modal-content">
             <h2 style="font-weight: 600; font-size: 20px; margin-bottom: 8px;">API Setup</h2>
-            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suce)" autocomplete="off" spellcheck="false">
+            <input type="text" id="apiKeyInput" placeholder="Serper Key (Web Suche)" autocomplete="off" spellcheck="false">
             <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini liefert schnelle Direktantworten. Serper liefert das Web.</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px;">Gemini formatiert intelligente und visuelle Antworten.</p>
         </div>
     </div>
 
@@ -253,25 +275,39 @@
         </div>
     </div>
 
-    <div id="ai-sheet">
-        <div class="drag-pill"></div>
-        <div class="ai-sheet-header">
-            <div class="ai-sheet-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-                Intelligence
+    <div id="ai-container" class="state-hidden">
+        
+        <div class="ai-collapsed-view" onclick="expandAiSheet()">
+            <div class="ai-collapsed-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
             </div>
-            <button class="ai-sheet-close" onclick="closeAiSheet()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+            <div class="ai-collapsed-text" id="ai-collapsed-text">Denke nach...</div>
+            <div class="ai-collapsed-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </div>
         </div>
-        <div class="ai-sheet-content" id="ai-sheet-content">
+
+        <div class="ai-expanded-view">
+            <div class="drag-pill"></div>
+            <div class="ai-sheet-header">
+                <div class="ai-sheet-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ai-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                    Intelligence
+                </div>
+                <button class="ai-sheet-close" onclick="closeAiSheetCompletely()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
-        <form class="ai-followup-form" onsubmit="handleAiFollowup(event)">
-            <input type="text" id="aiFollowupInput" placeholder="Fragen..." autocomplete="off">
-            <button type="submit">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-            </button>
-        </form>
+            <div class="ai-sheet-content" id="ai-sheet-content">
+                </div>
+            <form class="ai-followup-form" onsubmit="handleAiFollowup(event)">
+                <input type="text" id="aiFollowupInput" placeholder="Fragen..." autocomplete="off">
+                <button type="submit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                </button>
+            </form>
+        </div>
+
     </div>
 
     <div id="bottom-bar">
@@ -284,8 +320,8 @@
             <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
             <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
         </div>
-        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="openAiSheet()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        <button class="ai-reopen-btn" id="aiReopenBtn" onclick="restoreAiPill()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
         </button>
     </div>
 
@@ -299,7 +335,8 @@
         const tabSlider = document.getElementById('tabSlider');
         const tabs = document.querySelectorAll('.tab');
         
-        const aiSheet = document.getElementById('ai-sheet');
+        const aiContainer = document.getElementById('ai-container');
+        const aiCollapsedText = document.getElementById('ai-collapsed-text');
         const aiContent = document.getElementById('ai-sheet-content');
         const aiReopenBtn = document.getElementById('aiReopenBtn');
         const bottomBar = document.getElementById('bottom-bar');
@@ -422,6 +459,13 @@
             document.getElementById(`view-${type}`).classList.add('active');
             currentType = type;
             
+            if (type !== 'search') {
+                aiContainer.className = 'state-hidden';
+                aiReopenBtn.classList.remove('active');
+            } else if (state['search'].loaded && aiContent.innerHTML.trim() !== '') {
+                restoreAiPill();
+            }
+
             if (currentQuery && !state[currentType].loaded) {
                 renderSkeletons(currentType); 
                 performSearch(currentType, false, true);
@@ -456,6 +500,9 @@
         }
 
         function triggerNewSearch() {
+            aiContainer.className = 'state-hidden';
+            aiReopenBtn.classList.remove('active');
+
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
@@ -469,36 +516,35 @@
             
             performSearch(currentType, false, true);
             
-            if (getCookie('gemini_api_key')) {
-                fetchGeminiAI(currentQuery, false);
+            if (getCookie('gemini_api_key') && currentType === 'search') {
+                fetchGeminiAIBottomSheet(currentQuery, false);
             }
         }
 
         function openSearch() { searchOverlay.classList.add('active'); overlaySearchInput.focus(); }
         function closeSearch() { searchOverlay.classList.remove('active'); overlaySearchInput.blur(); }
 
-        // --- GEMINI KI LOGIK (Mit Folgefragen) ---
-        function openAiSheet() {
-            aiSheet.classList.add('active');
+        /* --- KI WIDGET LOGIK --- */
+        function showAiPill() {
+            aiContainer.className = 'state-collapsed';
+            bottomBar.style.transform = 'translate(-50%, 0)';
             aiReopenBtn.classList.remove('active');
+        }
+
+        function expandAiSheet() {
+            aiContainer.className = 'state-expanded';
             bottomBar.style.transform = 'translate(-50%, 150%)'; 
         }
 
-        function closeAiSheet() {
-            aiSheet.classList.remove('active');
+        function closeAiSheetCompletely() {
+            aiContainer.className = 'state-hidden';
+            bottomBar.style.transform = 'translate(-50%, 0)';
             aiReopenBtn.classList.add('active'); 
-            bottomBar.style.transform = 'translate(-50%, 0)'; 
             followupInput.blur();
         }
 
-        function formatMarkdown(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>')
-                .replace(/^- (.*)/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        function restoreAiPill() {
+            showAiPill();
         }
 
         function handleAiFollowup(e) {
@@ -507,32 +553,63 @@
             if(q) {
                 followupInput.value = '';
                 followupInput.blur();
-                fetchGeminiAI(q, true);
+                fetchGeminiAIBottomSheet(q, true);
             }
         }
 
-        async function fetchGeminiAI(query, isFollowUp = false) {
+        function renderAiWidget(dataObj) {
+            if (dataObj.type === 'currency') {
+                return `
+                <div class="ai-widget-currency">
+                    <div class="currency-label">${dataObj.currency.from} =</div>
+                    <div class="currency-value">${dataObj.currency.to}</div>
+                </div>`;
+            } else if (dataObj.type === 'places' && dataObj.places && dataObj.places.length > 0) {
+                let cards = dataObj.places.map(p => `
+                    <div class="ai-place-card">
+                        <div class="place-title">${p.name}</div>
+                        ${p.address ? `<div class="place-info"><svg class="place-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${p.address}</div>` : ''}
+                        ${p.hours ? `<div class="place-info"><svg class="place-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${p.hours}</div>` : ''}
+                        ${p.website ? `<div class="place-info"><svg class="place-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> <a href="${p.website}" target="_blank" style="color:inherit;">Website</a></div>` : ''}
+                    </div>
+                `).join('');
+                return `<div class="ai-widget-places-scroll">${cards}</div>`;
+            } else {
+                let htmlText = dataObj.details || dataObj.short_answer || '';
+                htmlText = htmlText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                return `<div class="ai-widget-text">${htmlText}</div>`;
+            }
+        }
+
+        async function fetchGeminiAIBottomSheet(query, isFollowUp = false) {
             const geminiKey = getCookie('gemini_api_key');
             if (!geminiKey) return;
 
             if (!isFollowUp) {
                 aiChatHistory = [];
                 aiContent.innerHTML = '';
+                aiCollapsedText.innerText = "Denke nach...";
+                showAiPill();
             } else {
                 aiContent.innerHTML += `<div class="chat-bubble user-message">${query}</div>`;
+                requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
             }
 
             const loadingId = `loading-${Date.now()}`;
-            aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><span style="opacity:0.6;">Denke nach...</span></div>`;
+            aiContent.innerHTML += `<div class="chat-bubble ai-message" id="${loadingId}"><div class="ai-widget-text">Denke nach...</div></div>`;
             
-            requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
-            if (!isFollowUp) openAiSheet();
+            const prompt = `Du bist ein hilfreicher Suchassistent. Antworte AUSSCHLIESSLICH im folgenden JSON Format. Keine Markdown-Blöcke um das JSON, nur pures valid JSON.
+            Schema:
+            {
+              "type": "currency" oder "places" oder "text",
+              "short_answer": "Extrem kurzer Satz für die Vorschau (max 6 Wörter).",
+              "currency": {"from": "100 CHF", "to": "105.40 EUR"}, // Nur befüllen wenn type=currency
+              "places": [{"name": "Ort 1", "address": "Mustergasse 1", "hours": "Geöffnet bis 22:00", "website": "https..."}], // Nur wenn type=places
+              "details": "Detailtext mit **Fettgedrucktem** falls type=text"
+            }
+            Nutzeranfrage: "${query}"`;
 
-            const prompt = isFollowUp 
-                ? `Neue Frage des Nutzers: "${query}". Antworte basierend auf dem bisherigen Kontext. Antworte extrem kurz, präzise und direkt auf den Punkt.`
-                : `Der Nutzer sucht nach: "${query}". Antworte extrem kurz, präzise und brandaktuell. Wenn es eine Rechenaufgabe/Währung ist, gib nur das Resultat. Wenn es eine Faktenfrage ist, antworte direkt im 1. Satz. Wenn es um lokale Orte geht, nenne 2 konkrete Beispiele. Keine langen Einleitungen. Nutze Fett-Druck (**) für wichtige Daten.`;
-
-            // Append to context array
+            // Für History merkt sich die KI die Inputs
             aiChatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
             try {
@@ -541,24 +618,36 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: aiChatHistory,
-                        generationConfig: { temperature: 0.1, maxOutputTokens: 250 }
+                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
                     })
                 });
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
-                const answerText = data.candidates[0].content.parts[0].text;
-                aiChatHistory.push({ role: "model", parts: [{ text: answerText }] });
+                const rawJsonStr = data.candidates[0].content.parts[0].text;
+                aiChatHistory.push({ role: "model", parts: [{ text: rawJsonStr }] });
 
-                document.getElementById(loadingId).innerHTML = `<p>${formatMarkdown(answerText)}</p>`;
+                const parsedData = JSON.parse(rawJsonStr);
+                
+                // Update Pill Text
+                if (!isFollowUp) {
+                    aiCollapsedText.innerText = parsedData.short_answer || 'Antwort bereit.';
+                }
+                
+                // Render Widget
+                document.getElementById(loadingId).innerHTML = renderAiWidget(parsedData);
+
             } catch (error) {
-                document.getElementById(loadingId).innerHTML = '<span style="color:#ff6b6b;">KI konnte nicht laden. Bitte überprüfe den API Key.</span>';
-                aiChatHistory.pop(); // Remove failed prompt
+                console.error("AI Error", error);
+                if (!isFollowUp) aiCollapsedText.innerText = "Fehler bei der KI.";
+                document.getElementById(loadingId).innerHTML = '<div class="ai-widget-text" style="color:#ff6b6b;">KI Antwort konnte nicht geladen werden.</div>';
+                aiChatHistory.pop(); 
             }
             requestAnimationFrame(() => aiContent.scrollTop = aiContent.scrollHeight);
         }
 
+        // --- STANDARD SERPER RENDER LOGIK ---
         function renderSkeletons(type) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
@@ -612,21 +701,6 @@
                 isLoading = false; 
             }
         }
-
-        function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
-
-        window.toggleSitelinks = function(btn) {
-            const container = btn.closest('.card').querySelector('.sitelinks-container');
-            if (container.style.gridTemplateRows === '1fr') {
-                container.style.gridTemplateRows = '0fr';
-                btn.style.transform = 'rotate(0deg)';
-                btn.style.background = 'rgba(255,255,255,0.05)';
-            } else {
-                container.style.gridTemplateRows = '1fr';
-                btn.style.transform = 'rotate(180deg)';
-                btn.style.background = 'rgba(255,255,255,0.15)';
-            }
-        };
 
         async function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
