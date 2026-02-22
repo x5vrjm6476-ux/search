@@ -245,7 +245,7 @@
             <input type="text" id="apiKeyInput" placeholder="Serper Key (Suche)" autocomplete="off" spellcheck="false">
             <input type="text" id="geminiKeyInput" class="gemini-input" placeholder="Gemini Key (Gratis KI)" autocomplete="off" spellcheck="false">
             <button onclick="saveApiKeys()">Speichern</button>
-            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 16px; line-height: 1.4;">Gemini liefert interaktive Widgets & intelligente Antworten.</p>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 16px; line-height: 1.4;">Gemini liefert interaktive Widgets & Echtzeit-Antworten.</p>
         </div>
     </div>
 
@@ -338,9 +338,9 @@
         let aiHistory = []; 
         
         const state = {
-            search: { page: 1, loaded: false },
-            images: { page: 1, loaded: false },
-            shopping: { page: 1, loaded: false }
+            search: { page: 1, loaded: false, lastSearchData: null },
+            images: { page: 1, loaded: false, lastSearchData: null },
+            shopping: { page: 1, loaded: false, lastSearchData: null }
         };
 
         const colorCache = new Map();
@@ -489,13 +489,14 @@
             triggerNewSearch();
         }
 
-        function triggerNewSearch() {
+        async function triggerNewSearch() {
             forceCloseAiSheet();
             aiReopenBtn.classList.remove('active');
 
             Object.keys(state).forEach(k => {
                 state[k].page = 1;
                 state[k].loaded = false;
+                state[k].lastSearchData = null;
                 const vp = document.getElementById(`view-${k}`);
                 const content = vp.querySelector('.results-content');
                 content.querySelectorAll('.page-block, .grid-page, .empty-state').forEach(el => el.remove());
@@ -504,11 +505,19 @@
             requestAnimationFrame(() => updateTabSlider(document.querySelector('.tab.active')));
             renderSkeletons(currentType);
             
-            performSearch(currentType, false, true);
+            const autoOpen = shouldAutoOpenAI(currentQuery);
+            if (currentType === 'search' && getCookie('gemini_api_key')) {
+                if (autoOpen) {
+                    openAiSheetCompact(false);
+                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Suche Echtzeit-Daten...</span>';
+                }
+            }
+
+            await performSearch(currentType, false, true);
             
             if (currentType === 'search' && getCookie('gemini_api_key')) {
                 aiHistory = []; 
-                fetchGeminiAI(currentQuery, true);
+                fetchGeminiAI(currentQuery, true, autoOpen);
             }
         }
 
@@ -533,7 +542,7 @@
             bottomBar.style.transform = 'translate(-50%, 150%)'; 
             
             if (manual && aiHistory.length === 0) {
-                fetchGeminiAI(currentQuery, false);
+                fetchGeminiAI(currentQuery, false, true);
             }
         }
 
@@ -564,18 +573,18 @@
             bottomBar.style.transform = 'translate(-50%, 0)'; 
         }
 
-        // Apple-style Solid Colors für Währungen
+        // Apple-style Solid Colors 
         function getCurrencyColor(code) {
             const colors = {
-                'EUR': '#007AFF', // Apple Blue
-                'USD': '#34C759', // Apple Green
-                'CHF': '#FF3B30', // Apple Red
-                'GBP': '#5856D6', // Apple Purple
-                'JPY': '#FF9500', // Apple Orange
+                'EUR': '#0A84FF', // Apple Blue
+                'USD': '#30D158', // Apple Green
+                'CHF': '#FF453A', // Apple Red
+                'GBP': '#BF5AF2', // Apple Purple
+                'JPY': '#FF9F0A', // Apple Orange
                 'AUD': '#32ADE6', // Apple Indigo
-                'CAD': '#FFCC00'  // Apple Yellow
+                'CAD': '#FFD60A'  // Apple Yellow
             };
-            return colors[code.toUpperCase()] || '#8E8E93'; // Apple Gray Fallback
+            return colors[(code || '').toUpperCase()] || '#3A3A3C'; // Apple Gray
         }
 
         function renderJsonWidget(data) {
@@ -610,7 +619,7 @@
                             </div>
                             <div class="widget-place-actions">
                                 <a href="${searchUrl}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Karte</a>
-                                ${p.phone ? `<a href="tel:${p.phone.replace(/\s+/g,'')}" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Anrufen</a>` : ''}
+                                ${p.phone ? `<a href="tel:${p.phone.replace(/[^\d+]/g,'')}" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Anrufen</a>` : ''}
                                 ${p.website ? `<a href="${p.website}" target="_blank" class="widget-place-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Website</a>` : ''}
                             </div>
                         </div>
@@ -622,7 +631,6 @@
                 html += `<div class="ai-short-text">${data.short_answer || 'Antwort geladen.'}</div>`;
             }
 
-            // Vollständiger Text (wird erst beim Ausklappen eingeblendet)
             if (data.full_text) {
                 let formattedFull = data.full_text.replace(/\n/g, '<br>');
                 html += `<div class="ai-full-text">${formattedFull}</div>`;
@@ -631,45 +639,54 @@
             return html;
         }
 
-        async function fetchGeminiAI(query, isInitialSearch) {
+        async function fetchGeminiAI(query, isInitialSearch, shouldShowLoading) {
             const geminiKey = getCookie('gemini_api_key');
             if (!geminiKey) return;
 
             if (isInitialSearch) {
-                const autoOpen = shouldAutoOpenAI(query);
-                if (autoOpen) {
-                    openAiSheetCompact(false);
-                    aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Suche aktuelle Daten...</span>';
-                } else {
+                if (!shouldShowLoading) {
                     aiReopenBtn.classList.add('active'); 
                     return; 
                 }
             } else {
-                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Sucht Antwort...</span>';
+                aiContent.innerHTML = '<span style="opacity:0.6; font-size: 16px; font-weight: 500;">Generiere Antwort...</span>';
             }
 
             aiHistory.push({ role: "user", parts: [{ text: query }] });
 
-            const systemInstruction = `Du bist ein hilfreicher Suchassistent. Nutze zwingend "Google Search" um Echtzeitdaten abzufragen.
-            Antworte IMMER und AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Markdown-Codeblöcke um das JSON herum, gib reines JSON zurück!
+            // Echte Live-Daten von Serper extrahieren und an Gemini verfüttern (Grounding!)
+            let contextText = "Keine Live-Zusatzdaten gefunden.";
+            if (state.search.lastSearchData) {
+                const d = state.search.lastSearchData;
+                let parts = [];
+                if (d.answerBox) parts.push(`Direkte Antwort von Google: ${d.answerBox.answer || d.answerBox.snippet}`);
+                if (d.organic) parts.push(`Web-Ergebnisse:\n` + d.organic.slice(0,3).map(o => `${o.title}: ${o.snippet}`).join('\n'));
+                if (d.localResults) parts.push(`Lokale Orte:\n` + d.localResults.slice(0,3).map(l => `${l.title} (${l.address}, ${l.rating} Sterne)`).join(' | '));
+                if (parts.length > 0) contextText = parts.join('\n\n');
+            }
+
+            const systemInstruction = `Du bist ein hilfreicher KI-Suchassistent. Beantworte die Anfrage präzise. 
+            Nutze dafür zwingend die folgenden ECHTZEIT-Suchergebnisse (Wichtig für Kurse, Wetter, Fakten, Orte):
+            ---
+            ${contextText}
+            ---
+            Antworte AUSSCHLIESSLICH im untenstehenden JSON-Format! Keine Markdown-Codeblöcke um das JSON herum, gib absolut reines JSON zurück!
             
             {
               "type": "currency" | "places" | "text",
-              "short_answer": "Sehr kurze, direkte Antwort in 1 Satz ohne Einleitung.",
-              "full_text": "Ausführlichere Erklärung, Details und Kontext. Verfasse keine unnötigen Einleitungen.",
+              "short_answer": "Sehr kurze, direkte Antwort in 1 Satz (für Fakten, Alter etc.). Keine Einleitung.",
+              "full_text": "Ausführlichere Erklärung, Details und Kontext. Formatiere wichtige Begriffe mit HTML <b>Tags</b>.",
               "currency": { "from": "CHF", "to": "EUR", "amount_from": "100", "amount_to": "105.20" },
               "places": [ { "name": "Ort 1", "address": "Mustergasse 1", "phone": "+41...", "website": "https...", "hours": "Geöffnet bis 18:00" } ]
             }`;
 
             try {
-                // gemini-1.5-flash ist extrem schnell, verlässlich und unterstützt native JSON-Formate
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: aiHistory,
                         systemInstruction: { parts: [{ text: systemInstruction }] },
-                        tools: [{ googleSearch: {} }], 
                         generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
                     })
                 });
@@ -681,16 +698,15 @@
                 aiHistory.push({ role: "model", parts: [{ text: answerRaw }] });
 
                 try {
-                    // Falls das Modell doch Markdown-Tags mitsendet, bereinigen wir diese zur Sicherheit
                     const cleanJson = answerRaw.replace(/```json/gi, '').replace(/```/g, '').trim();
                     const parsedJson = JSON.parse(cleanJson);
                     aiContent.innerHTML = renderJsonWidget(parsedJson);
                 } catch (parseError) {
-                    aiContent.innerHTML = `<div class="ai-short-text">Formatierungsfehler der KI.</div><div class="ai-full-text">${answerRaw}</div>`;
+                    aiContent.innerHTML = `<div class="ai-short-text">Formatierungsfehler.</div><div class="ai-full-text">${answerRaw}</div>`;
                 }
 
             } catch (error) {
-                aiContent.innerHTML = '<span style="color:#ff3b30; font-size: 16px; font-weight:500;">Verbindungsfehler zur KI. Bitte prüfe den API Key.</span>';
+                aiContent.innerHTML = '<span style="color:#FF453A; font-size: 16px; font-weight:500;">Verbindungsfehler zur KI. Bitte prüfe den API Key.</span>';
                 aiHistory.pop(); 
             }
         }
@@ -701,7 +717,7 @@
             if(q) {
                 aiFollowUpInput.value = '';
                 aiFollowUpInput.blur();
-                fetchGeminiAI(q, false);
+                fetchGeminiAI(q, false, true);
             }
         }
         // --- ENDE KI LOGIK ---
@@ -749,6 +765,10 @@
 
                 if (!response.ok) throw new Error();
                 const data = await response.json();
+                
+                if (type === 'search' && isInitial) {
+                    state[type].lastSearchData = data;
+                }
                 
                 await renderResults(type, data, isLoadMore, isInitial);
                 state[type].loaded = true;
