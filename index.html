@@ -8,7 +8,6 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://encrypted-tbn0.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -104,14 +103,14 @@
         /* AI Compact Widget */
         #ai-compact-widget {
             position: fixed; bottom: calc(var(--safe-bottom) + 85px); left: 50%; transform: translateX(-50%) scale(0.9);
-            background: rgba(30, 30, 32, 0.6); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 100px; padding: 10px 18px 10px 14px;
+            background: rgba(30, 30, 32, 0.7); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 100px; padding: 10px 18px 10px 14px;
             display: flex; align-items: center; gap: 10px; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); transition: var(--spring-smooth); max-width: 90%; cursor: pointer;
         }
         #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: all; }
         #ai-compact-widget:active { transform: translateX(-50%) scale(0.95); }
-        .ai-icon-small { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 50%; color: white; flex-shrink: 0; }
+        .ai-icon-small { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: rgba(255,255,255,0.15); border-radius: 50%; color: white; flex-shrink: 0; }
         .ai-compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* AI Bottom Sheet */
@@ -132,7 +131,7 @@
         .ai-sheet-title { margin-top: 12px; font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;}
         .ai-sheet-close { position: absolute; right: 20px; top: 18px; width: 30px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.1); border: none; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; }
         .ai-sheet-close:active { transform: scale(0.9); }
-        .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; -webkit-overflow-scrolling: touch; }
+        .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;}
         .ai-chat-input-area { padding: 16px 20px calc(var(--safe-bottom) + 16px); background: #111112; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end;}
         .ai-chat-input { flex: 1; background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 16px; color: white; font-size: 16px; outline: none; resize: none; max-height: 100px; min-height: 44px;}
         .ai-send-btn { width: 44px; height: 44px; border-radius: 22px; background: white; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;}
@@ -140,24 +139,22 @@
         .ai-send-btn svg { fill: black; width: 20px; height: 20px; }
 
         /* AI Cards / Bubbles */
-        .ai-bubble-user { align-self: flex-end; background: #1c1c1e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; color: white; }
+        .ai-bubble-user { align-self: flex-end; background: #2c2c2e; padding: 12px 16px; border-radius: 20px 20px 4px 20px; font-size: 16px; max-width: 85%; color: white; border: 1px solid rgba(255,255,255,0.05); }
         .ai-bubble-model { align-self: flex-start; max-width: 95%; display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
-        /* Currency Widget iOS Style */
         .widget-currency { background: var(--bg-color); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
         .widget-currency-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
-        .widget-currency-amount { font-size: 32px; font-weight: 700; }
-        .widget-currency-converted { font-size: 20px; font-weight: 500; opacity: 0.9; }
+        .widget-currency-amount { font-size: 32px; font-weight: 700; color: white; }
+        .widget-currency-converted { font-size: 20px; font-weight: 500; opacity: 0.9; color: rgba(255,255,255,0.9); }
 
-        /* Place Widget iOS Style */
         .widget-place { background: #1c1c1e; border-radius: 24px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .widget-place-name { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+        .widget-place-name { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: white; }
         .widget-place-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 15px; color: #d1d1d6; }
         .widget-place-row:last-child { margin-bottom: 0; }
-        .widget-place-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; }
+        .widget-place-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; flex-shrink: 0; color: white; }
         
-        /* Fact Widget */
         .widget-fact { background: #1c1c1e; padding: 16px 20px; border-radius: 20px 20px 20px 4px; font-size: 16px; line-height: 1.5; color: white; border: 1px solid rgba(255,255,255,0.05);}
+        .ai-loader { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; padding-left: 8px; }
 
         /* Bottom Bar */
         #bottom-bar {
@@ -170,10 +167,10 @@
         }
         .search-circle-btn {
             width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15);
+            cursor: pointer; transition: var(--spring-fast); flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.15); color: white;
         }
         .search-circle-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
-        .search-circle-btn svg { width: 20px; height: 20px; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        .search-circle-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
         .tabs-container { position: relative; display: flex; padding: 4px; }
         .tab { padding: 10px 20px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.65); cursor: pointer; position: relative; z-index: 2; transition: color 0.2s ease; text-align: center; }
@@ -242,7 +239,7 @@
         .modal-content input { width: 100%; padding: 16px; margin: 10px 0; border-radius: 16px; border: none; background: #000; color: white; font-size: 15px; outline: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);}
         .modal-content button { background: white; color: black; padding: 16px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; width: 100%; transition: var(--spring-fast); margin-top: 10px;}
         .modal-content button:active { transform: scale(0.95); }
-        .modal-title { font-weight: 600; font-size: 20px; margin-bottom: 16px; }
+        .modal-title { font-weight: 600; font-size: 20px; margin-bottom: 16px; color: white;}
         .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; text-align: left; padding-left: 8px;}
     </style>
 </head>
@@ -327,12 +324,17 @@
             <button class="search-circle-btn" onclick="openSearch()">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
+            
             <div class="tabs-container">
                 <div class="tab-slider" id="tabSlider"></div>
                 <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
                 <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
                 <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
             </div>
+
+            <button class="search-circle-btn" onclick="openAiSheet(true)">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
+            </button>
         </div>
     </div>
 
@@ -364,6 +366,7 @@
 
         // AI Globals
         let geminiHistory = [];
+        let isAiThinking = false;
         const aiCompactWidget = document.getElementById('ai-compact-widget');
         const aiCompactText = document.getElementById('ai-compact-text');
         const aiSheetOverlay = document.getElementById('ai-sheet-overlay');
@@ -384,7 +387,6 @@
                     return result;
                 }
             }
-            // Fallback Dark Styling
             const fallback = { bg: `rgba(255,255,255,0.08)`, text: `#ffffff`, border: `1px solid rgba(255,255,255,0.05)` };
             colorCache.set(domain, fallback);
             return fallback;
@@ -508,10 +510,6 @@
             if(q) startSearchFrom(q);
         }
 
-        overlaySearchInput.addEventListener('blur', () => {
-            setTimeout(() => { if(searchOverlay.classList.contains('active')) closeSearch(); }, 50);
-        });
-
         function startSearchFrom(query) {
             homeView.classList.add('hidden');
             resultsWrapper.classList.add('active');
@@ -534,7 +532,7 @@
             renderSkeletons(currentType);
             performSearch(currentType, false, true);
             
-            // Trigger KI Background Check
+            // KI Background Check
             triggerGemini(currentQuery, false);
         }
 
@@ -559,10 +557,8 @@
             }
             frag.appendChild(pageBlock);
             content.appendChild(frag);
-            
             const trigger = content.querySelector('.load-more-trigger');
             if (trigger) content.appendChild(trigger);
-            
             const vp = document.getElementById(`view-${type}`);
             requestAnimationFrame(() => vp.scrollTop = vp.scrollHeight);
         }
@@ -596,39 +592,29 @@
 
         function getHostname(url) { try { return new URL(url).hostname.replace('www.', ''); } catch { return 'Link'; } }
 
-        // Render Results - JETZT MIT AWAIT FÜR FARBEN (Kein Flashing mehr)
         async function renderResults(type, data, isLoadMore, isInitial) {
             const vp = document.getElementById(`view-${type}`);
             const content = vp.querySelector('.results-content');
             let trigger = content.querySelector('.load-more-trigger');
 
             let rawItems = type === 'search' ? data.organic : (type === 'images' ? data.images : data.shopping) || [];
-            
-            if (isInitial) {
-                Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
-            }
+            if (isInitial) Array.from(content.children).forEach(child => { if(child !== trigger) child.remove(); });
             if (rawItems.length === 0) return;
 
             let items = rawItems.reverse();
             const pageBlock = document.createElement('div');
             pageBlock.className = type === 'search' ? 'page-block' : 'grid-page';
 
-            // Alle Farben asynchron vorab laden!
             let domainColors = [];
-            if (type === 'search') {
-                domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
-            }
+            if (type === 'search') domainColors = await Promise.all(items.map(item => getDominantColor(getHostname(item.link))));
 
             items.forEach((item, index) => {
-                const domain = getHostname(item.link);
-                
                 if (type === 'search') {
+                    const domain = getHostname(item.link);
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `card ${isInitial ? 'animate-in' : ''}`; el.target = '_blank';
-
                     const color = domainColors[index];
                     const styleStr = color ? `background: ${color.bg}; color: ${color.text}; border: ${color.border};` : '';
-
                     el.innerHTML = `
                         <div class="card-header"><div class="color-pill" style="${styleStr}"><span>${domain}</span></div></div>
                         <div class="card-title">${item.title}</div>
@@ -637,7 +623,6 @@
                     pageBlock.appendChild(el);
                 } 
                 else if (type === 'images') {
-                    const myIndex = globalImages.length;
                     globalImages.push(item);
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
@@ -661,7 +646,6 @@
 
             const oldScrollHeight = vp.scrollHeight;
             const oldScrollTop = vp.scrollTop;
-
             content.appendChild(pageBlock);
             if (trigger) content.appendChild(trigger); 
 
@@ -676,19 +660,18 @@
         }
 
         // ==========================================
-        // Gemini KI Integration
+        // Gemini KI Integration mit Fallback & Google Grounding
         // ==========================================
         
-        async function triggerGemini(query, isFollowUp = false) {
+        async function triggerGemini(query, isManualTrigger = false) {
             const apiKey = getCookie('gemini_api_key');
             if (!apiKey) return;
+            if (isAiThinking) return;
 
-            if (!isFollowUp) {
-                geminiHistory = [];
+            if (!isManualTrigger && geminiHistory.length === 0) {
                 aiCompactWidget.classList.remove('active');
                 aiChatContent.innerHTML = '';
-            } else {
-                // User Bubble hinzufügen
+            } else if (isManualTrigger) {
                 const userBubble = document.createElement('div');
                 userBubble.className = 'ai-bubble-user';
                 userBubble.innerText = query;
@@ -696,16 +679,28 @@
                 scrollToBottom(aiChatContent);
             }
 
-            const systemPrompt = `Du bist eine KI in einer Apple-Such-App. Antworte IMMER in striktem JSON. Analysiere die Suchanfrage.
-            - Währung (z.B. "100 chf in euro"): {"type": "currency", "shortAnswer": "100 CHF = 104.50 EUR", "color": "#E54D2E", "title": "Währungsumrechnung", "amount": "100 CHF", "converted": "104.50 EUR"} (Nutze eine passende kräftige Solid-Color HEX für "color". Dollar=Grün, Euro=Blau, CHF=Rot. KEINE Verläufe).
-            - Ort/Restaurant: {"type": "place", "shortAnswer": "Restaurant XYZ", "name": "...", "address": "...", "phone": "...", "website": "...", "email": "..."}
-            - Kurzer Fakt/Person: {"type": "fact", "shortAnswer": "Kurze Antwort (max 40 Zeichen)", "details": "Ausführliche Beschreibung..."}
-            - Normale Chat-Frage (Folgefragen): {"type": "chat", "shortAnswer": "Antwort", "details": "Längerer Text..."}
-            - Wenn Web-Suche besser ist und keine klaren Daten existieren: {"type": "none"}
-            Gib KEIN Markdown um das JSON aus (kein \`\`\`json). Nur das pure JSON Objekt.`;
+            // Neues System Prompt mit robusten Fallbacks
+            const systemPrompt = `Du bist ein intelligenter Assistent mit Google-Suche Zugriff (Grounding). Antworte IMMER in reinem JSON.
+            Regeln für das JSON-Format:
+            - Bei Währungen: {"type": "currency", "shortAnswer": "100 CHF = 104.50 EUR", "color": "#E54D2E", "title": "Währung", "amount": "100 CHF", "converted": "104.50 EUR"} (Benutze HEX Colors, keine Verläufe).
+            - Bei Orten/Unternehmen: {"type": "place", "shortAnswer": "Name", "name": "...", "address": "...", "phone": "...", "website": "..."}
+            - Bei direkten Nutzerfragen oder Fakten: {"type": "chat", "shortAnswer": "Kurze Info", "details": "Ausführliche Antwort..."}
+            - NUR wenn es eine automatische Hintergrundsuche ist UND der Begriff völlig unklar ist: {"type": "none"}
+            Gib KEIN Markdown aus, nur das JSON-Objekt!`;
 
-            if(!isFollowUp) {
-                geminiHistory.push({ role: "user", parts: [{ text: query }] });
+            geminiHistory.push({ role: "user", parts: [{ text: query }] });
+            isAiThinking = true;
+
+            // Ladeindikator im Chat
+            let loaderId = 'loader-' + Date.now();
+            if (isManualTrigger) {
+                const loader = document.createElement('div');
+                loader.id = loaderId;
+                loader.className = 'ai-loader';
+                loader.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg> Suche im Web...`;
+                loader.style.animation = 'pulse 1s infinite';
+                aiChatContent.appendChild(loader);
+                scrollToBottom(aiChatContent);
             }
 
             try {
@@ -715,21 +710,33 @@
                     body: JSON.stringify({
                         system_instruction: { parts: [{ text: systemPrompt }] },
                         contents: geminiHistory,
+                        tools: [{ googleSearch: {} }], // Grounding für neueste Web-Daten!
                         generationConfig: { response_mime_type: "application/json" }
                     })
                 });
                 
                 if (!res.ok) throw new Error("Gemini API Error");
                 const data = await res.json();
-                const textResp = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const parsed = JSON.parse(textResp);
                 
-                // Add model response to history
+                // Entferne eventuelles Markdown, falls die KI es trotzdem schickt
+                let textResp = data.candidates[0].content.parts[0].text;
+                let cleanJson = textResp.replace(/```json/gi, '').replace(/```/g, '').trim();
+                
+                let parsed;
+                try {
+                    parsed = JSON.parse(cleanJson);
+                } catch (e) {
+                    // ROBUSTES FALLBACK: Wenn JSON kaputt ist, zeige es als normalen Chat!
+                    parsed = { type: 'chat', shortAnswer: "Antwort", details: textResp };
+                }
+                
                 geminiHistory.push(data.candidates[0].content);
 
-                if (!isFollowUp) {
+                if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
+
+                if (!isManualTrigger) {
                     if (parsed.type !== 'none') {
-                        aiCompactText.innerText = parsed.shortAnswer;
+                        aiCompactText.innerText = parsed.shortAnswer || "KI Antwort verfügbar";
                         aiCompactWidget.classList.add('active');
                         appendAiCard(parsed);
                     }
@@ -738,6 +745,10 @@
                 }
             } catch (e) {
                 console.error("Gemini Error", e);
+                if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
+                if(isManualTrigger) appendAiCard({ type: 'chat', details: "Es gab leider einen Fehler bei der Verbindung zur KI." });
+            } finally {
+                isAiThinking = false;
             }
         }
 
@@ -749,8 +760,8 @@
                 wrapper.innerHTML = `
                     <div class="widget-currency" style="background-color: ${data.color || '#2E8B57'};">
                         <div class="widget-currency-title" style="color: rgba(255,255,255,0.7);">${data.title || 'Umrechnung'}</div>
-                        <div class="widget-currency-amount" style="color: white;">${data.amount}</div>
-                        <div class="widget-currency-converted" style="color: rgba(255,255,255,0.9);">${data.converted}</div>
+                        <div class="widget-currency-amount">${data.amount}</div>
+                        <div class="widget-currency-converted">${data.converted}</div>
                     </div>
                 `;
             } else if (data.type === 'place') {
@@ -761,7 +772,7 @@
                 
                 wrapper.innerHTML = `
                     <div class="widget-place">
-                        <div class="widget-place-name" style="color: white;">${data.name}</div>
+                        <div class="widget-place-name">${data.name}</div>
                         ${details}
                     </div>
                 `;
@@ -780,26 +791,35 @@
             const q = aiChatInput.value.trim();
             if(!q) return;
             aiChatInput.value = '';
-            
-            geminiHistory.push({ role: "user", parts: [{ text: q }] });
             triggerGemini(q, true);
         }
 
-        function openAiSheet() {
+        function openAiSheet(isManualBtnClick = false) {
             aiCompactWidget.classList.remove('active');
             aiSheetOverlay.classList.add('active');
-            setTimeout(() => scrollToBottom(aiChatContent), 50);
+            
+            // Wenn der User unten auf den KI-Button klickt und noch nichts geladen wurde
+            if (isManualBtnClick && aiChatContent.innerHTML.trim() === '') {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'ai-bubble-model';
+                wrapper.innerHTML = `<div class="widget-fact">Hallo! Ich habe Zugriff auf das aktuelle Internet. Was möchtest du wissen?</div>`;
+                aiChatContent.appendChild(wrapper);
+            }
+            
+            setTimeout(() => {
+                scrollToBottom(aiChatContent);
+                aiChatInput.focus();
+            }, 300);
         }
 
         function closeAiSheet() {
             aiSheetOverlay.classList.remove('active');
-            aiCompactWidget.classList.add('active');
+            if (aiChatContent.innerHTML.trim() !== '' && geminiHistory.length > 0) {
+                aiCompactWidget.classList.add('active');
+            }
         }
 
-        function scrollToBottom(el) {
-            el.scrollTop = el.scrollHeight;
-        }
-
+        function scrollToBottom(el) { el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); }
 
         // ==========================================
         // Image Viewer Logic
