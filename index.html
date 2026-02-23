@@ -88,58 +88,56 @@
         .cancel-btn { background: none; border: none; color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; padding: 10px 4px; flex-shrink: 0; transition: var(--spring-fast); }
         .cancel-btn:active { opacity: 0.6; }
 
-        .page-block { display: flex; flex-direction: column; width: 100%; gap: 20px; }
-        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 20px; align-content: start; }
+        .page-block { display: flex; flex-direction: column; width: 100%; gap: 12px; }
+        .grid-page { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; align-content: start; }
         @media (min-width: 600px) { .grid-page { grid-template-columns: repeat(3, 1fr); } }
 
         .animate-in { animation: slideIn 0.4s cubic-bezier(0.32, 0.72, 0, 1) both; }
         @keyframes slideIn { 0% { opacity: 0; transform: translateY(15px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* AI MINIATUR WIDGET (Pulsing Loader & Centered UI) */
+        /* AI MINIATUR WIDGET */
         #ai-compact-widget {
-            position: fixed; bottom: calc(var(--safe-bottom) + 75px); left: 50%; transform: translateX(-50%) scale(0.95);
+            position: fixed; bottom: calc(var(--safe-bottom) + 82px); left: 50%; transform: translateX(-50%) scale(0.95);
             background: rgba(30, 30, 32, 0.85); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 32px; padding: 6px 6px 10px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 36px; padding: 10px;
             display: flex; flex-direction: column; z-index: 90; opacity: 0; pointer-events: none;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); 
-            transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); width: 92%; max-width: 420px;
+            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1); width: 92%; max-width: 420px;
             overflow: hidden; display: none; touch-action: pan-y;
         }
         #ai-compact-widget.active { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
         
         #ai-compact-widget.is-loading {
-            background: linear-gradient(135deg, rgba(30,30,32,0.9), rgba(45,45,50,0.9), rgba(30,30,32,0.9));
-            background-size: 200% 200%; padding-bottom: 6px;
+            width: max-content; padding: 12px 24px; border-radius: 100px;
+            background: linear-gradient(135deg, rgba(30,30,32,0.9), rgba(50,50,55,0.9), rgba(30,30,32,0.9));
+            background-size: 200% 200%;
             animation: compact-shimmer 2.5s ease infinite;
         }
         @keyframes compact-shimmer { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
 
-        .compact-header-bar {
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 4px 6px; height: 36px; cursor: pointer;
+        .glow-text {
+            font-size: 15px; font-weight: 500;
+            background: linear-gradient(90deg, #fff, #8e8e93, #fff); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: text-shine 2s linear infinite; white-space: nowrap;
         }
-        .compact-header-left { display: flex; align-items: center; gap: 10px; }
-        
-        .compact-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)); border-radius: 50%; color: white; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);}
-        .compact-text { font-size: 15px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @keyframes text-shine { to { background-position: 200% center; } }
         
         .compact-close-btn {
-            background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+            position: absolute; right: 14px; top: 14px; background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
             width: 28px; height: 28px; color: white; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 100; transition: background 0.2s, transform 0.2s; flex-shrink: 0;
+            cursor: pointer; z-index: 100; transition: background 0.2s, transform 0.2s;
         }
-        .compact-close-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
+        .compact-close-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
 
         .compact-widget-container {
-            pointer-events: none; max-height: 240px; overflow: hidden; padding: 0 6px;
-            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-            display: none; margin-top: 6px; 
+            cursor: pointer; overflow: hidden;
+            display: none; padding: 2px;
         }
         .compact-widget-container .ios-ai-widget, 
         .compact-widget-container .ios-currency-card,
         .compact-widget-container .ios-place-card,
-        .compact-widget-container .ios-person-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; padding: 8px 0;}
+        .compact-widget-container .ios-person-card { box-shadow: none; border: none; margin-bottom: 0; background: transparent !important; backdrop-filter: none; padding: 6px 4px;}
 
         /* AI BOTTOM SHEET */
         #ai-sheet-overlay {
@@ -160,9 +158,9 @@
         #ai-sheet-overlay.active .ai-sheet { transform: translateY(0) scale(1); }
         .ai-sheet-header { padding: 18px; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05); touch-action: pan-y;}
         .ai-sheet-handle { width: 44px; height: 5px; background: rgba(255,255,255,0.25); border-radius: 3px; position: absolute; top: 12px; }
-        .ai-sheet-title { margin-top: 10px; font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;}
         .ai-sheet-close { position: absolute; right: 20px; top: 18px; width: 32px; height: 32px; border-radius: 16px; background: rgba(255,255,255,0.1); border: none; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; }
         .ai-sheet-close:active { transform: scale(0.85); }
+        
         .ai-chat-content { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 24px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;}
         .ai-chat-input-area { padding: 12px 20px calc(var(--safe-bottom) + 12px); background: rgba(17, 17, 18, 0.95); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-end;}
         .ai-chat-input { flex: 1; background: #242426; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 14px 18px; color: white; font-size: 16px; outline: none; resize: none; max-height: 100px; min-height: 48px; transition: var(--spring-fast);}
@@ -174,39 +172,34 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-6px); } }
         .shake-anim { animation: shake 0.3s ease-in-out; border-color: rgba(255,59,48,0.6) !important; }
 
-        /* AI Chat Bubbles & Apple-like Widgets */
+        /* AI Chat Bubbles */
         .ai-bubble-user { 
             align-self: flex-end; background: #2c2c2e; padding: 14px 18px; border-radius: 22px 22px 6px 22px; font-size: 16px; max-width: 85%; 
             color: white; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 16px; animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+        .ai-bubble-model { align-self: flex-start; max-width: 100%; width: 100%; display: flex; flex-direction: column; gap: 16px; animation: slideInChat 0.4s cubic-bezier(0.32, 0.72, 0, 1); position: relative; }
         @keyframes slideInChat { 0% { opacity: 0; transform: translateY(12px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* JSON UI CARDS */
         .ios-ai-widget {
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-        .ios-ai-widget-header { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #a1a1a6; margin-bottom: 16px; }
         .ios-ai-widget-content { color: #f2f2f7; font-size: 16px; line-height: 1.6; }
         
         .ios-currency-card {
             background: linear-gradient(135deg, rgba(36,36,38,0.8), rgba(28,28,30,0.6)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 24px; color: white;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 6px;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 22px; color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
         }
-        .ios-currency-title { font-size: 14px; font-weight: 500; color: #8e8e93; margin-bottom: 6px; }
-        .ios-currency-row { display: flex; align-items: baseline; gap: 12px; margin-top: 4px;}
-        .ios-currency-amount { font-size: 22px; font-weight: 500; color: #8e8e93; }
-        .ios-currency-converted { font-size: 42px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
-        .ios-currency-icon { color: #8e8e93; display: flex; align-items: center;}
+        .ios-currency-pill { font-size: 15px; font-weight: 600; padding: 6px 14px; border-radius: 12px; margin-bottom: 6px; }
+        .ios-currency-converted { font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; }
 
         /* Orte & Personen Karten */
         .ios-place-card, .ios-person-card {
             background: rgba(30,30,32,0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border-radius: 28px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            border-radius: 28px; padding: 22px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.2);
         }
-        .ios-place-card:last-child, .ios-person-card:last-child { margin-bottom: 0; }
         
         .ios-place-name { font-size: 20px; font-weight: 600; color: white; margin-bottom: 16px; letter-spacing: -0.2px;}
         .ios-place-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; font-size: 15px; color: #d1d1d6; line-height: 1.4;}
@@ -218,12 +211,8 @@
 
         .ios-person-card { cursor: pointer; transition: transform 0.2s, background 0.2s; }
         .ios-person-card:active { transform: scale(0.98); background: rgba(40,40,42,0.6); }
-        .ios-person-header { display: flex; align-items: center; gap: 16px; }
-        
-        /* Clean Apple Contact Avatar */
-        .ios-person-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #a1a1a6, #636366); display: flex; justify-content: center; align-items: center; color: white; flex-shrink: 0; font-size: 22px; font-weight: 500;}
-        
-        .ios-person-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .ios-person-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .ios-person-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
         .ios-person-name { font-size: 19px; font-weight: 600; color: white; letter-spacing: -0.2px;}
         .ios-person-role { font-size: 15px; color: #8e8e93; line-height: 1.3; }
         .ios-person-chevron { color: #8e8e93; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
@@ -231,8 +220,9 @@
         .ios-person-bio { display: none; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 15px; line-height: 1.6; color: #d1d1d6; animation: slideDown 0.3s ease; }
         .ios-person-card.expanded .ios-person-chevron { transform: rotate(180deg); }
         .ios-person-card.expanded .ios-person-bio { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .ai-h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 18px 0 10px 0; letter-spacing: -0.2px;}
+        .ai-h2 { font-size: 18px; font-weight: 600; color: #fff; margin: 18px 0 10px 0; letter-spacing: -0.2px;}
         .ai-h2:first-child { margin-top: 0; }
         .ai-h3 { font-size: 16px; font-weight: 600; color: #e5e5ea; margin: 16px 0 8px 0; }
         .ai-highlight { font-weight: 600; color: #fff; background: rgba(255, 255, 255, 0.12); padding: 2px 8px; border-radius: 8px; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
@@ -240,7 +230,7 @@
         .ai-li { margin-bottom: 10px; position: relative; padding-left: 20px; color: #d1d1d6;}
         .ai-li::before { content: "•"; color: #ffffff; position: absolute; left: 0; font-weight: bold; }
 
-        /* Kompakteres Bottom Bar */
+        /* Bottom Bar */
         #bottom-bar {
             position: fixed; bottom: calc(var(--safe-bottom) + 16px); left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 32, 0.55); 
@@ -266,13 +256,13 @@
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), width 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
         }
 
-        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 26px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02); margin-bottom: 20px;}
+        .card { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 22px 24px; text-decoration: none; color: inherit; display: block; border: 1px solid rgba(255,255,255,0.02);}
         .card:active { transform: scale(0.97); background-color: var(--card-hover); transition: transform 0.15s; }
         .card-header { margin-bottom: 14px; }
         .color-pill { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.05); color: #ffffff; }
         .color-pill span { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
-        .card-title { font-size: 19px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); line-height: 1.3; }
-        .card-snippet { font-size: 15px; color: var(--text-muted); line-height: 1.5; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); line-height: 1.3; }
+        .card-snippet { font-size: 14px; color: var(--text-muted); line-height: 1.5; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .image-card { border-radius: 20px; overflow: hidden; background: var(--card-bg); display: block; aspect-ratio: 4/5; cursor: zoom-in; }
         .image-card:active { transform: scale(0.95); transition: transform 0.15s; }
@@ -320,14 +310,14 @@
 
     <div id="home-view">
         <form class="home-search-wrapper" action="javascript:void(0);" onsubmit="handleHomeSubmit(event)">
-            <input type="search" id="homeSearchInput" class="home-search-input" placeholder="suchen..." autocomplete="off" spellcheck="false">
+            <input type="search" id="homeSearchInput" class="home-search-input" placeholder="Suchen..." autocomplete="off" spellcheck="false">
         </form>
     </div>
 
     <div id="search-overlay">
         <form class="overlay-bar-container" action="javascript:void(0);" onsubmit="handleOverlaySubmit(event)">
-            <input type="search" id="overlaySearchInput" class="overlay-input" placeholder="suchen..." autocomplete="off" spellcheck="false">
-            <button type="button" class="cancel-btn" onclick="closeSearch()">abbrechen</button>
+            <input type="search" id="overlaySearchInput" class="overlay-input" placeholder="Suchen..." autocomplete="off" spellcheck="false">
+            <button type="button" class="cancel-btn" onclick="closeSearch()">Abbrechen</button>
         </form>
     </div>
 
@@ -342,16 +332,11 @@
     </div>
 
     <div id="ai-compact-widget">
-        <div class="compact-header-bar" onclick="openAiSheet()">
-            <div class="compact-header-left">
-                <div class="compact-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                </div>
-                <div class="compact-text" id="ai-compact-text">intelligente antwort...</div>
-            </div>
-            <button class="compact-close-btn" onclick="closeCompactWidget(event)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-            </button>
+        <button class="compact-close-btn" id="compact-close-btn" onclick="closeCompactWidget(event)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+        <div class="compact-loading-state" id="compact-loading-state" style="display:none;">
+            <div class="glow-text">Ich denke nach...</div>
         </div>
         <div class="compact-widget-container" id="compact-widget-container" onclick="openAiSheet()"></div>
     </div>
@@ -360,18 +345,14 @@
         <div class="ai-sheet">
             <div class="ai-sheet-header" id="ai-sheet-header">
                 <div class="ai-sheet-handle"></div>
-                <div class="ai-sheet-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                    intelligente antwort
-                </div>
                 <button class="ai-sheet-close" onclick="closeAiSheet()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                 </button>
             </div>
             <div class="ai-chat-content" id="ai-chat-content">
                 </div>
             <form class="ai-chat-input-area" onsubmit="handleAiChat(event)">
-                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="folgefrage stellen..." autocomplete="off">
+                <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Folgefrage stellen..." autocomplete="off">
                 <button type="submit" class="ai-send-btn" id="ai-send-btn">
                     <svg viewBox="0 0 24 24"><path d="M3 20V4l19 8-19 8zm2-3l11.85-5L5 7v3.5l6 1.5-6 1.5V17z"/></svg>
                 </button>
@@ -397,9 +378,9 @@
             
             <div class="tabs-container">
                 <div class="tab-slider" id="tabSlider"></div>
-                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">web</div>
-                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">bilder</div>
-                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">shopping</div>
+                <div class="tab active" data-type="search" onclick="switchTab(this, 'search')">Web</div>
+                <div class="tab" data-type="images" onclick="switchTab(this, 'images')">Bilder</div>
+                <div class="tab" data-type="shopping" onclick="switchTab(this, 'shopping')">Shopping</div>
             </div>
 
             <button class="search-circle-btn" onclick="triggerManualAi()">
@@ -440,7 +421,8 @@
         let activeGeminiModel = null; 
         let isAiThinking = false;
         const aiCompactWidget = document.getElementById('ai-compact-widget');
-        const aiCompactText = document.getElementById('ai-compact-text');
+        const aiCompactCloseBtn = document.getElementById('compact-close-btn');
+        const aiCompactLoadingState = document.getElementById('compact-loading-state');
         const aiCompactContainer = document.getElementById('compact-widget-container');
         const aiSheetOverlay = document.getElementById('ai-sheet-overlay');
         const aiSheet = document.querySelector('.ai-sheet');
@@ -740,7 +722,6 @@
                     });
                     const el = document.createElement('a');
                     el.href = item.link; el.className = `image-card ${isInitial ? 'animate-in' : ''}`;
-                    // Wieder Thumbnails für extrem schnelles Laden!
                     el.innerHTML = `<img src="${item.thumbnailUrl || item.imageUrl}" loading="lazy" onerror="this.closest('.image-card').remove();">`;
                     el.onclick = function(e) { e.preventDefault(); openImageViewer(this); };
                     pageBlock.appendChild(el);
@@ -822,7 +803,6 @@
         function parseAiJsonToHtml(rawText, isCompactMode = false) {
             let html = '';
             try {
-                // Bereinige evtl. markdown
                 let cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const blocks = JSON.parse(cleanJson);
                 
@@ -835,15 +815,14 @@
                     const data = block.data;
 
                     if (type === 'currency') {
+                        const col = data.color || '#0a84ff';
                         html += `
                             <div class="ios-currency-card">
-                                <div class="ios-currency-title">${data.title || 'währungsumrechnung'}</div>
-                                <div class="ios-currency-row">
-                                    <div class="ios-currency-amount">${data.amount || ''}</div>
-                                    <div class="ios-currency-icon">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </div>
-                                    <div class="ios-currency-converted" style="color: ${data.color || '#0a84ff'};">${data.converted || ''}</div>
+                                <div class="ios-currency-pill" style="color: ${col}; background: ${col}20;">
+                                    ${data.amount || ''}
+                                </div>
+                                <div class="ios-currency-converted" style="color: ${col};">
+                                    ${data.converted || ''}
                                 </div>
                             </div>
                         `;
@@ -860,7 +839,7 @@
                             details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div><span><a href="tel:${data.phone}">${data.phone}</a></span></div>`;
                         }
                         if(data.website && data.website.toLowerCase() !== 'nicht verfügbar') {
-                            details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span><a href="${data.website}" target="_blank">website besuchen</a></span></div>`;
+                            details += `<div class="ios-place-row"><div class="ios-place-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><span><a href="${data.website}" target="_blank">Website besuchen</a></span></div>`;
                         }
 
                         html += `
@@ -871,13 +850,9 @@
                         `;
                     } 
                     else if (type === 'person') {
-                        // Schicke Apple Avatar Initialen (die ersten Buchstaben)
-                        const initials = (data.name || 'P').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                        
                         html += `
                             <div class="ios-person-card" onclick="this.classList.toggle('expanded')">
                                 <div class="ios-person-header">
-                                    <div class="ios-person-avatar">${initials}</div>
                                     <div class="ios-person-info">
                                         <div class="ios-person-name">${data.name || ''}</div>
                                         <div class="ios-person-role">${data.role || ''} • ${data.info || ''}</div>
@@ -895,7 +870,6 @@
                     }
                 }
             } catch (e) {
-                // Fallback, wenn das Modell wider Erwarten kein reines JSON liefert
                 html = formatBasicTextToHtml(rawText);
             }
             return html;
@@ -930,10 +904,6 @@
 
             return `
                 <div class="ios-ai-widget">
-                    <div class="ios-ai-widget-header">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"></path></svg>
-                        <span>intelligente antwort</span>
-                    </div>
                     <div class="ios-ai-widget-content">${finalHtml}</div>
                 </div>
             `;
@@ -985,33 +955,32 @@
 
             const modelName = await getValidModel(apiKey);
 
-            // STRIKTER JSON PROMPT - Viel robuster und fehlerfrei beim Parsen!
-            const systemPrompt = `du bist ein brillanter, präziser ki-assistent.
-WICHTIG: antworte AUSSCHLIESSLICH in validem JSON als Array von Objekten. keine markdown code blöcke, nur das reine JSON-array!
-verwende immer durchgehend kleinschreibung. nutze nur die typen, die für die frage sinn machen.
+            // STRIKTER JSON PROMPT OHNE CAPSLOCK ZWANG
+            const systemPrompt = `Du bist ein brillanter, präziser KI-Assistent.
+WICHTIG: Antworte AUSSCHLIESSLICH in validem JSON als Array von Objekten. Keine Markdown Code Blöcke, nur das reine JSON-Array!
+Verwende ganz normale, korrekte Groß- und Kleinschreibung.
 
-beispiel-struktur, exakt so einhalten:
+Beispiel-Struktur, exakt so einhalten:
 [
-  { "type": "currency", "data": { "title": "währungsumrechnung", "amount": "100 €", "converted": "105 $", "color": "#007aff" } },
-  { "type": "place", "data": { "name": "restaurant name", "address": "musterstraße 1", "phone": "01234", "hours": "08:00 - 22:00", "website": "https..." } },
-  { "type": "person", "data": { "name": "steve jobs", "role": "mitgründer, apple", "info": "1955-2011", "bio": "ausführliche beschreibung hier..." } },
-  { "type": "text", "data": { "content": "normaler text hier mit **fettdruck** falls nötig." } }
+  { "type": "currency", "data": { "amount": "100 €", "converted": "105 $", "color": "#007AFF" } },
+  { "type": "place", "data": { "name": "Restaurant Name", "address": "Musterstraße 1", "phone": "01234", "hours": "08:00 - 22:00", "website": "https..." } },
+  { "type": "person", "data": { "name": "Steve Jobs", "role": "Mitgründer, Apple", "info": "1955-2011", "bio": "Ausführliche Beschreibung hier..." } },
+  { "type": "text", "data": { "content": "Normaler Text hier mit **Fettdruck** falls nötig." } }
 ]`;
 
-            let combinedText = "anweisung: " + systemPrompt + "\n\n";
+            let combinedText = "Anweisung: " + systemPrompt + "\n\n";
             if (geminiHistory.length > 0) {
                 for (let msg of geminiHistory) {
-                    const role = msg.role === 'user' ? 'user' : 'ki';
+                    const role = msg.role === 'user' ? 'User' : 'KI';
                     combinedText += `${role}: ${msg.parts[0].text}\n`;
                 }
-                combinedText += "\naktuelle frage:\n";
+                combinedText += "\nAktuelle Frage:\n";
             }
             combinedText += query;
 
             const flatContents = [{ role: "user", parts: [{ text: combinedText }] }];
 
             try {
-                // Grounding Tool ist an, aber wir zwingen es zur JSON ausgabe im System prompt
                 const payload = { contents: flatContents, tools: [{ googleSearch: {} }] };
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
@@ -1019,7 +988,6 @@ beispiel-struktur, exakt so einhalten:
                 if (res.ok) return await res.json();
             } catch(e) { }
 
-            // Fallback Request
             const basePayload = { contents: [...geminiHistory, { role: "user", parts: [{ text: query }] }] };
             const resFallback = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(basePayload)
@@ -1027,7 +995,7 @@ beispiel-struktur, exakt so einhalten:
             
             if (!resFallback.ok) {
                 activeGeminiModel = null;
-                throw new Error("api limit oder fehler");
+                throw new Error("API Limit oder Fehler");
             }
             return await resFallback.json();
         }
@@ -1037,12 +1005,14 @@ beispiel-struktur, exakt so einhalten:
                 aiCompactWidget.style.display = 'flex';
                 aiCompactWidget.classList.add('active');
                 aiCompactWidget.classList.add('is-loading');
-                aiCompactText.innerText = 'ich denke nach...';
+                aiCompactLoadingState.style.display = 'block';
+                aiCompactCloseBtn.style.display = 'none';
                 aiCompactContainer.style.display = 'none';
                 aiCompactContainer.innerHTML = '';
             } else {
                 aiCompactWidget.classList.remove('is-loading');
-                aiCompactText.innerText = 'intelligente antwort';
+                aiCompactLoadingState.style.display = 'none';
+                aiCompactCloseBtn.style.display = 'flex';
                 aiCompactContainer.style.display = 'block';
             }
         }
@@ -1060,15 +1030,16 @@ beispiel-struktur, exakt so einhalten:
             if (isManualTrigger) {
                 const loader = document.createElement('div');
                 loader.id = loaderId;
-                loader.style.padding = '12px 18px';
-                loader.style.borderRadius = '24px';
+                loader.style.padding = '12px 24px';
+                loader.style.borderRadius = '100px';
                 loader.style.background = 'linear-gradient(270deg, rgba(40,40,42,0.6), rgba(60,60,65,0.6), rgba(40,40,42,0.6))';
                 loader.style.backgroundSize = '200% 200%';
                 loader.style.animation = 'compact-shimmer 2s ease infinite';
                 loader.style.width = 'fit-content';
                 loader.style.color = 'white';
                 loader.style.fontSize = '15px';
-                loader.innerText = 'ich suche die antwort...';
+                loader.style.fontWeight = '500';
+                loader.innerText = 'Ich denke nach...';
                 
                 aiChatContent.appendChild(loader);
                 scrollToBottom(aiChatContent);
@@ -1087,7 +1058,7 @@ beispiel-struktur, exakt so einhalten:
                     }
                 }
 
-                if (!textResp.trim()) { throw new Error("kein text gefunden."); }
+                if (!textResp.trim()) { throw new Error("Kein Text gefunden."); }
                 
                 geminiHistory.push({ role: "user", parts: [{ text: query }] });
                 geminiHistory.push({ role: "model", parts: [{ text: textResp }] });
@@ -1105,7 +1076,7 @@ beispiel-struktur, exakt so einhalten:
                 if (searchId !== currentSearchId) return;
                 if (document.getElementById(loaderId)) document.getElementById(loaderId).remove();
                 if(isManualTrigger) {
-                    appendAiCard(`[ { "type": "text", "data": { "content": "es gab leider einen fehler bei der verbindung zur ki. (${e.message})" } } ]`);
+                    appendAiCard(`[ { "type": "text", "data": { "content": "Es gab leider einen Fehler bei der Verbindung zur KI. (${e.message})" } } ]`);
                 } else {
                     closeCompactWidget();
                 }
